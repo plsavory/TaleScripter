@@ -1,5 +1,6 @@
 #include "SFML/Graphics.hpp"
 #include <iostream>
+#include "Resource/TextureManager.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
 
 SpriteRenderer::SpriteRenderer(sf::RenderWindow *window) {

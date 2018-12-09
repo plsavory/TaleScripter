@@ -4,6 +4,7 @@
 #ifndef BASE_GAME_SCREEN_INCLUDED
 #define BASE_GAME_SCREEN_INCLUDED
 
+#include "Resource/ResourceManager.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
 
 class GameScreen {

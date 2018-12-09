@@ -13,7 +13,7 @@ enum GameState {
 
 class GameManager {
 public:
-  GameManager(sf::RenderWindow *window);
+  GameManager(sf::RenderWindow *window, ResourceManager *rManager);
   ~GameManager();
   void init();
   void update();

@@ -7,6 +7,7 @@ GAME_FRAMEWORK_FILES = Game/Src/TileRenderer/Tile.cpp Game/Src/TileRenderer/Tile
 LIBRARIES = -L Libs/SFML/lib -lsfml-graphics -lsfml-window -lsfml-system
 
 INPUT_MANAGER_FILES = Game/Src/Input/InputManager.cpp Game/Src/Input/KeyboardHandler.cpp Game/Src/Input/Keymap.cpp Game/Src/Input/GamepadHandler.cpp Game/Src/Input/MouseHandler.cpp
+RESOURCE_MANAGER_FILES = Game/Src/Resource/ResourceManager.cpp Game/Src/Resource/TextureManager.cpp
 
 all:
-	$(CC) $(CFLAGS) $(DIRECTORIES_TO_INCLUDE) $(GAME_FRAMEWORK_FILES) $(INPUT_MANAGER_FILES) $(FILES_TO_COMPILE) $(LIBRARIES) -o build\Test
+	$(CC) $(CFLAGS) $(DIRECTORIES_TO_INCLUDE) $(GAME_FRAMEWORK_FILES) $(INPUT_MANAGER_FILES) $(RESOURCE_MANAGER_FILES) $(FILES_TO_COMPILE) $(LIBRARIES) -o build\Test

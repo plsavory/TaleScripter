@@ -3,6 +3,7 @@
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"
 #include "SFML/Graphics.hpp"
+#include "Resource/ResourceManager.hpp"
 #include "Base/GameManager.hpp"
 #include "Base/Game.hpp"
 

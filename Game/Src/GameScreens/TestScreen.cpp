@@ -1,17 +1,25 @@
 #include "SFML/Graphics.hpp"
+#include "Resource/ResourceManager.hpp"
 #include "GameScreens/TestScreen.hpp"
 #include <iostream>
 
-TestScreen::TestScreen(sf::RenderWindow *windowPointer) {
+TestScreen::TestScreen(sf::RenderWindow *windowPointer, ResourceManager *rManager) {
   window = windowPointer;
 
   spriteRenderer = new SpriteRenderer(window);
   sprite = new Sprite(window);
 
-  testImage = new sf::Texture();
-  testImage->loadFromFile("testassets\\uzume.jpg");
+  // Load an image as a test
+  rManager->loadTexture("testassets\\uzume.jpg", "uzume");
 
-  sprite->setImage(testImage);
+  /*
+    Without this call to rManager-Update() being here, the image will not display.
+    This is because we are setting an image on something which hasn't loaded yet.
+    TODO: Load a texture into a sprite using the SpriteHandler class only once it has loaded
+   */
+  rManager->update();
+
+  sprite->setImage(rManager->getTexture("uzume")->texture);
   sprite->setPosition(0,0);
 }
 

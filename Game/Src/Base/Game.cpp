@@ -8,6 +8,7 @@
 #include <iostream>
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"
+#include "Resource/ResourceManager.hpp"
 #include "SFML/Graphics.hpp"
 #include "Base/GameManager.hpp"
 #include "Base/Game.hpp"
@@ -24,6 +25,7 @@ Game::Game() {
  */
 Game::~Game() {
   delete(gameManager);
+  delete(resourceManager);
 }
 
 /**
@@ -35,7 +37,12 @@ void Game::run() {
   // Initialise SFML
   window = new sf::RenderWindow(sf::VideoMode(1280,720), gameTitle, sf::Style::Close);
   window->setFramerateLimit(60);
-  gameManager = new GameManager(window);
+
+  // Create ResourceManager to spin up the resource loading thread
+  resourceManager = new ResourceManager();
+
+  gameManager = new GameManager(window, resourceManager);
+
   sf::Clock updateClock;
 
   // Enter the main loop
@@ -57,10 +64,7 @@ void Game::run() {
     }
 
     // Update the game state 60 times a second
-    if (updateClock.getElapsedTime().asMilliseconds() >= 16) {
-      update();
-      updateClock.restart();
-    }
+    update(updateClock.getElapsedTime().asMilliseconds());
 
     // Clear the window
     window->clear(sf::Color::Black);
@@ -77,7 +81,8 @@ void Game::run() {
 /**
  * [Game::update Update loop, should be called once per frame]
  */
-void Game::update() {
+void Game::update(int gameTime) {
+  resourceManager->update();
   gameManager->update();
 }
 

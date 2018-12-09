@@ -1,13 +1,14 @@
 // GameManager.cpp - Manages the current game control flow. Calls the appropriate objects depending on the current state of the game.
 
 #include "SFML/Graphics.hpp"
+#include "Resource/ResourceManager.hpp"
 #include "Base/GameManager.hpp"
 
-GameManager::GameManager(sf::RenderWindow *window) {
+GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager) {
   currentGameState = GameState::Test;
 
   // Create each game GameScreen
-  testScreen = new TestScreen(window);
+  testScreen = new TestScreen(window, rManager);
 }
 
 GameManager::~GameManager() {
