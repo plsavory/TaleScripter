@@ -4,7 +4,10 @@
 #include "Base/GameManager.hpp"
 
 GameManager::GameManager(sf::RenderWindow *window) {
-  currentGameState = GameState::TestHarness;
+  currentGameState = GameState::Test;
+
+  // Create each game GameScreen
+  testScreen = new TestScreen(window);
 }
 
 GameManager::~GameManager() {
@@ -18,6 +21,9 @@ void GameManager::init() {
 void GameManager::update() {
 
   switch (currentGameState) {
+    case GameState::Test:
+    testScreen->update();
+    break;
     default:
     break;
   }
@@ -26,6 +32,9 @@ void GameManager::update() {
 
 void GameManager::draw() {
   switch (currentGameState) {
+    case GameState::Test:
+    testScreen->draw();
+    break;
     default:
     break;
   }

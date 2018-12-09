@@ -16,7 +16,7 @@
  * [Game::Game Class constructor - Initialise variables here]
  */
 Game::Game() {
-  gameManager = new GameManager(window);
+
 }
 
 /**
@@ -35,7 +35,7 @@ void Game::run() {
   // Initialise SFML
   window = new sf::RenderWindow(sf::VideoMode(1280,720), gameTitle, sf::Style::Close);
   window->setFramerateLimit(60);
-
+  gameManager = new GameManager(window);
   sf::Clock updateClock;
 
   // Enter the main loop
