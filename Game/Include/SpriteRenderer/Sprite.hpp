@@ -9,6 +9,7 @@ public:
   void setPosition(int x, int y);
   std::string name;
   int priority;
+  bool textureSet;
 private:
   sf::Sprite *mySprite;
   sf::Texture *myImage;
@@ -18,5 +19,4 @@ private:
   std::string imageName;
   int textureId;
   TextureManager *textureManager;
-  bool textureSet;
 };

@@ -6,10 +6,17 @@
 TestScreen::TestScreen(sf::RenderWindow *windowPointer, ResourceManager *rManager, SpriteRenderer *sRenderer) {
   window = windowPointer;
   spriteRenderer = sRenderer;
+  resourceManager = rManager;
 
   // Load an image as a test
-  rManager->loadTexture("testassets\\uzume.jpg", "uzume");
+  resourceManager->loadTexture("testassets\\uzume.jpg", "uzume");
+  resourceManager->loadTexture("testassets\\uzume2.jpg", "uzume2");
+  resourceManager->loadTexture("testassets\\natsuki.jpg", "natsuki");
+  resourceManager->loadTexture("testassets\\monika.png", "monika");
   spriteRenderer->addSprite("uzume", "uzume", 1);
+  spriteRenderer->addSprite("uzume2", "uzume2", 0);
+  spriteRenderer->addSprite("natsuki", "natsuki", 9);
+  spriteRenderer->addSprite("monika", "monika", 6);
 
 }
 
@@ -26,5 +33,5 @@ void TestScreen::update() {
 }
 
 void TestScreen::draw() {
-  
+
 }

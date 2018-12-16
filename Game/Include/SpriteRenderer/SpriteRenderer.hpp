@@ -3,6 +3,8 @@
 
 #define MAX_SPRITE_COUNT 50
 #define SPRITE_RENDERER_UPDATE_DELAY 250
+#define SPRITE_RENDERER_PRIORITISE_DELAY 500
+#define SPRITE_RENDERER_MAX_PRIORITIES 5
 
 #include "SpriteRenderer/Sprite.hpp"
 
@@ -18,7 +20,6 @@ public:
   void draw();
   Sprite* getSprite(int id);
   Sprite* getSprite(std::string name);
-  int addSprite(Sprite *sprite, int priority, std::string name);
   int addSprite(std::string imageName, std::string name, int priority);
   void removeSprite(int id);
   void setCameraPosition(int x, int y);
@@ -28,9 +29,12 @@ private:
   void renderPrioritisedSprites();
   sf::RenderWindow *displayWindow;
   Sprite* sprite[MAX_SPRITE_COUNT];
+  int priorityMatrix[MAX_SPRITE_COUNT]; // TODO: Experiment with a linked list rather than a priority matrix
+  int priorityMatrixIndex;
   SpriteRenderMode renderMode;
   sf::Clock *updateClock;
   TextureManager *textureManager;
+  sf::Clock *spritePriorityClock;
 };
 
 #endif

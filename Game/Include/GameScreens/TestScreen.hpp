@@ -15,6 +15,7 @@ public:
 private:
   Sprite *sprite;
   SpriteRenderer *spriteRenderer;
+  ResourceManager *resourceManager;
   sf::Texture *testImage;
 };
 

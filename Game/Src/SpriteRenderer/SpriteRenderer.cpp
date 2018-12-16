@@ -8,14 +8,23 @@ SpriteRenderer::SpriteRenderer(sf::RenderWindow *window, TextureManager *tManage
   renderMode = SpriteRenderMode::Standard;
   textureManager = tManager;
 
-  // Initialise all sprite pointers to null so that we can test whether a sprite exists or not
+  // Initialise all sprite pointers to null and priority matrix to -1 so that we can test whether a sprite exists or not
   for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
     sprite[i] = NULL;
+    priorityMatrix[i] = -1;
   }
 
-  renderMode = SpriteRenderMode::Standard;
+  renderMode = SpriteRenderMode::Prioritised;
 
   updateClock = new sf::Clock();
+
+  if (renderMode == SpriteRenderMode::Prioritised) {
+    // TODO: Allow this to be switched on and off at will
+    spritePriorityClock = new sf::Clock();
+  } else {
+    spritePriorityClock = NULL;
+  }
+
 }
 
 SpriteRenderer::~SpriteRenderer() {
@@ -28,6 +37,7 @@ SpriteRenderer::~SpriteRenderer() {
   }
 
   delete updateClock;
+  delete spritePriorityClock;
 
 }
 
@@ -43,11 +53,18 @@ void SpriteRenderer::update() {
       }
     }
   }
+
+  if (renderMode == SpriteRenderMode::Prioritised) {
+    prioritiseSprites();
+  }
 }
 
 void SpriteRenderer::draw() {
 // TODO: add support for prioritised sprite rendering
   switch (renderMode) {
+    case SpriteRenderMode::Prioritised:
+    renderPrioritisedSprites();
+    break;
     case SpriteRenderMode::Standard:
     renderSprites();
     break;
@@ -58,6 +75,49 @@ void SpriteRenderer::draw() {
 }
 
 void SpriteRenderer::prioritiseSprites() {
+
+  // Prioritising the sprites is an expensive operation, so do this infrequently.
+  // TODO: Find the most adequate frequency to balance response and performance
+
+  if (!spritePriorityClock) {
+    return;
+  }
+
+  if (spritePriorityClock->getElapsedTime().asMilliseconds() <= SPRITE_RENDERER_PRIORITISE_DELAY) {
+    return;
+  }
+
+  // Empty the priority matrix
+  for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
+    priorityMatrix[i] = -1;
+  }
+
+  // For each priority, loop over each sprite once and allocate it a spot within the priority matrix
+  priorityMatrixIndex = 0;
+
+  for (int iPriority = 0; iPriority < MAX_SPRITE_COUNT; iPriority++) {
+    for (int iSprite = 0; iSprite < MAX_SPRITE_COUNT; iSprite++) {
+
+      // TODO: Think of other checks which might be needed to prevent rendering
+      if (!sprite[iSprite]) {
+        continue;
+      }
+
+      if (!sprite[iSprite]->textureSet) {
+        continue;
+      }
+
+      if (sprite[iSprite]->priority != iPriority) {
+        continue;
+      }
+
+      // If all of the above checks have passed, prioritise the sprite into this slot
+      priorityMatrix[priorityMatrixIndex] = iSprite;
+      priorityMatrixIndex++;
+    }
+  }
+
+  spritePriorityClock->restart();
 
 }
 
@@ -75,6 +135,14 @@ void SpriteRenderer::renderSprites() {
  */
 void SpriteRenderer::renderPrioritisedSprites() {
 
+  for (int i = priorityMatrixIndex; i>=0; i--) {
+
+    if (priorityMatrix[i] == -1) {
+      continue;
+    }
+
+    sprite[priorityMatrix[i]]->draw();
+  }
 }
 
 Sprite* SpriteRenderer::getSprite(int id) {
@@ -92,10 +160,6 @@ Sprite* SpriteRenderer::getSprite(std::string name) {
   }
 
   return NULL;
-
-}
-
-int SpriteRenderer::addSprite(Sprite *sprite, int priority, std::string name) {
 
 }
 
