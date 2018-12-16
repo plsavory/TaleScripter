@@ -15,6 +15,7 @@ public:
   int loadTexture(std::string fname, std::string name);
   Texture* getTexture(int id);
   Texture* getTexture(std::string name);
+  TextureManager* getTextureManager();
 private:
   void processQueue();
   TextureManager *textureManager;

@@ -98,6 +98,8 @@ void TextureManager::processQueue() {
   texture[textureLoadQueue.front().getId()]->texture
     ->loadFromFile(textureLoadQueue.front().getFilename());
 
+    texture[textureLoadQueue.front().getId()]->loaded = true;
+
   std::cout<<"Loading image file: "<<textureLoadQueue.front().getFilename()<<std::endl;
 
   // Remove the texture load request from memory

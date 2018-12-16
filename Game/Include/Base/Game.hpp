@@ -16,6 +16,7 @@ private:
   std::string gameTitle = "GameFramework";
   ResourceManager *resourceManager;
   GameManager *gameManager;
+  SpriteRenderer *spriteRenderer;
 };
 
 #endif

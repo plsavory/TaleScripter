@@ -4,11 +4,11 @@
 #include "Resource/ResourceManager.hpp"
 #include "Base/GameManager.hpp"
 
-GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager) {
+GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer) {
   currentGameState = GameState::Test;
 
   // Create each game GameScreen
-  testScreen = new TestScreen(window, rManager);
+  testScreen = new TestScreen(window, rManager, sRenderer);
 }
 
 GameManager::~GameManager() {

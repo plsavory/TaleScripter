@@ -9,6 +9,7 @@
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"
 #include "Resource/ResourceManager.hpp"
+#include "SpriteRenderer/SpriteRenderer.hpp"
 #include "SFML/Graphics.hpp"
 #include "Base/GameManager.hpp"
 #include "Base/Game.hpp"
@@ -26,6 +27,7 @@ Game::Game() {
 Game::~Game() {
   delete(gameManager);
   delete(resourceManager);
+  delete(spriteRenderer);
 }
 
 /**
@@ -40,8 +42,8 @@ void Game::run() {
 
   // Create ResourceManager to spin up the resource loading thread
   resourceManager = new ResourceManager();
-
-  gameManager = new GameManager(window, resourceManager);
+  spriteRenderer = new SpriteRenderer(window,resourceManager->getTextureManager());
+  gameManager = new GameManager(window, resourceManager, spriteRenderer);
 
   sf::Clock updateClock;
 
@@ -84,6 +86,7 @@ void Game::run() {
 void Game::update(int gameTime) {
   resourceManager->update();
   gameManager->update();
+  spriteRenderer->update();
 }
 
 /**
@@ -91,4 +94,5 @@ void Game::update(int gameTime) {
  */
 void Game::draw() {
   gameManager->draw();
+  spriteRenderer->draw();
 }

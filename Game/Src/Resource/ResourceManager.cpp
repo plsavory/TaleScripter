@@ -58,3 +58,7 @@ Texture* ResourceManager::getTexture(std::string name) {
 Texture* ResourceManager::getTexture(int id) {
   return textureManager->getTexture(id);
 }
+
+TextureManager* ResourceManager::getTextureManager() {
+  return textureManager;
+}

@@ -3,24 +3,14 @@
 #include "GameScreens/TestScreen.hpp"
 #include <iostream>
 
-TestScreen::TestScreen(sf::RenderWindow *windowPointer, ResourceManager *rManager) {
+TestScreen::TestScreen(sf::RenderWindow *windowPointer, ResourceManager *rManager, SpriteRenderer *sRenderer) {
   window = windowPointer;
-
-  spriteRenderer = new SpriteRenderer(window);
-  sprite = new Sprite(window);
+  spriteRenderer = sRenderer;
 
   // Load an image as a test
   rManager->loadTexture("testassets\\uzume.jpg", "uzume");
+  spriteRenderer->addSprite("uzume", "uzume", 1);
 
-  /*
-    Without this call to rManager-Update() being here, the image will not display.
-    This is because we are setting an image on something which hasn't loaded yet.
-    TODO: Load a texture into a sprite using the SpriteHandler class only once it has loaded
-   */
-  rManager->update();
-
-  sprite->setImage(rManager->getTexture("uzume")->texture);
-  sprite->setPosition(0,0);
 }
 
 TestScreen::~TestScreen() {
@@ -36,6 +26,5 @@ void TestScreen::update() {
 }
 
 void TestScreen::draw() {
-  sprite->draw();
-  spriteRenderer->draw();
+  
 }
