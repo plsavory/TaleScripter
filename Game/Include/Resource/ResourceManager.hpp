@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <thread>
+#include "Resource/MusicManager.hpp"
 #include "Resource/TextureManager.hpp"
 
 class ResourceManager {
@@ -16,9 +17,13 @@ public:
   Texture* getTexture(int id);
   Texture* getTexture(std::string name);
   TextureManager* getTextureManager();
+  MusicManager* getMusicManager() {
+    return musicManager;
+  };
 private:
   void processQueue();
   TextureManager *textureManager;
+  MusicManager *musicManager;
   std::thread *resourceLoadThread;
   bool terminateLoadingThread;
 };

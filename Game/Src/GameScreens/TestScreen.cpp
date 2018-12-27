@@ -18,6 +18,13 @@ TestScreen::TestScreen(sf::RenderWindow *windowPointer, ResourceManager *rManage
   spriteRenderer->addSprite("natsuki", "natsuki", 9);
   spriteRenderer->addSprite("monika", "monika", 6);
 
+  // Play some music as a test
+  resourceManager->getMusicManager()
+    ->addStream("testfile","testassets\\02.ogg");
+
+  resourceManager->getMusicManager()
+    ->playAudioStream("testfile");
+
 }
 
 TestScreen::~TestScreen() {

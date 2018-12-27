@@ -7,6 +7,7 @@ ResourceManager::ResourceManager() {
 
   // Create required objects
   textureManager = new TextureManager();
+  musicManager = new MusicManager();
 
 }
 
@@ -29,6 +30,7 @@ void ResourceManager::processQueue() {
   // Loop until the loading queue is empty
   while (!isQueueEmpty()) {
     textureManager->processQueue();
+    musicManager->processQueue();
   }
 }
 
@@ -38,7 +40,7 @@ void ResourceManager::processQueue() {
  */
 bool ResourceManager::isQueueEmpty() {
   // TODO: Monitor other resources too
-  return textureManager->isQueueEmpty();
+  return (textureManager->isQueueEmpty() && musicManager->isQueueEmpty());
 }
 
 /**
