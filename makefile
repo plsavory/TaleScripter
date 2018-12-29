@@ -11,9 +11,10 @@ RESOURCE_MANAGER_FILES = Game/Src/Resource/ResourceManager.cpp Game/Src/Resource
 DATABASE_FILES = Game/Src/Database/DatabaseConnection.cpp Game/Src/Database/DatabaseSchema.cpp
 AUDIO_MANAGER_FILES = Game/Src/Resource/MusicManager.cpp
 GAME_COMPILER_FILES = Game/Src/GameCompilerEntryPoint.cpp Game/Src/GameCompiler/GameCompiler.cpp Game/Src/Misc/Utils.cpp
+FONT_MANAGER_FILES = Game/Src/Resource/FontManager.cpp
 
 all:
-	$(CC) $(CFLAGS) $(DIRECTORIES_TO_INCLUDE) $(GAME_FRAMEWORK_FILES) $(AUDIO_MANAGER_FILES) $(INPUT_MANAGER_FILES) $(RESOURCE_MANAGER_FILES) $(DATABASE_FILES) $(FILES_TO_COMPILE) $(LIBRARIES) -o build\Test
+	$(CC) $(CFLAGS) $(DIRECTORIES_TO_INCLUDE) $(GAME_FRAMEWORK_FILES) $(AUDIO_MANAGER_FILES) $(INPUT_MANAGER_FILES) $(RESOURCE_MANAGER_FILES) $(DATABASE_FILES) $(FONT_MANAGER_FILES) $(FILES_TO_COMPILE) $(LIBRARIES) -o build\Test
 
 compiler:
 	$(CC) $(CFLAGS) $(DIRECTORIES_TO_INCLUDE) $(GAME_COMPILER_FILES) $(DATABASE_FILES) $(LIBRARIES) -o build\Test-compiler

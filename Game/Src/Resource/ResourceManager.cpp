@@ -10,6 +10,7 @@ ResourceManager::ResourceManager() {
   // Create required objects
   textureManager = new TextureManager();
   musicManager = new MusicManager();
+  fontManager = new FontManager();
 
   loadResourcesFromDatabase();
 
@@ -35,6 +36,7 @@ void ResourceManager::processQueue() {
   while (!isQueueEmpty()) {
     textureManager->processQueue();
     musicManager->processQueue();
+    fontManager->processQueue();
   }
 }
 

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <thread>
+#include "Resource/FontManager.hpp"
 #include "Resource/MusicManager.hpp"
 #include "Resource/TextureManager.hpp"
 
@@ -20,10 +21,14 @@ public:
   MusicManager* getMusicManager() {
     return musicManager;
   };
+  FontManager* getFontManager() {
+    return fontManager;
+  }
 private:
   void processQueue();
   TextureManager *textureManager;
   MusicManager *musicManager;
+  FontManager *fontManager;
   std::thread *resourceLoadThread;
   bool terminateLoadingThread;
   void loadResourcesFromDatabase();

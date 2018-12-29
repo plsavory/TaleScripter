@@ -8,6 +8,7 @@
 #include <iostream>
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"
+#include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
