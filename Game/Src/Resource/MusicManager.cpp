@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include "Database/DatabaseConnection.hpp"
 #include "Resource/MusicManager.hpp"
 
 MusicManager::MusicManager() {
@@ -48,7 +48,7 @@ void MusicManager::playAudioStream(std::string name) {
 }
 
 void MusicManager::playAudioStream(int id) {
-
+  // TODO (I don't think this is needed, decide later when it isn't 2am.)
 }
 
 void MusicManager::addAllStreamsFromDatabase() {
@@ -116,5 +116,35 @@ int MusicManager::findAudioStream(std::string name) {
   }
 
   return -1;
+
+}
+
+/**
+ * [MusicManager::loadAllFromDatabase Fetch the audio streams and their names from the database]
+ * @param database [Database connection]
+ */
+void MusicManager::loadAllFromDatabase(DatabaseConnection *database) {
+
+  DataSet *result = new DataSet();
+
+  database->executeQuery("SELECT * FROM music", result);
+
+  for (int i = 0; i < result->getRowCount()-1; i++) {
+
+    // Ignore this entry if either of the columns are missing data
+    if (!(result->getRow(i)->doesColumnExist("name") && result->getRow(i)->doesColumnExist("filename"))) {
+      continue;
+    }
+
+    std::string name = result->getRow(i)->getColumn("name")->getData();
+    std::string fname = result->getRow(i)->getColumn("filename")->getData();
+
+    std::string fullFileName = "resource\\music\\";
+    fullFileName.append(fname);
+
+    addStream(name, fullFileName);
+  }
+
+  delete result;
 
 }

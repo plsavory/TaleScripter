@@ -25,7 +25,7 @@ std::string DatabaseSchema::getName() {
  * @return [True if successful, false if failure]
  */
 bool DatabaseSchema::createDatabase() {
-  std::cout<<"Creating database " << name << ".gfdb..." << std::endl;
+  std::cout<<"Creating database " << name << ".db..." << std::endl;
 
   // Database connection
   sqlite3 *db;
@@ -33,7 +33,7 @@ bool DatabaseSchema::createDatabase() {
   int rc;
 
   std::string filename = name;
-  filename.append(".gfdb");
+  filename.append(".db");
 
   // Convert the string to a char array TODO: Move this into its own function
   char *fName = new char[filename.length() + 1];

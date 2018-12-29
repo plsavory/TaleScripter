@@ -5,5 +5,6 @@ public:
   static bool testBit(int bit, const unsigned char variable);
   static bool testBit(int bit, const unsigned short variable);
   static std::string getVersionString(bool verboseString);
+  static bool fileExists(const std::string &fileName);
 private:
 };

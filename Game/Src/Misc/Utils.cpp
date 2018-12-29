@@ -2,6 +2,10 @@
 #include "Misc/Utils.hpp"
 #include "Misc/ProjectInfo.hpp"
 #include <sstream>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string>
+#include <fstream>
 
 /**
  * [Utils::setBit Sets or unsets a bit on the provided 8-bit variable]
@@ -89,4 +93,20 @@ std::string Utils::getVersionString(bool verboseString)
   }
 
     return stringStream.str();
+}
+
+/**
+ * [Utils::fileExists Checks to see if a file exists or not]
+ * @param  fileName [Path to the file]
+ * @return          [True if file exists, otherwise false.]
+ */
+bool Utils::fileExists(const std::string &fileName) {
+
+  if (FILE *file = fopen(fileName.c_str(), "r")) {
+    fclose(file);
+    return true;
+  };
+
+  return false;
+
 }

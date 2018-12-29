@@ -26,6 +26,8 @@ private:
   MusicManager *musicManager;
   std::thread *resourceLoadThread;
   bool terminateLoadingThread;
+  void loadResourcesFromDatabase();
+  DatabaseConnection *resourceDatabase;
 };
 
 #endif

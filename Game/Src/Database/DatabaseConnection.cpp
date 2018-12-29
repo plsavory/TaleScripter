@@ -9,8 +9,9 @@ DatabaseConnection::DatabaseConnection(std::string name) {
   // Initialise values and open database connection
   zErrMsg = 0;
 
-  std::string filename = name;
-  filename.append(".gfdb");
+  std::string filename = "db\\";
+  filename.append(name);
+  filename.append(".db");
 
   // Convert the string to a char array TODO: Move this into its own function
   char *fName = new char[filename.length() + 1];

@@ -1,5 +1,7 @@
 #include <SFML/Graphics.hpp>
+#include "Database/DatabaseConnection.hpp"
 #include "Resource/ResourceManager.hpp"
+#include "Misc/Utils.hpp"
 
 ResourceManager::ResourceManager() {
 
@@ -8,6 +10,8 @@ ResourceManager::ResourceManager() {
   // Create required objects
   textureManager = new TextureManager();
   musicManager = new MusicManager();
+
+  loadResourcesFromDatabase();
 
 }
 
@@ -63,4 +67,20 @@ Texture* ResourceManager::getTexture(int id) {
 
 TextureManager* ResourceManager::getTextureManager() {
   return textureManager;
+}
+
+/**
+ * [loadResourcesFromDatabase Attempts to load all resource files which are linked in the database]
+ */
+void ResourceManager::loadResourcesFromDatabase() {
+  // Attempt to connect to the Resource database if it exists
+  if (!Utils::fileExists("db\\resource.db")) {
+    return;
+  }
+
+  // Connect to the resource database
+  resourceDatabase = new DatabaseConnection("resource");
+
+  // Load all resources from the database
+  musicManager->loadAllFromDatabase(resourceDatabase);
 }

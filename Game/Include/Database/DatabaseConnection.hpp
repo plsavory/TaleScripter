@@ -1,4 +1,8 @@
+#ifndef DATABASE_CONNECTION_INCLUDED
+#define DATABASE_CONNECTION_INCLUDED
+
 #include "SQLite/sqlite3.h"
+#include <iostream>
 
 #define DATA_SET_MAX_ROWS 1000
 #define DATA_SET_MAX_COLUMNS 50
@@ -17,9 +21,15 @@ public:
   ~DataSetColumn() {
 
   };
+  std::string getName() {
+    return name;
+  }
+  std::string getData() {
+    return data;
+  }
+private:
   std::string name;
   std::string data;
-private:
 };
 
 struct DataSetRow {
@@ -52,7 +62,7 @@ public:
   DataSetColumn* getColumn(std::string name) {
     for (int i = 0; i<DATA_SET_MAX_COLUMNS; i++) {
       if (column[i]) {
-        if (column[i]->name == name) {
+        if (column[i]->getName() == name) {
           return getColumn(i);
         }
       }
@@ -63,7 +73,7 @@ public:
   bool doesColumnExist(std::string name) {
     for (int i = 0; i<DATA_SET_MAX_COLUMNS; i++) {
       if (column[i]) {
-        if (column[i]->name == name) {
+        if (column[i]->getName() == name) {
           return true;
         }
       }
@@ -75,7 +85,7 @@ public:
 
     for (int i = 0; i < DATA_SET_MAX_COLUMNS; i++) {
       if (column[i]) {
-        std::cout<<"Column: " << column[i]->name << " | "<< column[i]->data;
+        std::cout<<"Column: " << column[i]->getName() << " | "<< column[i]->getData();
         std::cout<<std::endl;
       }
     }
@@ -92,6 +102,8 @@ public:
     for (int i = 0; i < DATA_SET_MAX_ROWS; i++) {
       row[i] = NULL;
     }
+
+    rowCount = 0;
 
   };
 
@@ -119,6 +131,7 @@ public:
     for (int i = 0; i < DATA_SET_MAX_ROWS; i++) {
       if (!row[i]) {
         row[i] = new DataSetRow();
+        rowCount++;
         return row[i];
       }
     }
@@ -144,8 +157,15 @@ public:
       }
     }
   }
+  int getRowCount() {
+    return rowCount+1;
+  }
+  DataSetRow* getRow(int id) {
+    return row[id];
+  }
 private:
   DataSetRow *row[DATA_SET_MAX_ROWS];
+  int rowCount;
 };
 
 class DatabaseConnection {
@@ -159,3 +179,5 @@ private:
   char *zErrMsg;
   int rc;
 };
+
+#endif

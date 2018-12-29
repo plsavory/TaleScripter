@@ -1,6 +1,7 @@
 // GameManager.cpp - Manages the current game control flow. Calls the appropriate objects depending on the current state of the game.
 
 #include "SFML/Graphics.hpp"
+#include "Database/DatabaseConnection.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "Base/GameManager.hpp"
 

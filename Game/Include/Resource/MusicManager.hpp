@@ -116,6 +116,7 @@ public:
   void playAudioStream(int id);
   void playAudioStream(std::string name);
   int findAudioStream(std::string name);
+  void loadAllFromDatabase(DatabaseConnection *database);
 private:
   AudioStream *audioStream[MAX_AUDIO_STREAMS];
   std::queue<PlayRequest> playRequestQueue;
