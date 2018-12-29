@@ -12,6 +12,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
+#include "TextRenderer/TextRenderer.hpp"
 #include "SFML/Graphics.hpp"
 #include "Base/GameManager.hpp"
 #include "Base/Game.hpp"
@@ -30,6 +31,7 @@ Game::~Game() {
   delete(gameManager);
   delete(resourceManager);
   delete(spriteRenderer);
+  delete(textRenderer);
 }
 
 /**
@@ -45,7 +47,8 @@ void Game::run() {
   // Create ResourceManager to spin up the resource loading thread
   resourceManager = new ResourceManager();
   spriteRenderer = new SpriteRenderer(window,resourceManager->getTextureManager());
-  gameManager = new GameManager(window, resourceManager, spriteRenderer);
+  textRenderer = new TextRenderer(window, resourceManager->getFontManager());
+  gameManager = new GameManager(window, resourceManager, spriteRenderer, textRenderer);
 
   sf::Clock updateClock;
 
@@ -89,12 +92,15 @@ void Game::update(int gameTime) {
   resourceManager->update();
   gameManager->update();
   spriteRenderer->update();
+  textRenderer->update();
 }
 
 /**
  * [Game::draw Draw loop, handle display here]
  */
 void Game::draw() {
+  // TODO: Handle priorities for different types of rendering
   gameManager->draw();
   spriteRenderer->draw();
+  textRenderer->draw();
 }

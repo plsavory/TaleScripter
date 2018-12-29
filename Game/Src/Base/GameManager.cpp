@@ -3,13 +3,14 @@
 #include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "Resource/ResourceManager.hpp"
+#include "Base/Renderers.hpp"
 #include "Base/GameManager.hpp"
 
-GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer) {
+GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer) {
   currentGameState = GameState::Test;
 
   // Create each game GameScreen
-  testScreen = new TestScreen(window, rManager, sRenderer);
+  testScreen = new TestScreen(window, rManager, sRenderer, tRenderer);
 }
 
 GameManager::~GameManager() {

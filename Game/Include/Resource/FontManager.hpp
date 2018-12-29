@@ -53,6 +53,8 @@ public:
 
     state = FontState::fsLoaded;
 
+    std::cout<<"Font "<<getName()<<" loaded from file "<<getFilename()<<" successfully."<<std::endl;
+
   }
   sf::Font* getFont() {
     return myFont;
@@ -69,7 +71,7 @@ public:
   FontManager();
   ~FontManager();
   Font* addFont(std::string name, std::string filename);
-  void loadAllFromDatabase();
+  void loadAllFromDatabase(DatabaseConnection *database);
   void processQueue();
   void loadFont(std::string name);
   void loadFont(int id);

@@ -5,6 +5,7 @@
 #include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "Resource/ResourceManager.hpp"
+#include "Base/Renderers.hpp"
 #include "Base/GameManager.hpp"
 #include "Base/Game.hpp"
 

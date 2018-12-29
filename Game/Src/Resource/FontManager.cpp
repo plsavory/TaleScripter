@@ -1,6 +1,7 @@
 #include "SFML/System.hpp"
 #include "SFML/Graphics.hpp"
 #include <queue>
+#include "Database/DatabaseConnection.hpp"
 #include "Resource/FontManager.hpp"
 
 FontManager::FontManager() {
@@ -81,7 +82,26 @@ bool FontManager::isQueueEmpty() {
   return (fontLoadQueue.size() == 0);
 }
 
-void FontManager::loadAllFromDatabase() {
+void FontManager::loadAllFromDatabase(DatabaseConnection *database) {
+
+  DataSet *result = new DataSet();
+
+  database->executeQuery("SELECT * FROM fonts", result);
+
+  for (int i = 0; i < result->getRowCount()-1; i++) {
+    // Ignore this entry if either of the columns are missing data
+    if (!(result->getRow(i)->doesColumnExist("name") && result->getRow(i)->doesColumnExist("filename"))) {
+      continue;
+    }
+
+    std::string name = result->getRow(i)->getColumn("name")->getData();
+    std::string fname = result->getRow(i)->getColumn("filename")->getData();
+
+    std::string fullFileName = "resource\\fonts\\";
+    fullFileName.append(fname);
+
+    addFont(name, fullFileName);
+  }
 
 }
 

@@ -6,7 +6,6 @@
 
 #include "Database/DatabaseConnection.hpp"
 #include "Resource/ResourceManager.hpp"
-#include "SpriteRenderer/SpriteRenderer.hpp"
 
 class GameScreen {
 public:

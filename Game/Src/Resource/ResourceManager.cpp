@@ -85,4 +85,5 @@ void ResourceManager::loadResourcesFromDatabase() {
 
   // Load all resources from the database
   musicManager->loadAllFromDatabase(resourceDatabase);
+  fontManager->loadAllFromDatabase(resourceDatabase);
 }

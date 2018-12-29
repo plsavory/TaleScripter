@@ -17,6 +17,7 @@ private:
   ResourceManager *resourceManager;
   GameManager *gameManager;
   SpriteRenderer *spriteRenderer;
+  TextRenderer *textRenderer;
 };
 
 #endif
