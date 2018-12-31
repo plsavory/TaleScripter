@@ -27,11 +27,16 @@ KeyboardHandler::~KeyboardHandler() {
  * @param name [Name of the event]
  * @param key  [Key (as a string) to bind]
  */
-int KeyboardHandler::bindEvent(std::string name, std::string key) {
+int KeyboardHandler::bindEvent(std::string name, std::string key, bool onlyTriggerOnPress) {
 
   sf::Keyboard::Key keycode = Keymap::getKeycode(key);
 
-  return bindEvent(name, keycode);
+  int result = bindEvent(name, keycode, onlyTriggerOnPress);
+
+  if (result < 0) {
+    std::cout<<"Unable to bind keyboard event "<<name<<" with key "<<key<<std::endl;
+  }
+  return result;
 
 }
 
@@ -42,14 +47,21 @@ int KeyboardHandler::bindEvent(std::string name, std::string key) {
  * @param key  [Key (SFML keycode) to bind]
  * @return      [ID of the bound event, or -1 on failure]
  */
-int KeyboardHandler::bindEvent(std::string name, sf::Keyboard::Key key) {
+int KeyboardHandler::bindEvent(std::string name, sf::Keyboard::Key key, bool onlyTriggerOnPress) {
+
+  if (key == sf::Keyboard::Unknown) {
+    return -1;
+  }
 
   // Find if a keyboard event with this name already exists
   int eventId = getEvent(name);
 
   if (eventId >= 0) {
+
     // Event exists if we get into here
     if (keyboardEvent[eventId]->bindEvent(name,key)) {
+
+      keyboardEvent[eventId]->waitForKeyRelease(onlyTriggerOnPress);
       return eventId;
     } else {
       return -1;
@@ -62,6 +74,7 @@ int KeyboardHandler::bindEvent(std::string name, sf::Keyboard::Key key) {
   for (int i = 0; i<0xFF; i++) {
     if (!keyboardEvent[i]) {
       keyboardEvent[i] = new KeyboardEvent(name, key);
+      keyboardEvent[i]->waitForKeyRelease(onlyTriggerOnPress);
       return i;
     }
   }
@@ -103,12 +116,16 @@ bool KeyboardHandler::isEventPressed(std::string name) {
   int eventId = getEvent(name);
 
   if (eventId >= 0) {
-    return keyboardEvent[eventId]->isDown();
+    return isEventPressed(eventId);
   }
 
   // No event found with this id
   return false;
 
+}
+
+bool KeyboardHandler::isEventPressed(int id) {
+  return keyboardEvent[id]->isDown();
 }
 
 bool KeyboardHandler::isEventUp(std::string name) {
@@ -127,4 +144,12 @@ bool KeyboardHandler::isEventUp(std::string name) {
   // No event found with this id
   return false;
 
+}
+
+void KeyboardHandler::update() {
+  for (int i = 0; i < 0xFF; i++) {
+    if (keyboardEvent[i]) {
+      keyboardEvent[i]->update();
+    }
+  }
 }

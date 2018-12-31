@@ -14,6 +14,7 @@
 #include "SpriteRenderer/SpriteRenderer.hpp"
 #include "TextRenderer/TextRenderer.hpp"
 #include "SFML/Graphics.hpp"
+#include "Input/InputManager.hpp"
 #include "Base/GameManager.hpp"
 #include "Base/Game.hpp"
 
@@ -32,6 +33,7 @@ Game::~Game() {
   delete(resourceManager);
   delete(spriteRenderer);
   delete(textRenderer);
+  delete(inputManager);
 }
 
 /**
@@ -45,10 +47,11 @@ void Game::run() {
   window->setFramerateLimit(60);
 
   // Create ResourceManager to spin up the resource loading thread
+  inputManager = new InputManager();
   resourceManager = new ResourceManager();
   spriteRenderer = new SpriteRenderer(window,resourceManager->getTextureManager());
   textRenderer = new TextRenderer(window, resourceManager->getFontManager());
-  gameManager = new GameManager(window, resourceManager, spriteRenderer, textRenderer);
+  gameManager = new GameManager(window, resourceManager, spriteRenderer, textRenderer, inputManager);
 
   sf::Clock updateClock;
 
@@ -86,9 +89,10 @@ void Game::run() {
 }
 
 /**
- * [Game::update Update loop, should be called once per frame]
+ * [Game::update Update loop]
  */
 void Game::update(int gameTime) {
+  inputManager->update();
   resourceManager->update();
   gameManager->update();
   spriteRenderer->update();

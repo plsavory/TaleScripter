@@ -18,6 +18,7 @@ private:
   GameManager *gameManager;
   SpriteRenderer *spriteRenderer;
   TextRenderer *textRenderer;
+  InputManager *inputManager;
 };
 
 #endif

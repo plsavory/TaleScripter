@@ -6,6 +6,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "Base/Renderers.hpp"
+#include "Input/InputManager.hpp"
 #include "Base/GameManager.hpp"
 #include "Base/Game.hpp"
 

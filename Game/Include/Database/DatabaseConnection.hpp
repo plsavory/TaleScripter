@@ -6,7 +6,6 @@
 
 #define DATA_SET_MAX_ROWS 1000
 #define DATA_SET_MAX_COLUMNS 50
-#define DATABASE_DEBUG
 
 enum FetchMode {None, All, One};
 

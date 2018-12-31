@@ -15,6 +15,8 @@ public:
     enabled = true;
     initialiseKeys();
     bindEvent(eName, eKey);
+    waitForRelease = false;
+    canTriggerEvent = true;
   };
   /**
    * [KeyboardEvent Bind a key to this event]
@@ -26,6 +28,9 @@ public:
 
     if (foundKey != sf::Keyboard::Key::Unknown) {
       KeyboardEvent(eName, foundKey);
+    } else {
+      std::cout<<"Failure to bind key "<<eKey<<" to event "
+        <<name<<" - key with name "<<eKey<<" could not be linked.";
     }
   };
 
@@ -70,6 +75,11 @@ public:
     if (!enabled) {
       return false;
     }
+
+    if (!canTriggerEvent) {
+      return false;
+    }
+
     // Check all key codes bound to this event, return true as soon as we find one that is pressed.
     for (int i = 0; i<4; i++) {
       // Don't even bother checking unknown keys
@@ -78,6 +88,9 @@ public:
       }
 
       if (sf::Keyboard::isKeyPressed(key[i])) {
+        if (waitForRelease) {
+          canTriggerEvent = false;
+        }
         return true;
       }
     }
@@ -87,6 +100,24 @@ public:
   std::string getName() {
     return name;
   }
+  void waitForKeyRelease(bool wait) {
+    waitForRelease = wait;
+  }
+  void update() {
+    // Will re-set canTriggerEvent if needed
+    if (canTriggerEvent) {
+      return;
+    }
+
+    // If any of the keys are pressed, exit the function so that we don't set canTriggerEvent
+    for (int i = 0; i < 4; i++) {
+      if (sf::Keyboard::isKeyPressed(key[i])) {
+        return;
+      }
+    }
+
+    canTriggerEvent = true;
+  }
 private:
   std::string name;
   sf::Keyboard::Key key[4];
@@ -95,17 +126,21 @@ private:
       key[i] = sf::Keyboard::Unknown;
     }
   };
+  bool canTriggerEvent; // We need to wait if a key has been pressed if waitForRelease is on
+  bool waitForRelease;
 };
 
 class KeyboardHandler {
 public:
   KeyboardHandler();
   ~KeyboardHandler();
-  int bindEvent(std::string name, std::string key);
-  int bindEvent(std::string name, sf::Keyboard::Key key);
+  int bindEvent(std::string name, std::string key, bool onlyTriggerOnPress);
+  int bindEvent(std::string name, sf::Keyboard::Key key, bool onlyTriggerOnPress);
   int getEvent(std::string name);
   bool isEventPressed(std::string name);
+  bool isEventPressed(int id);
   bool isEventUp(std::string name);
+  void update();
 private:
   bool enabled;
   KeyboardEvent *keyboardEvent[0xFF];

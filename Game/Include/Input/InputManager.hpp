@@ -10,6 +10,9 @@ public:
   InputManager();
   ~InputManager();
   void update();
+  int bindKeyboardEvent(std::string name, std::string key, bool onlyTriggerOnPress);
+  bool isEventPressed(int id);
+  bool isEventPressed(std::string name);
 private:
   MouseHandler *mouseHandler;
   KeyboardHandler *keyboardHandler;

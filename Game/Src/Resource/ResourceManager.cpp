@@ -46,7 +46,7 @@ void ResourceManager::processQueue() {
  */
 bool ResourceManager::isQueueEmpty() {
   // TODO: Monitor other resources too
-  return (textureManager->isQueueEmpty() && musicManager->isQueueEmpty());
+  return (textureManager->isQueueEmpty() && musicManager->isQueueEmpty() && fontManager->isQueueEmpty());
 }
 
 /**

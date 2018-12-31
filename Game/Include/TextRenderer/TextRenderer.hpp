@@ -28,7 +28,6 @@ public:
   void setFont() {
     Font *fontFindAttempt = fontManager->getFont(fontName);
 
-
     if (!fontFindAttempt) {
       return;
     }
