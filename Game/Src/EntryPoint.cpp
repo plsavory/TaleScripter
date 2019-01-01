@@ -7,6 +7,7 @@
 #include "Resource/ResourceManager.hpp"
 #include "Base/Renderers.hpp"
 #include "Input/InputManager.hpp"
+#include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/GameManager.hpp"
 #include "Base/Game.hpp"
 

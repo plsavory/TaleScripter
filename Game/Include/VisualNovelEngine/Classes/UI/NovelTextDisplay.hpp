@@ -8,6 +8,7 @@ public:
   bool hasTextFinished();
   void update();
   void displayWholeStringImmediately();
+  void setText(std::string newText);
 private:
   TextRenderer *textRenderer;
   std::string storyFont;

@@ -6,6 +6,7 @@
 // Include all of the game GameScreens
 #include "GameScreens/TestScreen.hpp"
 #include "VisualNovelEngine/Screens/NovelScreen.hpp"
+#include "VisualNovelEngine/Classes/Data/Novel.hpp"
 
 // Don't give anything in this enum the same name as a class, it breaks the build process - I learned this the hard way.
 enum GameState {
@@ -26,6 +27,7 @@ private:
   InputManager *inputManager;
   TestScreen *testScreen;
   NovelScreen *novelScreen;
+  NovelData *novel;
 };
 
 #endif

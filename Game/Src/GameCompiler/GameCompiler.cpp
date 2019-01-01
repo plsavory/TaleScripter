@@ -55,6 +55,42 @@ void GameCompiler::createResourceDatabase() {
 
     // Create the Database
     resourceDb->createDatabase();
+
+  }
+
+  if (!Utils::fileExists("db\\novel")) {
+
+    // Create the novel database which will be used to store the actual visual novel
+    DatabaseSchema *novelDb = new DatabaseSchema("novel");
+
+    DatabaseTable *gameInformationTable = novelDb->addTable("game_information");
+    gameInformationTable->addColumn("game_title", ColumnType::tText, false, "");
+    gameInformationTable->addColumn("author_name", ColumnType::tText, false, "");
+    gameInformationTable->addColumn("version_number", ColumnType::tDouble, false, "");
+
+    DatabaseTable *chaptersTable = novelDb->addTable("chapters");
+    chaptersTable->addPrimaryKey();
+    chaptersTable->addColumn("title", ColumnType::tText, false, "");
+    chaptersTable->addColumn("requirement_id", ColumnType::tInteger, false, "");
+
+    DatabaseTable *scenesTable = novelDb->addTable("scenes");
+    scenesTable->addPrimaryKey();
+    scenesTable->addColumn("chapter_id", ColumnType::tInteger, false, "");
+    scenesTable->addColumn("background_image_name", ColumnType::tText, false, "");
+
+    DatabaseTable *sceneSegmentsTable = novelDb->addTable("scene_segments");
+    sceneSegmentsTable->addPrimaryKey();
+    sceneSegmentsTable->addColumn("scene_id", ColumnType::tInteger, false, "");
+    sceneSegmentsTable->addColumn("background_music_name", ColumnType::tText, false, "");
+    sceneSegmentsTable->addColumn("visual_effect_name", ColumnType::tText, false, "");
+
+    DatabaseTable *segmentLinesTable = novelDb->addTable("segment_lines");
+    segmentLinesTable->addPrimaryKey();
+    segmentLinesTable->addColumn("scene_segment_id", ColumnType::tInteger, true, "");
+    segmentLinesTable->addColumn("character_id", ColumnType::tInteger, false, "");
+    segmentLinesTable->addColumn("text", ColumnType::tText, true, "");
+
+    novelDb->createDatabase();
   }
 
 }

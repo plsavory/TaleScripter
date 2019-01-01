@@ -10,20 +10,25 @@ NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer) {
 
   textRenderer = tRenderer;
 
-  textCounterDelay = 50;
+  textCounterDelay = 35;
   textCounterClock = new sf::Clock();
 
   currentDisplayText = "";
-  fullDisplayText = "This is a test, hopefully things are beginning to work and appear on screen now.";
+  fullDisplayText = "";
 
   storyFont = "story_font"; // TODO: Load from config
 
-  myText = textRenderer->addText("novel_text_display_text", "story_font");
+  myText = textRenderer->addText("novel_text_display_text", storyFont);
   myText->setPosition(10,400);
 }
 
 NovelTextDisplay::~NovelTextDisplay() {
 
+}
+
+void NovelTextDisplay::setText(std::string newText) {
+  currentDisplayText = "";
+  fullDisplayText = newText;
 }
 
 void NovelTextDisplay::update() {
