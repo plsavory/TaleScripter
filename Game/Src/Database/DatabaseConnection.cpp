@@ -73,8 +73,8 @@ void DatabaseConnection::executeQuery(std::string query, DataSet *destinationDat
             const char* cName = sqlite3_column_name(statement,col);
             const char* cData = reinterpret_cast<const char*>(sqlite3_column_text(statement,col));
 
-            std::string columnName(cName);
-            std::string data(cData);
+            std::string columnName((cName ? cName : ""));
+            std::string data((cData ? cData : ""));
 
             row->addColumn(cName, cData);
           }

@@ -96,6 +96,10 @@ public:
       state = AudioStreamState::Paused;
     }
   };
+
+  bool isPlaying() {
+    return state == AudioStreamState::Playing;
+  }
 private:
   std::string name;
   std::string fileName;

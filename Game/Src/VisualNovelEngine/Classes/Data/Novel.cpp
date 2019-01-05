@@ -15,7 +15,7 @@ void NovelData::start() {
 
   currentChapter = 0;
   currentScene = 0;
-  currentSceneSegment = 0;
+  currentSceneSegment = -1;
   currentSceneSegmentLine = -1; // Game hasn't started yet, first line has id of 0
 
 }
@@ -27,6 +27,12 @@ void NovelData::start() {
 AdvanceState NovelData::getNextAction() {
 
   if (currentSceneSegmentLine == getCurrentSceneSegment()->getLineCount()-1) {
+
+    if (currentSceneSegment == getCurrentScene()->getSegmentCount()-1) {
+
+      return AdvanceState::SceneEnd;
+    }
+
     return AdvanceState::SceneSegmentEnd;
   }
 
@@ -35,6 +41,10 @@ AdvanceState NovelData::getNextAction() {
 
 NovelSceneSegment* NovelData::getCurrentSceneSegment() {
   return chapter[currentChapter]->getScene(currentScene)->getSceneSegment(currentSceneSegment);
+}
+
+NovelScene* NovelData::getCurrentScene() {
+    return chapter[currentChapter]->getScene(currentScene);
 }
 
 void NovelData::loadFromDatabase() {
@@ -85,6 +95,12 @@ NovelData::~NovelData() {
 
 NovelSceneSegmentLine* NovelData::getNextLine() {
   return getCurrentSceneSegment()->getLine(++currentSceneSegmentLine);
+}
+
+NovelSceneSegment* NovelData::advanceToNextSegment() {
+  currentSceneSegmentLine = -1; // Reset which line we're on
+
+  return getCurrentScene()->getSceneSegment(++currentSceneSegment);
 }
 
 // Chapter-specific stuff
@@ -208,6 +224,10 @@ NovelSceneSegment* NovelScene::getSceneSegment(int id) {
   return segment[id];
 }
 
+int NovelScene::getSegmentCount() {
+  return segmentCount;
+}
+
 // Segment-specific stuff
 NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId, std::string ssBackgroundMusicName, std::string ssVisualEffectName) {
   id = ssId;
@@ -269,6 +289,10 @@ NovelSceneSegment::getLineCount() {
 
 NovelSceneSegmentLine* NovelSceneSegment::getLine(int id) {
   return line[id];
+}
+
+std::string NovelSceneSegment::getBackgroundMusicName() {
+  return backgroundMusicName;
 }
 
 // Line-specific stuff

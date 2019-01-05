@@ -46,6 +46,11 @@ public:
     }
   };
   DataSetColumn* addColumn(std::string name, std::string data) {
+
+    if (name == "") {
+      return NULL;
+    }
+
     for (int i = 0; i<DATA_SET_MAX_COLUMNS; i++) {
       if (!column[i]) {
         column[i] = new DataSetColumn(name,data);

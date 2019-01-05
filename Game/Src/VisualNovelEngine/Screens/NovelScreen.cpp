@@ -18,6 +18,8 @@ NovelScreen::NovelScreen(sf::RenderWindow *windowPointer,ResourceManager *rManag
   textRenderer = tRenderer;
   inputManager = iManager;
   novel = novelPointer;
+  musicManager = resourceManager->getMusicManager();
+
 
   textDisplay = new NovelTextDisplay(tRenderer);
 
@@ -30,7 +32,7 @@ NovelScreen::~NovelScreen() {
 }
 
 void NovelScreen::start() {
-  nextLine();
+  nextSegment();
 }
 
 void NovelScreen::update() {
@@ -59,9 +61,11 @@ void NovelScreen::draw() {
  */
 void NovelScreen::advance() {
   switch (novel->getNextAction()) {
-    case NextLine:
+    case AdvanceState::NextLine:
     nextLine();
     break;
+    case AdvanceState::SceneSegmentEnd:
+    nextSegment();
     default:
     break;
   }
@@ -71,5 +75,16 @@ void NovelScreen::nextLine() {
 
   NovelSceneSegmentLine *nextLine = novel->getNextLine();
   textDisplay->setText(nextLine->getText());
-  
+
+}
+
+void NovelScreen::nextSegment() {
+
+  NovelSceneSegment *nextSegment = novel->advanceToNextSegment();
+
+  // Play the music file related to the scene segment
+  musicManager->playAudioStream(nextSegment->getBackgroundMusicName());
+
+  nextLine();
+
 }

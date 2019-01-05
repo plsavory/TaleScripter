@@ -27,6 +27,7 @@ public:
   ~NovelSceneSegment();
   int getLineCount();
   NovelSceneSegmentLine* getLine(int id);
+  std::string getBackgroundMusicName();
 private:
   int id;
   std::string backgroundMusicName;
@@ -40,6 +41,7 @@ public:
   NovelScene(DatabaseConnection *db, int sId, std::string bgImage);
   ~NovelScene();
   NovelSceneSegment* getSceneSegment(int id);
+  int getSegmentCount();
 private:
   int id;
   std::string backgroundImage;
@@ -71,6 +73,8 @@ public:
   AdvanceState getNextAction();
   NovelSceneSegment* getCurrentSceneSegment();
   NovelSceneSegmentLine* getNextLine();
+  NovelSceneSegment* advanceToNextSegment();
+  NovelScene* getCurrentScene();
 private:
   void loadFromDatabase();
   DatabaseConnection *novelDb;

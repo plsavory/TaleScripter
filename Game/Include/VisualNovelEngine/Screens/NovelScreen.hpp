@@ -17,10 +17,12 @@ private:
   TextRenderer *textRenderer;
   NovelTextDisplay *textDisplay;
   InputManager *inputManager;
+  MusicManager *musicManager;
   NovelData *novel;
   void advance();
   int advanceEventId;
   void nextLine();
+  void nextSegment();
 };
 
 #endif

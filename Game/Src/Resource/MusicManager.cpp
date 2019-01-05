@@ -63,7 +63,14 @@ void MusicManager::processQueue() {
     return;
   }
 
-  // TODO: Stop all other audio streams
+  // Stop all other audio streams
+  for (int i = 0; i < MAX_AUDIO_STREAMS; i++) {
+    if (audioStream[i]) {
+      if (audioStream[i]->isPlaying()) {
+        audioStream[i]->stop(true);
+      }
+    }
+  }
 
   // Play the stream
 
