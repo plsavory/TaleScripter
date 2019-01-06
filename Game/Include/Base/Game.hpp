@@ -19,6 +19,7 @@ private:
   SpriteRenderer *spriteRenderer;
   TextRenderer *textRenderer;
   InputManager *inputManager;
+  BackgroundImageRenderer *backgroundImageRenderer;
 };
 
 #endif

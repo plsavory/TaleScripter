@@ -1,9 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include "Database/DatabaseConnection.hpp"
+#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "Misc/Utils.hpp"
 
-ResourceManager::ResourceManager() {
+ResourceManager::ResourceManager(BackgroundImageRenderer *backgroundImageRendererPointer) {
 
   terminateLoadingThread = false;
 
@@ -11,6 +12,7 @@ ResourceManager::ResourceManager() {
   textureManager = new TextureManager();
   musicManager = new MusicManager();
   fontManager = new FontManager();
+  backgroundImageRenderer = backgroundImageRendererPointer;
 
   loadResourcesFromDatabase();
 
@@ -37,6 +39,7 @@ void ResourceManager::processQueue() {
     textureManager->processQueue();
     musicManager->processQueue();
     fontManager->processQueue();
+    backgroundImageRenderer->processQueue();
   }
 }
 
@@ -46,7 +49,7 @@ void ResourceManager::processQueue() {
  */
 bool ResourceManager::isQueueEmpty() {
   // TODO: Monitor other resources too
-  return (textureManager->isQueueEmpty() && musicManager->isQueueEmpty() && fontManager->isQueueEmpty());
+  return (textureManager->isQueueEmpty() && musicManager->isQueueEmpty() && fontManager->isQueueEmpty() && backgroundImageRenderer->isQueueEmpty());
 }
 
 /**
@@ -86,4 +89,5 @@ void ResourceManager::loadResourcesFromDatabase() {
   // Load all resources from the database
   musicManager->loadAllFromDatabase(resourceDatabase);
   fontManager->loadAllFromDatabase(resourceDatabase);
+  backgroundImageRenderer->addAllFromDatabase(resourceDatabase);
 }

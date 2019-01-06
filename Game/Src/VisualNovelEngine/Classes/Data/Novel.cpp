@@ -14,7 +14,7 @@ NovelData::NovelData() {
 void NovelData::start() {
 
   currentChapter = 0;
-  currentScene = 0;
+  currentScene = -1;
   currentSceneSegment = -1;
   currentSceneSegmentLine = -1; // Game hasn't started yet, first line has id of 0
 
@@ -29,8 +29,12 @@ AdvanceState NovelData::getNextAction() {
   if (currentSceneSegmentLine == getCurrentSceneSegment()->getLineCount()-1) {
 
     if (currentSceneSegment == getCurrentScene()->getSegmentCount()-1) {
-
+      std::cout<<"Current Scene: "<<currentScene<<"Number of scenes: "<<getCurrentChapter()->getSceneCount()-1<<std::endl;
+      if (currentScene == getCurrentChapter()->getSceneCount()-1) {
+        return AdvanceState::ChapterEnd;
+      }
       return AdvanceState::SceneEnd;
+
     }
 
     return AdvanceState::SceneSegmentEnd;
@@ -45,6 +49,10 @@ NovelSceneSegment* NovelData::getCurrentSceneSegment() {
 
 NovelScene* NovelData::getCurrentScene() {
     return chapter[currentChapter]->getScene(currentScene);
+}
+
+NovelChapter* NovelData::getCurrentChapter() {
+  return chapter[currentChapter];
 }
 
 void NovelData::loadFromDatabase() {
@@ -100,7 +108,18 @@ NovelSceneSegmentLine* NovelData::getNextLine() {
 NovelSceneSegment* NovelData::advanceToNextSegment() {
   currentSceneSegmentLine = -1; // Reset which line we're on
 
+  if (getCurrentScene()->getSegmentCount() == 0) {
+    // TODO: Allow scenes with no segments as a background image transition between multiple places
+    std::cout<<"Error: scene "<<getCurrentScene()->getId()<<" has no scene segments"<<std::endl;
+  }
   return getCurrentScene()->getSceneSegment(++currentSceneSegment);
+}
+
+NovelScene* NovelData::advanceToNextScene() {
+  currentSceneSegment = -1;
+  currentScene++;
+  std::cout<<"Advance to next scene: "<<currentScene<<std::endl;
+  return getCurrentScene();
 }
 
 // Chapter-specific stuff
@@ -139,9 +158,10 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
     scene[i] = new NovelScene(db,
       std::stoi(sceneData->getRow(i)->getColumn("id")->getData()),
       sceneData->getRow(i)->getColumn("background_image_name")->getData());
-
     sceneCount++;
   }
+
+  delete sceneData;
 }
 
 NovelChapter::~NovelChapter() {
@@ -162,6 +182,10 @@ std::string NovelChapter::getTitle() {
 
 NovelScene* NovelChapter::getScene(int id) {
   return scene[id];
+}
+
+int NovelChapter::getSceneCount() {
+  return sceneCount;
 }
 
 // Scene-specific stuff
@@ -226,6 +250,14 @@ NovelSceneSegment* NovelScene::getSceneSegment(int id) {
 
 int NovelScene::getSegmentCount() {
   return segmentCount;
+}
+
+int NovelScene::getId() {
+  return id;
+}
+
+std::string NovelScene::getBackgroundImageName() {
+  return backgroundImage;
 }
 
 // Segment-specific stuff

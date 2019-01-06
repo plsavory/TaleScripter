@@ -9,7 +9,7 @@
 
 class ResourceManager {
 public:
-  ResourceManager();
+  ResourceManager(BackgroundImageRenderer *backgroundImageRendererPointer);
   ~ResourceManager();
   void listenerThread();
   bool isQueueEmpty();
@@ -33,6 +33,7 @@ private:
   bool terminateLoadingThread;
   void loadResourcesFromDatabase();
   DatabaseConnection *resourceDatabase;
+  BackgroundImageRenderer *backgroundImageRenderer;
 };
 
 #endif

@@ -10,6 +10,7 @@
 #include "SFML/Window.hpp"
 #include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
+#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
 #include "TextRenderer/TextRenderer.hpp"
@@ -35,6 +36,7 @@ Game::~Game() {
   delete(spriteRenderer);
   delete(textRenderer);
   delete(inputManager);
+  delete(backgroundImageRenderer);
 }
 
 /**
@@ -49,10 +51,11 @@ void Game::run() {
 
   // Create ResourceManager to spin up the resource loading thread
   inputManager = new InputManager();
-  resourceManager = new ResourceManager();
+  backgroundImageRenderer = new BackgroundImageRenderer(window);
+  resourceManager = new ResourceManager(backgroundImageRenderer);
   spriteRenderer = new SpriteRenderer(window,resourceManager->getTextureManager());
   textRenderer = new TextRenderer(window, resourceManager->getFontManager());
-  gameManager = new GameManager(window, resourceManager, spriteRenderer, textRenderer, inputManager);
+  gameManager = new GameManager(window, resourceManager, spriteRenderer, textRenderer, inputManager, backgroundImageRenderer);
 
   sf::Clock updateClock;
 
@@ -96,6 +99,7 @@ void Game::update(int gameTime) {
   inputManager->update();
   resourceManager->update();
   gameManager->update();
+  backgroundImageRenderer->update();
   spriteRenderer->update();
   textRenderer->update();
 }
@@ -106,6 +110,7 @@ void Game::update(int gameTime) {
 void Game::draw() {
   // TODO: Handle priorities for different types of rendering
   gameManager->draw();
+  backgroundImageRenderer->draw();
   spriteRenderer->draw();
   textRenderer->draw();
 }

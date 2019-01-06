@@ -15,7 +15,7 @@ enum GameState {
 
 class GameManager {
 public:
-  GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager);
+  GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, BackgroundImageRenderer *bgRenderer);
   ~GameManager();
   void init();
   void update();

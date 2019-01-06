@@ -2,6 +2,7 @@
 #include "SFML/Graphics.hpp"
 #include "Input/InputManager.hpp"
 #include "Database/DatabaseConnection.hpp"
+#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "Base/Renderers.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
@@ -11,7 +12,7 @@
 // Objects used on this screen
 #include "VisualNovelEngine/Classes/UI/NovelTextDisplay.hpp"
 
-NovelScreen::NovelScreen(sf::RenderWindow *windowPointer,ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, NovelData *novelPointer) {
+NovelScreen::NovelScreen(sf::RenderWindow *windowPointer,ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, NovelData *novelPointer, BackgroundImageRenderer *backgroundImageRendererPointer) {
   window = windowPointer;
   spriteRenderer = sRenderer;
   resourceManager = rManager;
@@ -19,6 +20,7 @@ NovelScreen::NovelScreen(sf::RenderWindow *windowPointer,ResourceManager *rManag
   inputManager = iManager;
   novel = novelPointer;
   musicManager = resourceManager->getMusicManager();
+  backgroundImageRenderer = backgroundImageRendererPointer;
 
 
   textDisplay = new NovelTextDisplay(tRenderer);
@@ -32,7 +34,7 @@ NovelScreen::~NovelScreen() {
 }
 
 void NovelScreen::start() {
-  nextSegment();
+  nextScene();
 }
 
 void NovelScreen::update() {
@@ -60,12 +62,18 @@ void NovelScreen::draw() {
  * [NovelScreen::advance Advance the story]
  */
 void NovelScreen::advance() {
+
+  // TODO: Handle transition animations between scenes when a transition has been set by the user
   switch (novel->getNextAction()) {
     case AdvanceState::NextLine:
     nextLine();
     break;
     case AdvanceState::SceneSegmentEnd:
     nextSegment();
+    break;
+    case AdvanceState::SceneEnd:
+    nextScene();
+    break;
     default:
     break;
   }
@@ -87,4 +95,15 @@ void NovelScreen::nextSegment() {
 
   nextLine();
 
+}
+
+void NovelScreen::nextScene() {
+  NovelScene *nextScene = novel->advanceToNextScene();
+  std::cout<<"Next scene"<<std::endl;
+  // Disable the UI for a period of time
+
+  // Set the new background image
+  backgroundImageRenderer->setBackground(nextScene->getBackgroundImageName());
+
+  nextSegment();
 }

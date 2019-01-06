@@ -5,7 +5,7 @@
 
 class NovelScreen {
 public:
-  NovelScreen(sf::RenderWindow *windowPointer,ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, NovelData *novelPointer);
+  NovelScreen(sf::RenderWindow *windowPointer,ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, NovelData *novelPointer, BackgroundImageRenderer *backgroundImageRendererPointer);
   ~NovelScreen();
   void start();
   void update();
@@ -18,11 +18,13 @@ private:
   NovelTextDisplay *textDisplay;
   InputManager *inputManager;
   MusicManager *musicManager;
+  BackgroundImageRenderer *backgroundImageRenderer;
   NovelData *novel;
   void advance();
   int advanceEventId;
   void nextLine();
   void nextSegment();
+  void nextScene();
 };
 
 #endif

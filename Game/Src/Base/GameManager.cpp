@@ -2,22 +2,23 @@
 
 #include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
+#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "Base/Renderers.hpp"
 #include "Input/InputManager.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/GameManager.hpp"
 
-GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager) {
+GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, BackgroundImageRenderer *bgRenderer) {
   currentGameState = GameState::Init;
   inputManager = iManager;
 
   // Create other objects
   novel = new NovelData();
-  
+
   // Create each game GameScreen
   testScreen = new TestScreen(window, rManager, sRenderer, tRenderer);
-  novelScreen = new NovelScreen(window, rManager, sRenderer, tRenderer, iManager, novel);
+  novelScreen = new NovelScreen(window, rManager, sRenderer, tRenderer, iManager, novel, bgRenderer);
 
   changeScreen(GameState::Novel);
 }

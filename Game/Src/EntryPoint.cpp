@@ -4,6 +4,7 @@
 #include "SFML/Window.hpp"
 #include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
+#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "Base/Renderers.hpp"
 #include "Input/InputManager.hpp"

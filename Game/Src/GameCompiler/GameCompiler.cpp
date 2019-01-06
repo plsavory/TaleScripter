@@ -53,6 +53,14 @@ void GameCompiler::createResourceDatabase() {
     textStyleTable->addColumn("bold", ColumnType::tBoolean, false, "");
     textStyleTable->addColumn("italic", ColumnType::tBoolean, false, "");
 
+    // Create background image table
+    DatabaseTable *backgroundImageTable = resourceDb->addTable("background_images");
+
+    backgroundImageTable->addPrimaryKey();
+    backgroundImageTable->addColumn("name", ColumnType::tText, false, "");
+    backgroundImageTable->addColumn("filename", ColumnType::tText, false, "");
+    backgroundImageTable->addColumn("enabled", ColumnType::tBoolean, false, "");
+
     // Create the Database
     resourceDb->createDatabase();
 
@@ -71,6 +79,8 @@ void GameCompiler::createResourceDatabase() {
     DatabaseTable *chaptersTable = novelDb->addTable("chapters");
     chaptersTable->addPrimaryKey();
     chaptersTable->addColumn("title", ColumnType::tText, false, "");
+    chaptersTable->addColumn("accessible_name", ColumnType::tText, false, "");
+    chaptersTable->addColumn("hidden_from_chapter_menu", ColumnType::tBoolean, false, "");
     chaptersTable->addColumn("requirement_id", ColumnType::tInteger, false, "");
 
     DatabaseTable *scenesTable = novelDb->addTable("scenes");

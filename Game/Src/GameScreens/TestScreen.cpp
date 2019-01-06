@@ -1,5 +1,6 @@
 #include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
+#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "Base/Renderers.hpp"
 #include "GameScreens/TestScreen.hpp"
