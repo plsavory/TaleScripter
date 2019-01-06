@@ -11,7 +11,6 @@
 #include <queue>
 
 #define MAX_AUDIO_STREAMS 50
-#define DEBUG_AUDIO_STREAM
 
 enum AudioStreamState {Unloaded, Stopped, Playing, Paused, Error};
 

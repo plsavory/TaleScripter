@@ -29,12 +29,12 @@ AdvanceState NovelData::getNextAction() {
   if (currentSceneSegmentLine == getCurrentSceneSegment()->getLineCount()-1) {
 
     if (currentSceneSegment == getCurrentScene()->getSegmentCount()-1) {
-      std::cout<<"Current Scene: "<<currentScene<<"Number of scenes: "<<getCurrentChapter()->getSceneCount()-1<<std::endl;
+
       if (currentScene == getCurrentChapter()->getSceneCount()-1) {
         return AdvanceState::ChapterEnd;
       }
-      return AdvanceState::SceneEnd;
 
+      return AdvanceState::SceneEnd;
     }
 
     return AdvanceState::SceneSegmentEnd;
@@ -118,7 +118,6 @@ NovelSceneSegment* NovelData::advanceToNextSegment() {
 NovelScene* NovelData::advanceToNextScene() {
   currentSceneSegment = -1;
   currentScene++;
-  std::cout<<"Advance to next scene: "<<currentScene<<std::endl;
   return getCurrentScene();
 }
 

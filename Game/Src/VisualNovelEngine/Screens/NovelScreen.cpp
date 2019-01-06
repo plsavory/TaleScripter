@@ -99,8 +99,8 @@ void NovelScreen::nextSegment() {
 
 void NovelScreen::nextScene() {
   NovelScene *nextScene = novel->advanceToNextScene();
-  std::cout<<"Next scene"<<std::endl;
-  // Disable the UI for a period of time
+
+  // TODO: Disable the UI for a period of time
 
   // Set the new background image
   backgroundImageRenderer->setBackground(nextScene->getBackgroundImageName());

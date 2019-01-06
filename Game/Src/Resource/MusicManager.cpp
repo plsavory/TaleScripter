@@ -63,10 +63,17 @@ void MusicManager::processQueue() {
     return;
   }
 
-  // Stop all other audio streams
+  // Stop all other audio streams, do nothing if we're trying to re-play the already-playing stream
   for (int i = 0; i < MAX_AUDIO_STREAMS; i++) {
     if (audioStream[i]) {
       if (audioStream[i]->isPlaying()) {
+
+        // Do nothing if we're trying to re-play the stream which is already playing
+        if (playRequestQueue.front().getId() == i) {
+          playRequestQueue.pop();
+          return;
+        }
+
         audioStream[i]->stop(true);
       }
     }
@@ -76,6 +83,7 @@ void MusicManager::processQueue() {
 
   if (!audioStream[playRequestQueue.front().getId()]) {
     std::cout<<"Audio stream error: Stream with ID ("<<playRequestQueue.front().getId()<<") does not exist."<<std::endl;
+    playRequestQueue.pop();
     return;
   }
 

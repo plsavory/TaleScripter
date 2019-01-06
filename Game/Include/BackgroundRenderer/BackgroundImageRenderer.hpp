@@ -26,8 +26,6 @@ public:
     mySprite = new sf::Sprite();
     mySprite->setPosition(sf::Vector2f(0.f,0.f));
     window = windowPointer;
-
-    std::cout<<"Background added:" << name << " file: "<<bFilename<<std::endl;
   }
   ~Background() {
     if (myTexture) {

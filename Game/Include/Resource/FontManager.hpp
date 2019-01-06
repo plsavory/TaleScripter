@@ -53,8 +53,6 @@ public:
 
     state = FontState::fsLoaded;
 
-    std::cout<<"Font "<<getName()<<" loaded from file "<<getFilename()<<" successfully."<<std::endl;
-
   }
   sf::Font* getFont() {
     return myFont;

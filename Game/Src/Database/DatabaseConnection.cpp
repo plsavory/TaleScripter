@@ -21,9 +21,8 @@ DatabaseConnection::DatabaseConnection(std::string name) {
 
   if (rc) {
     std::cout<<"Error opening/creating database"<<std::endl;
-  } else {
-    std::cout<<"Database Opened"<<std::endl;
   }
+  
 }
 
 DatabaseConnection::~DatabaseConnection() {
