@@ -40,3 +40,7 @@ bool InputManager::isEventPressed(int id) {
 bool InputManager::isEventPressed(std::string name) {
   return keyboardHandler->isEventPressed(name);
 }
+
+void InputManager::setEnabled(bool isEnabled) {
+  keyboardHandler->setEnabled(isEnabled);
+}

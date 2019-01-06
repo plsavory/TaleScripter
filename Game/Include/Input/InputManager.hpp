@@ -13,6 +13,7 @@ public:
   int bindKeyboardEvent(std::string name, std::string key, bool onlyTriggerOnPress);
   bool isEventPressed(int id);
   bool isEventPressed(std::string name);
+  void setEnabled(bool isEnabled);
 private:
   MouseHandler *mouseHandler;
   KeyboardHandler *keyboardHandler;

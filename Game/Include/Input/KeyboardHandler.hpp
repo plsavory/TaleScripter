@@ -141,6 +141,7 @@ public:
   bool isEventPressed(int id);
   bool isEventUp(std::string name);
   void update();
+  void setEnabled(bool isEnabled);
 private:
   bool enabled;
   KeyboardEvent *keyboardEvent[0xFF];

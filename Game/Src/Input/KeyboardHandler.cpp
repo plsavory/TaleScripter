@@ -125,6 +125,10 @@ bool KeyboardHandler::isEventPressed(std::string name) {
 }
 
 bool KeyboardHandler::isEventPressed(int id) {
+  if (!enabled) {
+    return false;
+  }
+  
   return keyboardEvent[id]->isDown();
 }
 
@@ -152,4 +156,8 @@ void KeyboardHandler::update() {
       keyboardEvent[i]->update();
     }
   }
+}
+
+void KeyboardHandler::setEnabled(bool isEnabled) {
+  enabled = isEnabled;
 }

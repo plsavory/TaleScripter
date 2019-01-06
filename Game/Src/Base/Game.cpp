@@ -102,6 +102,9 @@ void Game::update(int gameTime) {
   backgroundImageRenderer->update();
   spriteRenderer->update();
   textRenderer->update();
+
+  // Don't respond to input when the window isn't in focus
+  inputManager->setEnabled(window->hasFocus());
 }
 
 /**

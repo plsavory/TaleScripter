@@ -10,6 +10,24 @@ enum AdvanceState {
   ChapterEnd, SceneEnd, SceneSegmentEnd, NextLine
 };
 
+class ProjectInformation {
+public:
+  ProjectInformation(DatabaseConnection *db);
+  std::string getGameTitle() {
+    return gameTitle;
+  }
+  std::string getAuthorName() {
+    return authorName;
+  }
+  std::string getVersionNumber() {
+    return versionNumber;
+  }
+private:
+  std::string gameTitle;
+  std::string authorName;
+  std::string versionNumber;
+};
+
 class NovelSceneSegmentLine {
 public:
   NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText);
@@ -80,6 +98,7 @@ public:
   NovelScene* advanceToNextScene();
   NovelScene* getCurrentScene();
   NovelChapter* getCurrentChapter();
+  ProjectInformation* getProjectInformation();
 private:
   void loadFromDatabase();
   DatabaseConnection *novelDb;
@@ -89,6 +108,7 @@ private:
   int currentScene;
   int currentSceneSegment;
   int currentSceneSegmentLine;
+  ProjectInformation *projectInformation;
 };
 
 #endif

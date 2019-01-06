@@ -68,6 +68,9 @@ void NovelData::loadFromDatabase() {
 
   novelDb = new DatabaseConnection("novel");
 
+  // Load project information from Database
+  projectInformation = new ProjectInformation(novelDb);
+
   DataSet *chapterData = new DataSet();
 
   novelDb->executeQuery("SELECT * FROM chapters", chapterData);
@@ -119,6 +122,10 @@ NovelScene* NovelData::advanceToNextScene() {
   currentSceneSegment = -1;
   currentScene++;
   return getCurrentScene();
+}
+
+ProjectInformation* NovelData::getProjectInformation() {
+  return projectInformation;
 }
 
 // Chapter-specific stuff
@@ -344,4 +351,41 @@ NovelSceneSegmentLine::~NovelSceneSegmentLine() {
 
 std::string NovelSceneSegmentLine::getText() {
   return text;
+}
+
+// ProjectInformation specific things
+ProjectInformation::ProjectInformation(DatabaseConnection *db) {
+
+  // Initial values
+  gameTitle = "Unnamed GameFramework Project";
+  authorName = "Unknown";
+  versionNumber = "Unknown";
+
+  // Gets information about the project and stores it
+  DataSet *projectInformationDataSet = new DataSet();
+
+  db->executeQuery("SELECT * FROM project_information LIMIT 1;", projectInformationDataSet);
+
+  if (projectInformationDataSet->getRowCount() == 0) {
+    return;
+  }
+
+  if (!projectInformationDataSet->getRow(0)) {
+    return;
+  }
+
+  if (projectInformationDataSet->getRow(0)->doesColumnExist("game_title")) {
+    gameTitle = projectInformationDataSet->getRow(0)->getColumn("game_title")->getData();
+  }
+
+  if (projectInformationDataSet->getRow(0)->doesColumnExist("author_name")) {
+    authorName = projectInformationDataSet->getRow(0)->getColumn("author_name")->getData();
+  }
+
+  if (projectInformationDataSet->getRow(0)->doesColumnExist("version_number")) {
+    versionNumber = projectInformationDataSet->getRow(0)->getColumn("version_number")->getData();
+  }
+
+  delete projectInformationDataSet;
+
 }

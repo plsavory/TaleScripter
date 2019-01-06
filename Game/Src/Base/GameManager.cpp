@@ -8,6 +8,7 @@
 #include "Input/InputManager.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/GameManager.hpp"
+#include <sstream>
 
 GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, BackgroundImageRenderer *bgRenderer) {
   currentGameState = GameState::Init;
@@ -15,6 +16,10 @@ GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, Sp
 
   // Create other objects
   novel = new NovelData();
+
+  std::string windowTitle = novel->getProjectInformation()->getGameTitle();
+
+  window->setTitle(windowTitle);
 
   // Create each game GameScreen
   testScreen = new TestScreen(window, rManager, sRenderer, tRenderer);
