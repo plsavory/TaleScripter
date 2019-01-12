@@ -1,8 +1,10 @@
 CC = g++
 CFLAGS = -std=c++17 -g -Wall -O2
+GITVER = $(shell git rev-parse --abbrev-ref HEAD)
+REVISION = $(shell git rev-parse HEAD)
 
 DIRECTORIES_TO_INCLUDE = -I Game/Include -I Libs -I Libs/SFML/include -I Libs/Lua/Include -I Libs/SQLite/Include
-FILES_TO_COMPILE = Game/Src/EntryPoint.cpp
+FILES_TO_COMPILE = Game/Src/EntryPoint.cpp Game/Src/Misc/ParameterHandler.cpp
 GAME_FRAMEWORK_FILES = Game/Src/TileRenderer/Tile.cpp Game/Src/TileRenderer/Tilemap.cpp Game/Src/TileRenderer/TileRenderer.cpp Game/Src/GameScreens/TestScreen.cpp Game/Src/Base/Game.cpp Game/Src/Base/GameManager.cpp Game/Src/Base/GameScreen.cpp Game/Src/Misc/Utils.cpp Game/Src/SpriteRenderer/SpriteRenderer.cpp Game/Src/SpriteRenderer/Sprite.cpp
 LIBRARIES = -L Libs/SFML/lib -L Libs/SQLite -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsqlite3
 
@@ -17,7 +19,7 @@ VISUAL_NOVEL_ENGINE_FILES = Game/Src/VisualNovelEngine/Screens/NovelScreen.cpp G
 BACKGROUND_RENDERER_FILES = Game/Src/BackgroundRenderer/BackgroundImageRenderer.cpp
 
 all:
-	$(CC) $(CFLAGS) $(DIRECTORIES_TO_INCLUDE) $(GAME_FRAMEWORK_FILES) $(AUDIO_MANAGER_FILES) $(INPUT_MANAGER_FILES) $(RESOURCE_MANAGER_FILES) $(DATABASE_FILES) $(FONT_MANAGER_FILES) $(TEXT_RENDERER_FILES) $(FILES_TO_COMPILE) $(BACKGROUND_RENDERER_FILES) $(VISUAL_NOVEL_ENGINE_FILES) $(LIBRARIES) -o build\Test
+	$(CC) $(CFLAGS) $(DIRECTORIES_TO_INCLUDE) -DCURRENT_BRANCH=$(GITVER) -DCURRENT_COMMIT=$(REVISION) $(GAME_FRAMEWORK_FILES) $(AUDIO_MANAGER_FILES) $(INPUT_MANAGER_FILES) $(RESOURCE_MANAGER_FILES) $(DATABASE_FILES) $(FONT_MANAGER_FILES) $(TEXT_RENDERER_FILES) $(FILES_TO_COMPILE) $(BACKGROUND_RENDERER_FILES) $(VISUAL_NOVEL_ENGINE_FILES) $(LIBRARIES) -o build\Test
 
 compiler:
 	$(CC) $(CFLAGS) $(DIRECTORIES_TO_INCLUDE) $(GAME_COMPILER_FILES) $(DATABASE_FILES) $(LIBRARIES) -o build\Test-compiler
