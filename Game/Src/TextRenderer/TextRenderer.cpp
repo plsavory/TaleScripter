@@ -62,3 +62,7 @@ void TextRenderer::draw() {
   }
 
 }
+
+FontManager* TextRenderer::getFontManager() {
+  return fontManager;
+}

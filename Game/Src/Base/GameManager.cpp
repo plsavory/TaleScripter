@@ -13,6 +13,7 @@
 GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, BackgroundImageRenderer *bgRenderer) {
   currentGameState = GameState::Init;
   inputManager = iManager;
+  resourceManager = rManager;
 
   // Create other objects
   novel = new NovelData();
@@ -24,8 +25,6 @@ GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, Sp
   // Create each game GameScreen
   testScreen = new TestScreen(window, rManager, sRenderer, tRenderer);
   novelScreen = new NovelScreen(window, rManager, sRenderer, tRenderer, iManager, novel, bgRenderer);
-
-  changeScreen(GameState::Novel);
 }
 
 GameManager::~GameManager() {
@@ -41,12 +40,17 @@ void GameManager::update() {
   switch (currentGameState) {
     case GameState::Novel:
     novelScreen->update();
-    break;
+    return;
     case GameState::Test:
     testScreen->update();
-    break;
+    return;
     default:
     break;
+  }
+
+  // Start the game once initial resource loading has completed
+  if (currentGameState == GameState::Init && resourceManager->isQueueEmpty()) {
+    changeScreen(GameState::Novel);
   }
 
 }
@@ -55,10 +59,10 @@ void GameManager::draw() {
   switch (currentGameState) {
     case GameState::Novel:
     novelScreen->draw();
-    break;
+    return;
     case GameState::Test:
     testScreen->draw();
-    break;
+    return;
     default:
     break;
   }

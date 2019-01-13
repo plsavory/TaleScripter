@@ -10,7 +10,9 @@ public:
   void displayWholeStringImmediately();
   void setText(std::string newText);
 private:
+  std::string wordWrap(std::string textToWrap, float maxWidth);
   TextRenderer *textRenderer;
+  FontManager *fontManager;
   std::string storyFont;
   std::string currentDisplayText;
   std::string fullDisplayText;
@@ -18,6 +20,7 @@ private:
   sf::Clock *textCounterClock;
   int textCounterDelay;
   Text *myText;
+  int maxTextWidth;
 };
 
 #endif

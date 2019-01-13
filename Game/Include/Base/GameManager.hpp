@@ -28,6 +28,7 @@ private:
   TestScreen *testScreen;
   NovelScreen *novelScreen;
   NovelData *novel;
+  ResourceManager *resourceManager;
 };
 
 #endif

@@ -87,6 +87,7 @@ public:
   void update();
   void draw();
   Text* addText(std::string name, std::string font);
+  FontManager* getFontManager();
 private:
   sf::RenderWindow *window;
   FontManager *fontManager;

@@ -110,3 +110,64 @@ bool Utils::fileExists(const std::string &fileName) {
   return false;
 
 }
+
+/**
+ * [Utils::explodeString Splits a string into pieces and returns a vector containing them]
+ * @param string    [The string to split]
+ * @param delimiter [The character to split on]
+ */
+std::vector<std::string> Utils::explodeString(const std::string &string, char delimiter) {
+
+  std::vector<std::string> returnValue;
+  std::stringstream ss(string);
+  std::string currentItem;
+
+  while (std::getline(ss, currentItem, delimiter)) {
+    returnValue.push_back(currentItem);
+  }
+
+  return returnValue;
+
+}
+
+/**
+ * [Utils::implodeString Takes a vector of strings and a delimiter, returns them all as one string]
+ * @param  explodedString [The vector of strings to join]
+ * @param  glue           [A string to separate each element]
+ * @param  count          [Max number of elements to add to the string]
+ * @return                [The imploded string]
+ */
+std::string Utils::implodeString(std::vector<std::string> explodedString, std::string glue, unsigned int count) {
+
+  std::string returnValue;
+  unsigned int wordCount = 0;
+
+  while (!explodedString.empty()) {
+
+    std::string thisElement = "";
+    thisElement.append(explodedString.front());
+
+    explodedString.erase(explodedString.begin());
+
+    if (!explodedString.empty()) {
+
+      // Also check to ensure that we aren't appending to a newline
+      if (thisElement != "\n") {
+        thisElement.append(glue);
+      }
+    }
+
+    returnValue.append(thisElement);
+
+    // If we've reached the end of the number of characters we want to append, stop here
+    if (count != 0) {
+      if ((++wordCount) == count) {
+        return returnValue;
+      }
+    }
+
+  }
+
+  return returnValue;
+
+}
