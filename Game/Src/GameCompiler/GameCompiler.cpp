@@ -37,13 +37,13 @@ void GameCompiler::createResourceDatabase() {
 
     // Create font and text transform tables
     DatabaseTable *fontTable = resourceDb->addTable("fonts");
-
     fontTable->addPrimaryKey();
     fontTable->addColumn("name", ColumnType::tText, false, "");
     fontTable->addColumn("filename", ColumnType::tText, false, "");
     fontTable->addColumn("enabled", ColumnType::tBoolean, false, "");
 
     DatabaseTable *textStyleTable = resourceDb->addTable("text_styles");
+    textStyleTable->addPrimaryKey();
     textStyleTable->addColumn("name", ColumnType::tText, false, "");
     textStyleTable->addColumn("font_id", ColumnType::tInteger, false, "");
     textStyleTable->addColumn("size", ColumnType::tInteger, false, "");
@@ -55,19 +55,26 @@ void GameCompiler::createResourceDatabase() {
 
     // Create background image table
     DatabaseTable *backgroundImageTable = resourceDb->addTable("background_images");
-
     backgroundImageTable->addPrimaryKey();
     backgroundImageTable->addColumn("name", ColumnType::tText, false, "");
     backgroundImageTable->addColumn("filename", ColumnType::tText, false, "");
     backgroundImageTable->addColumn("enabled", ColumnType::tBoolean, false, "");
+
+    DatabaseTable *backgroundImageAttributesTable = resourceDb->addTable("background_image_attributes");
+    backgroundImageAttributesTable->addPrimaryKey();
+    backgroundImageAttributesTable->addColumn("background_image_id", ColumnType::tInteger, false, "");
+    backgroundImageAttributesTable->addColumn("enabled", ColumnType::tBoolean, false, "");
+    backgroundImageAttributesTable->addColumn("max_height", ColumnType::tInteger, false, "");
+    backgroundImageAttributesTable->addColumn("max_width", ColumnType::tInteger, false, "");
+    backgroundImageAttributesTable->addColumn("offset_left", ColumnType::tInteger, false, "");
+    backgroundImageAttributesTable->addColumn("offset_top", ColumnType::tInteger, false, "");
 
     // TODO: Pull in the Lua library to allow the script system to work
     DatabaseTable *scriptsTable = resourceDb->addTable("scripts");
-
-    backgroundImageTable->addPrimaryKey();
-    backgroundImageTable->addColumn("name", ColumnType::tText, false, "");
-    backgroundImageTable->addColumn("filename", ColumnType::tText, false, "");
-    backgroundImageTable->addColumn("enabled", ColumnType::tBoolean, false, "");
+    scriptsTable->addPrimaryKey();
+    scriptsTable->addColumn("name", ColumnType::tText, false, "");
+    scriptsTable->addColumn("filename", ColumnType::tText, false, "");
+    scriptsTable->addColumn("enabled", ColumnType::tBoolean, false, "");
 
     // Create the Database
     resourceDb->createDatabase();
@@ -91,7 +98,7 @@ void GameCompiler::createResourceDatabase() {
     gameInformationTable->addColumn("game_title", ColumnType::tText, false, "");
     gameInformationTable->addColumn("author_name", ColumnType::tText, false, "");
     gameInformationTable->addColumn("version_number", ColumnType::tDouble, false, "");
-    gameInformationTable->addColumn("text_display_type", ColumnType:tInteger, false, "");
+    gameInformationTable->addColumn("text_display_type", ColumnType::tInteger, false, "");
 
     /*
       A chapter can appear on the main menu once the player has read the previous one.
@@ -151,7 +158,33 @@ void GameCompiler::createResourceDatabase() {
     segmentLinesTable->addColumn("scene_segment_id", ColumnType::tInteger, true, "");
     segmentLinesTable->addColumn("language_id", ColumnType::tInteger, true, "");
     segmentLinesTable->addColumn("character_id", ColumnType::tInteger, false, "");
+    segmentLinesTable->addColumn("override_character_name", ColumnType::tText, false, "");
     segmentLinesTable->addColumn("text", ColumnType::tText, true, "");
+
+    /*
+      When a row in this table is linked to a segment line, the given action will happen with the given argument
+     */
+    DatabaseTable *segmentLineActionsTable = novelDb->addTable("segment_line_actions");
+    segmentLineActionsTable->addPrimaryKey();
+    segmentLineActionsTable->addColumn("segment_line_id", ColumnType::tInteger, true, "");
+    segmentLineActionsTable->addColumn("action_type_id", ColumnType::tInteger, true, "");
+    segmentLineActionsTable->addColumn("argument0", ColumnType::tText, false, "");
+    segmentLineActionsTable->addColumn("argument1", ColumnType::tText, false, "");
+    segmentLineActionsTable->addColumn("argument2", ColumnType::tText, false, "");
+    segmentLineActionsTable->addColumn("argument3", ColumnType::tText, false, "");
+
+    /*
+      Contains name and signatures of action types
+     */
+    DatabaseTable *actionTypesTable = novelDb->addTable("action_types");
+    actionTypesTable->addPrimaryKey();
+    actionTypesTable->addColumn("name", ColumnType::tText, true, "");
+    actionTypesTable->addColumn("description", ColumnType::tText, false, "");
+    actionTypesTable->addColumn("number_of_arguments", ColumnType::tText, true, "");
+    actionTypesTable->addColumn("argument0_description", ColumnType::tText, false, "");
+    actionTypesTable->addColumn("argument1_description", ColumnType::tText, false, "");
+    actionTypesTable->addColumn("argument2_description", ColumnType::tText, false, "");
+    actionTypesTable->addColumn("argument3_description", ColumnType::tText, false, "");
 
     /*
       The text_breaks table will be used to signify when the screen should clear
@@ -163,7 +196,14 @@ void GameCompiler::createResourceDatabase() {
      */
     DatabaseTable *textBreaksTable = novelDb->addTable("text_breaks");
     textBreaksTable->addPrimaryKey();
-    textBreaksTable->addColumn("", ColumnType::tInteger, false, "");
+    textBreaksTable->addColumn("segment_line_id", ColumnType::tInteger, false, "");
+
+    DatabaseTable *charactersTable = novelDb->addTable("characters");
+    charactersTable->addPrimaryKey();
+    charactersTable->addColumn("first_name", ColumnType::tText, true, "");
+    charactersTable->addColumn("surname", ColumnType::tText, false, "");
+    charactersTable->addColumn("bio", ColumnType::tText, false, "");
+    charactersTable->addColumn("age", ColumnType::tText, false, "");
 
     novelDb->createDatabase();
   }

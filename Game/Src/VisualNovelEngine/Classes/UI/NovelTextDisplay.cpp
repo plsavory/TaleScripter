@@ -1,17 +1,21 @@
 #include <iostream>
 #include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
-#include "Resource/FontManager.hpp"
+#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
+#include "Resource/ResourceManager.hpp"
 #include "TextRenderer/TextRenderer.hpp"
+#include "SpriteRenderer/SpriteRenderer.hpp"
 #include "VisualNovelEngine/Classes/UI/NovelTextDisplay.hpp"
 #include <sstream>
 #include <vector>
 #include "Misc/Utils.hpp"
 
-NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer) {
+NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer,SpriteRenderer *sRenderer, ResourceManager *rManager) {
 
   textRenderer = tRenderer;
   fontManager = tRenderer->getFontManager();
+  spriteRenderer = sRenderer;
+  resourceManager = rManager;
 
   textCounterDelay = 35;
   textCounterClock = new sf::Clock();
@@ -22,19 +26,34 @@ NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer) {
   storyFont = "story_font"; // TODO: Load from config
 
   myText = textRenderer->addText("novel_text_display_text", storyFont);
-  myText->setPosition(10,400);
+  myText->setPosition(150,600);
+  myText->setOutline(sf::Color::Black, 2); // TODO: Load from game theme in database
 
-  maxTextWidth = 1280;
+  nameDisplayText = textRenderer->addText("novel_text_display_name", storyFont);
+  nameDisplayText->setPosition(150,550);
+  nameDisplayText->setOutline(sf::Color::Black, 2); // TODO: Load from game theme in database
+  nameDisplayText->setString("");
+  maxTextWidth = 980;
+
+  // TODO: Load this from the database rather than hardcoded here
+  resourceManager->loadTexture("resource\\sprites\\vn_line.png", "novel_text_display_background");
+  backgroundSprite = spriteRenderer->addSprite("novel_text_display_background", "novel_text_display_background",2);
+
+  if (backgroundSprite) {
+    backgroundSprite->setPosition(140,585);
+  }
 }
 
 NovelTextDisplay::~NovelTextDisplay() {
 
 }
 
-void NovelTextDisplay::setText(std::string newText) {
+void NovelTextDisplay::setText(std::string newText, std::string cName) {
   newText = wordWrap(newText, maxTextWidth);
   currentDisplayText = "";
   fullDisplayText = newText;
+  characterName = cName;
+  nameDisplayText->setString(characterName);
 }
 
 void NovelTextDisplay::update() {

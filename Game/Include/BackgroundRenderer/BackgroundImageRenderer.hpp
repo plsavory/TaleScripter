@@ -16,6 +16,33 @@ private:
   TransitionType transitionType;
 };
 
+class BackgroundImageAttributes {
+public:
+  BackgroundImageAttributes(float mWidth, float mHeight, float oLeft, float oTop) {
+    maxHeight = mHeight;
+    maxWidth = mWidth;
+    offsetLeft = oLeft;
+    offsetTop = oTop;
+  }
+  float getMaxHeight() {
+    return maxHeight;
+  }
+  float getMaxWidth() {
+    return maxWidth;
+  }
+  float getOffsetLeft() {
+    return offsetLeft;
+  }
+  float getOffsetTop() {
+    return offsetTop;
+  }
+private:
+  float maxHeight;
+  float maxWidth;
+  float offsetLeft;
+  float offsetTop;
+};
+
 class Background {
 public:
   Background(std::string bName, std::string bFilename, sf::RenderWindow *windowPointer) {
@@ -43,6 +70,11 @@ public:
 
     myTexture->loadFromFile(fileName);
     mySprite->setTexture(*myTexture, true);
+
+    if (attributes) {
+      // Apply the attributes onto the sprite object
+      mySprite->setScale(attributes->getMaxWidth()/myTexture->getSize().x,attributes->getMaxHeight()/myTexture->getSize().y);
+    }
     myStatus = BackgroundStatus::bgLoaded;
   }
   BackgroundStatus getStatus() {
@@ -58,6 +90,11 @@ public:
   std::string getName() {
     return name;
   }
+  void setAttributes(BackgroundImageAttributes *a) {
+    if (a) {
+      attributes = a;
+    }
+  }
 private:
   std::string name;
   std::string fileName;
@@ -66,6 +103,7 @@ private:
   sf::Sprite *mySprite;
   BackgroundStatus myStatus;
   sf::RenderWindow *window;
+  BackgroundImageAttributes *attributes = NULL;
 };
 
 class BackgroundLoadRequest {

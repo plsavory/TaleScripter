@@ -88,7 +88,7 @@ void FontManager::loadAllFromDatabase(DatabaseConnection *database) {
 
   database->executeQuery("SELECT * FROM fonts", result);
 
-  for (int i = 0; i < result->getRowCount()-1; i++) {
+  for (int i = 0; i < result->getRowCount(); i++) {
     // Ignore this entry if either of the columns are missing data
     if (!(result->getRow(i)->doesColumnExist("name") && result->getRow(i)->doesColumnExist("filename"))) {
       continue;

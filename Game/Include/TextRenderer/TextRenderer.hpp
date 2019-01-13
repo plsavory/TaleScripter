@@ -43,6 +43,12 @@ public:
 
     fontSet = true;
   }
+
+  void setOutline(sf::Color color, float thickness) {
+    textObj->setOutlineColor(color);
+    textObj->setOutlineThickness(thickness);
+  }
+
   bool hasFontLoaded() {
     return !(font == NULL);
   }

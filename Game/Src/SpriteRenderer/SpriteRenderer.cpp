@@ -167,18 +167,18 @@ Sprite* SpriteRenderer::getSprite(std::string name) {
  * [SpriteRenderer::addSprite Add a sprite to the renderer]
  * @param  imageName [The name of the image (stored in TextureManager)]
  * @param  name      [Accessible name of the sprite]
- * @return           [ID of the sprite, -1 on failure]
+ * @return           [Sprite object, null on failure]
  */
-int SpriteRenderer::addSprite(std::string imageName, std::string name, int priority) {
+Sprite* SpriteRenderer::addSprite(std::string imageName, std::string name, int priority) {
 
   for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
     if (!sprite[i]) {
       sprite[i] = new Sprite(textureManager,displayWindow, name, imageName, priority);
-      return i;
+      return sprite[i];
     }
   }
 
-  return -1;
+  return NULL;
 
 }
 

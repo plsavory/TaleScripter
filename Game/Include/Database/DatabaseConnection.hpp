@@ -162,12 +162,7 @@ public:
     }
   }
   int getRowCount() {
-
-    if (rowCount == 0) {
-      return 0;
-    }
-    
-    return rowCount+1;
+    return rowCount;
   }
   DataSetRow* getRow(int id) {
     return row[id];

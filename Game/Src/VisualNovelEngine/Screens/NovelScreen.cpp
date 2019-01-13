@@ -23,7 +23,7 @@ NovelScreen::NovelScreen(sf::RenderWindow *windowPointer,ResourceManager *rManag
   backgroundImageRenderer = backgroundImageRendererPointer;
 
 
-  textDisplay = new NovelTextDisplay(tRenderer);
+  textDisplay = new NovelTextDisplay(tRenderer, spriteRenderer, resourceManager);
 
   // User input bindings for this screen (TODO: Also react to gamepad and mouse input)
   advanceEventId = inputManager->bindKeyboardEvent("novel_screen_text_advance","return", true);
@@ -82,7 +82,25 @@ void NovelScreen::advance() {
 void NovelScreen::nextLine() {
 
   NovelSceneSegmentLine *nextLine = novel->getNextLine();
-  textDisplay->setText(nextLine->getText());
+
+  // If the next line has a character or override name attached to it, use that as the character name
+  int characterId = nextLine->getCharacterId();
+
+  std::string characterName("");
+
+  if (!nextLine->getOverrideCharacterName().empty()) {
+    characterName = nextLine->getOverrideCharacterName();
+  }
+
+  if (characterId > 0 && characterName.empty()) {
+    Character* character = novel->getCharacter(characterId);
+
+    if (character) {
+      characterName = character->getFirstName();
+    }
+  }
+
+  textDisplay->setText(nextLine->getText(), characterName);
 
 }
 

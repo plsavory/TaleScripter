@@ -5,9 +5,23 @@
 #define MAX_SCENES 50
 #define MAX_SEGMENTS 50
 #define MAX_LINES 1000
+#define MAX_CHARACTERS 50
 
 enum AdvanceState {
   ChapterEnd, SceneEnd, SceneSegmentEnd, NextLine
+};
+
+class Character {
+public:
+  Character(int cId, std::string cFirstName, std::string cSurname, std::string cBio, std::string cAge);
+  int getId();
+  std::string getFirstName();
+private:
+  int id;
+  std::string firstName;
+  std::string surname;
+  std::string bio;
+  std::string age;
 };
 
 class ProjectInformation {
@@ -30,13 +44,16 @@ private:
 
 class NovelSceneSegmentLine {
 public:
-  NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText);
+  NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, std::string sslOverrideCharacterName);
   ~NovelSceneSegmentLine();
   std::string getText();
+  int getCharacterId();
+  std::string getOverrideCharacterName();
 private:
   int id;
   int characterId;
   std::string text;
+  std::string overrideCharacterName;
 };
 
 class NovelSceneSegment {
@@ -99,10 +116,12 @@ public:
   NovelScene* getCurrentScene();
   NovelChapter* getCurrentChapter();
   ProjectInformation* getProjectInformation();
+  Character* getCharacter(int id);
 private:
   void loadFromDatabase();
   DatabaseConnection *novelDb;
   NovelChapter *chapter[MAX_CHAPTERS];
+  Character *character[MAX_CHARACTERS];
   int chapterCount;
   int currentChapter;
   int currentScene;

@@ -111,6 +111,11 @@ public:
 
     // If any of the keys are pressed, exit the function so that we don't set canTriggerEvent
     for (int i = 0; i < 4; i++) {
+
+      if (key[i] == sf::Keyboard::Unknown) {
+        continue;
+      }
+
       if (sf::Keyboard::isKeyPressed(key[i])) {
         return;
       }

@@ -75,7 +75,7 @@ void DatabaseConnection::executeQuery(std::string query, DataSet *destinationDat
             std::string columnName((cName ? cName : ""));
             std::string data((cData ? cData : ""));
 
-            row->addColumn(cName, cData);
+            row->addColumn(columnName,data);
           }
         }
 
@@ -101,6 +101,8 @@ void DatabaseConnection::executeQuery(std::string query, DataSet *destinationDat
 
   if (error != "not an error") {
     std::cout<<"An SQL error occurred: " << error << std::endl;
+    std::cout<<std::endl<<"---------------------"<<std::endl;
+    std::cout<<query<<std::endl;
   }
 
   return;

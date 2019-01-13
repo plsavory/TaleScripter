@@ -1,5 +1,6 @@
 #include <iostream>
 #include <queue>
+#include <sstream>
 #include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "BackgroundRenderer/BackgroundImageRenderer.hpp"
@@ -89,7 +90,7 @@ void BackgroundImageRenderer::addAllFromDatabase(DatabaseConnection *db) {
 
   db->executeQuery("SELECT * FROM background_images WHERE enabled IS TRUE;", result);
 
-  for (int i = 0; i < result->getRowCount()-1; i++) {
+  for (int i = 0; i < result->getRowCount(); i++) {
 
     // Ignore this entry if either of the columns are missing data
     if (!(result->getRow(i)->doesColumnExist("name") && result->getRow(i)->doesColumnExist("filename"))) {
@@ -98,11 +99,48 @@ void BackgroundImageRenderer::addAllFromDatabase(DatabaseConnection *db) {
 
     std::string name = result->getRow(i)->getColumn("name")->getData();
     std::string fname = result->getRow(i)->getColumn("filename")->getData();
+    std::string id = result->getRow(i)->getColumn("id")->getData();
 
     std::string fullFileName = "resource\\backgrounds\\";
     fullFileName.append(fname);
 
-    addBackground(name, fullFileName);
+    Background *addedBackground = addBackground(name, fullFileName);
+
+    if (!addedBackground) {
+      return;
+    }
+
+    // If we have loaded a background, see if the background has any attributes in the database and apply them
+    DataSet *attributeResult = new DataSet();
+    std::ostringstream ss;
+    ss << "SELECT * FROM background_image_attributes WHERE background_image_id = " << id << " ORDER BY id DESC LIMIT 1;";
+    db->executeQuery(ss.str(), attributeResult);
+
+    if (attributeResult->getRowCount() == 1) {
+
+      float maxWidth = 0;
+      float maxHeight = 0;
+      float offsetLeft = 0;
+      float offsetTop = 0;
+
+      if (attributeResult->getRow(0)->doesColumnExist("max_width")) {
+        maxWidth = std::atof(attributeResult->getRow(0)->getColumn("max_width")->getData().c_str());
+      }
+
+      if (attributeResult->getRow(0)->doesColumnExist("max_height")) {
+        maxHeight = std::atof(attributeResult->getRow(0)->getColumn("max_height")->getData().c_str());
+      }
+
+      if (attributeResult->getRow(0)->doesColumnExist("offset_left")) {
+        offsetLeft = std::atof(attributeResult->getRow(0)->getColumn("offset_left")->getData().c_str());
+      }
+
+      if (attributeResult->getRow(0)->doesColumnExist("offset_top")) {
+        offsetTop = std::atof(attributeResult->getRow(0)->getColumn("offset_top")->getData().c_str());
+      }
+
+      addedBackground->setAttributes(new BackgroundImageAttributes(maxWidth, maxHeight, offsetLeft, offsetTop));
+    }
 
   }
 }

@@ -65,6 +65,8 @@ bool DatabaseSchema::createDatabase() {
 
       if (rc != SQLITE_OK) {
         std::cout<<"-----------"<<std::endl<<"Sql error:"<<std::endl<< zErrMsg << std::endl;
+        std::cout<<std::endl<<"---------------------"<<std::endl;
+        std::cout<<query<<std::endl;
         sqlite3_free(zErrMsg);
       } else {
         std::cout<<"Table "<<table[i]->getName()<<" created successfully."<<std::endl;
