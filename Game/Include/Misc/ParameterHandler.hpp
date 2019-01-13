@@ -9,4 +9,5 @@ public:
 private:
   bool shouldExitProgram;
   void printVersionInformation();
+  void printLicenceInformation();
 };

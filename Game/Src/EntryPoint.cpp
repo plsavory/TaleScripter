@@ -10,6 +10,7 @@
 #include "Input/InputManager.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/GameManager.hpp"
+#include <thread>
 #include "Base/Game.hpp"
 #include "Misc/ParameterHandler.hpp"
 

@@ -1,4 +1,4 @@
-#define PROJECT_NAME "GameFramework"
+#define PROJECT_NAME "TaleScripter"
 #define PROJECT_VERSION "v0.0.1"
 
 

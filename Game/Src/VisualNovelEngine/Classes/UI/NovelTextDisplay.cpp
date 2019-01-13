@@ -91,8 +91,6 @@ void NovelTextDisplay::displayWholeStringImmediately() {
  */
 std::string NovelTextDisplay::wordWrap(std::string textToWrap, float maxWidth) {
 
-  std::string stringToProcess = fullDisplayText;
-
   sf::Text *text = new sf::Text();
   Font *font = fontManager->getFont("story_font");
 

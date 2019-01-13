@@ -18,6 +18,8 @@
 #include "Input/InputManager.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/GameManager.hpp"
+#include <thread>
+#include <chrono>
 #include "Base/Game.hpp"
 
 /**
@@ -45,9 +47,11 @@ Game::~Game() {
 void Game::run() {
   // TODO: Load config file
 
+  int frameRateLimit = 60;
+
   // Initialise SFML
-  window = new sf::RenderWindow(sf::VideoMode(1280,720), gameTitle, sf::Style::Close);
-  window->setFramerateLimit(60);
+  window = new sf::RenderWindow(sf::VideoMode(1280,720), gameTitle, sf::Style::Default);
+  window->setFramerateLimit(frameRateLimit);
 
   // Create ResourceManager to spin up the resource loading thread
   inputManager = new InputManager();
@@ -58,6 +62,13 @@ void Game::run() {
   gameManager = new GameManager(window, resourceManager, spriteRenderer, textRenderer, inputManager, backgroundImageRenderer);
 
   sf::Clock updateClock;
+
+  #ifdef MULTITHREADED_RENDERING
+  // Launch the rendering thread if that compile option is enabled
+  window->setActive(false);
+  renderingThread = new std::thread(&Game::renderingThreadFunction, this);
+  renderingThread->detach(); // Launch the thread
+  #endif
 
   // Enter the main loop
   while (window->isOpen()) {
@@ -80,14 +91,14 @@ void Game::run() {
     // Update the game state 60 times a second
     update(updateClock.getElapsedTime().asMilliseconds());
 
-    // Clear the window
-    window->clear(sf::Color::Black);
-
+    #ifndef MULTITHREADED_RENDERING
     // Draw the game
     draw();
-
-    // Update the Window
     window->display();
+    #else
+    // Sleep the main thread for the time that one frame should happen
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000/frameRateLimit));
+    #endif
   }
 
 }
@@ -112,8 +123,25 @@ void Game::update(int gameTime) {
  */
 void Game::draw() {
   // TODO: Handle priorities for different types of rendering
+  // Clear the window
+  window->clear(sf::Color::Black);
+
   gameManager->draw();
   backgroundImageRenderer->draw();
   spriteRenderer->draw();
   textRenderer->draw();
 }
+
+#ifdef MULTITHREADED_RENDERING
+
+void Game::renderingThreadFunction() {
+  window->setActive(true);
+  window->setFramerateLimit(60);
+
+  while (window->isOpen()) {
+    draw();
+    window->display();
+  }
+}
+
+#endif
