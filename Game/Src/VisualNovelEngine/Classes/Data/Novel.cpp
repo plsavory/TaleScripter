@@ -15,12 +15,22 @@ NovelData::NovelData() {
   start();
 }
 
+/**
+ * [NovelData::start Start the novel from the start of the game]
+ */
 void NovelData::start() {
+  start(0,-1,-1,-1);
+}
 
-  currentChapter = 0;
-  currentScene = -1;
-  currentSceneSegment = -1;
-  currentSceneSegmentLine = -1; // Game hasn't started yet, first line has id of 0
+/**
+ * [NovelData::start Start the novel from the given position]
+ */
+void NovelData::start(int cChapter, int cScene, int cSceneSegment, int cSceneSegmentLine) {
+  
+  currentChapter = cChapter;
+  currentScene = cScene;
+  currentSceneSegment = cSceneSegment;
+  currentSceneSegmentLine = cSceneSegmentLine; // Game hasn't started yet, first line has id of 0
 
 }
 

@@ -6,16 +6,8 @@
  */
 
 #include <iostream>
-#include "SFML/System.hpp"
-#include "SFML/Window.hpp"
-#include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
-#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
-#include "Resource/ResourceManager.hpp"
-#include "SpriteRenderer/SpriteRenderer.hpp"
-#include "TextRenderer/TextRenderer.hpp"
-#include "SFML/Graphics.hpp"
-#include "Input/InputManager.hpp"
+#include "Base/Engine.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/GameManager.hpp"
 #include <thread>
@@ -34,18 +26,14 @@ Game::Game() {
  */
 Game::~Game() {
   delete(gameManager);
-  delete(resourceManager);
-  delete(spriteRenderer);
-  delete(textRenderer);
-  delete(inputManager);
-  delete(backgroundImageRenderer);
+  delete(engine);
 }
 
 /**
  * [Game::run Initialise and run the game]
  */
 void Game::run() {
-  // TODO: Load config file
+  // TODO: Load from config file
 
   int frameRateLimit = 60;
 
@@ -53,13 +41,16 @@ void Game::run() {
   window = new sf::RenderWindow(sf::VideoMode(1280,720), gameTitle, sf::Style::Default);
   window->setFramerateLimit(frameRateLimit);
 
+  // Create the main engine object(s)
+  engine = new Engine(window);
+
   // Create ResourceManager to spin up the resource loading thread
-  inputManager = new InputManager();
-  backgroundImageRenderer = new BackgroundImageRenderer(window);
-  resourceManager = new ResourceManager(backgroundImageRenderer);
-  spriteRenderer = new SpriteRenderer(window,resourceManager->getTextureManager());
-  textRenderer = new TextRenderer(window, resourceManager->getFontManager());
-  gameManager = new GameManager(window, resourceManager, spriteRenderer, textRenderer, inputManager, backgroundImageRenderer);
+  inputManager = engine->getInputManager();
+  backgroundImageRenderer = engine->getBackgroundImageRenderer();
+  resourceManager = engine->getResourceManager();
+  spriteRenderer = engine->getSpriteRenderer();
+  textRenderer = engine->getTextRenderer();
+  gameManager = new GameManager(engine);
 
   sf::Clock updateClock;
 

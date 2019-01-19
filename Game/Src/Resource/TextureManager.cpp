@@ -1,6 +1,9 @@
 #include <iostream>
 #include "Resource/TextureManager.hpp"
 
+/**
+ * [TextureManager::TextureManager Usual NULL initialisation so that if statements will work]
+ */
 TextureManager::TextureManager() {
 
   for (int i = 0; i<MAX_TEXTURES; i++) {
@@ -9,6 +12,9 @@ TextureManager::TextureManager() {
 
 }
 
+/**
+ * [TextureManager Delete all textures when self is deleted.]
+ */
 TextureManager::~TextureManager() {
 
   for (int i = 0; i<MAX_TEXTURES; i++) {
@@ -105,14 +111,31 @@ void TextureManager::processQueue() {
 
 }
 
+/**
+ * [TextureManager::isQueueEmpty Check if the texture load queue is empty]
+ * @return [True if queue is empty, otherwise false]
+ */
 bool TextureManager::isQueueEmpty() {
   return (textureLoadQueue.size() == 0);
 }
 
+/**
+ * [TextureManager::getTexture Gets the texture at the given texture array slot]
+ * @param  id [The ID of the texture]
+ * @return    [Texture object pointer]
+ */
 Texture* TextureManager::getTexture(int id) {
   return (texture[id]);
 }
 
+/**
+ * [TextureManager::getTexture Returns a texture with the given name
+ * Is slower than getting it directly through the ID so this should really
+ * only be used once to get a pointer to it]
+ * @param  name [Name of the texture]
+ * @return      [Success: Texture object pointer
+ *               Failure: NULL]
+ */
 Texture* TextureManager::getTexture(std::string name) {
   int textureId = findTexture(name);
 

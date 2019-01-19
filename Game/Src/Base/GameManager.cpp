@@ -1,30 +1,28 @@
 // GameManager.cpp - Manages the current game control flow. Calls the appropriate objects depending on the current state of the game.
 
-#include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
-#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
-#include "Resource/ResourceManager.hpp"
-#include "Base/Renderers.hpp"
-#include "Input/InputManager.hpp"
+#include "Base/Engine.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/GameManager.hpp"
 #include <sstream>
 
-GameManager::GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, BackgroundImageRenderer *bgRenderer) {
+GameManager::GameManager(Engine *enginePointer) {
   currentGameState = GameState::Init;
-  inputManager = iManager;
-  resourceManager = rManager;
+
+  engine = enginePointer;
+  sf::RenderWindow *window = engine->getWindow();
+  inputManager = engine->getInputManager();
+  resourceManager = engine->getResourceManager();
 
   // Create other objects
   novel = new NovelData();
 
   std::string windowTitle = novel->getProjectInformation()->getGameTitle();
-
   window->setTitle(windowTitle);
 
   // Create each game GameScreen
-  testScreen = new TestScreen(window, rManager, sRenderer, tRenderer);
-  novelScreen = new NovelScreen(window, rManager, sRenderer, tRenderer, iManager, novel, bgRenderer);
+  testScreen = new TestScreen(engine);
+  novelScreen = new NovelScreen(engine, novel);
 }
 
 GameManager::~GameManager() {

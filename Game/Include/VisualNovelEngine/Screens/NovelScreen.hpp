@@ -5,12 +5,13 @@
 
 class NovelScreen {
 public:
-  NovelScreen(sf::RenderWindow *windowPointer,ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, NovelData *novelPointer, BackgroundImageRenderer *backgroundImageRendererPointer);
+  NovelScreen(Engine *enginePointer, NovelData *novelPointer);
   ~NovelScreen();
   void start();
   void update();
   void draw();
 private:
+  Engine *engine;
   sf::RenderWindow *window;
   SpriteRenderer *spriteRenderer;
   ResourceManager *resourceManager;

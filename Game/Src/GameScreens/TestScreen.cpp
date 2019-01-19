@@ -1,16 +1,20 @@
-#include "SFML/Graphics.hpp"
+/*
+  TestScreen.cpp - Test any random things here. Keyboard shortcut should be enabled to jump to the test screen
+ */
+
+
 #include "Database/DatabaseConnection.hpp"
-#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
-#include "Resource/ResourceManager.hpp"
-#include "Base/Renderers.hpp"
+#include "Base/Engine.hpp"
 #include "GameScreens/TestScreen.hpp"
 #include <iostream>
 
-TestScreen::TestScreen(sf::RenderWindow *windowPointer, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer) {
-  window = windowPointer;
-  spriteRenderer = sRenderer;
-  resourceManager = rManager;
-  textRenderer = tRenderer;
+
+TestScreen::TestScreen(Engine *enginePointer) {
+  engine = enginePointer;
+  window = engine->getWindow();
+  spriteRenderer = engine->getSpriteRenderer();
+  resourceManager = engine->getResourceManager();
+  textRenderer = engine->getTextRenderer();
 
   // Load an image as a test
   // resourceManager->loadTexture("resource\\uzume.jpg", "uzume");

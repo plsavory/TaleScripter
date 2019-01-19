@@ -15,7 +15,7 @@ enum GameState {
 
 class GameManager {
 public:
-  GameManager(sf::RenderWindow *window, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, BackgroundImageRenderer *bgRenderer);
+  GameManager(Engine *enginePointer);
   ~GameManager();
   void init();
   void update();
@@ -24,6 +24,7 @@ public:
   void changeScreen(GameState newState);
 private:
   GameState currentGameState;
+  Engine *engine;
   InputManager *inputManager;
   TestScreen *testScreen;
   NovelScreen *novelScreen;

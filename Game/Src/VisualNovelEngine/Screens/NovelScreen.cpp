@@ -1,10 +1,5 @@
-#include "SFML/System.hpp"
-#include "SFML/Graphics.hpp"
-#include "Input/InputManager.hpp"
+#include "Base/Engine.hpp"
 #include "Database/DatabaseConnection.hpp"
-#include "BackgroundRenderer/BackgroundImageRenderer.hpp"
-#include "Resource/ResourceManager.hpp"
-#include "Base/Renderers.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "VisualNovelEngine/Screens/NovelScreen.hpp"
 #include <iostream>
@@ -12,18 +7,18 @@
 // Objects used on this screen
 #include "VisualNovelEngine/Classes/UI/NovelTextDisplay.hpp"
 
-NovelScreen::NovelScreen(sf::RenderWindow *windowPointer,ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer, InputManager *iManager, NovelData *novelPointer, BackgroundImageRenderer *backgroundImageRendererPointer) {
-  window = windowPointer;
-  spriteRenderer = sRenderer;
-  resourceManager = rManager;
-  textRenderer = tRenderer;
-  inputManager = iManager;
+NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer) {
+  engine = enginePointer;
+  window = engine->getWindow();
+  spriteRenderer = engine->getSpriteRenderer();
+  resourceManager = engine->getResourceManager();
+  textRenderer = engine->getTextRenderer();
+  inputManager = engine->getInputManager();
   novel = novelPointer;
   musicManager = resourceManager->getMusicManager();
-  backgroundImageRenderer = backgroundImageRendererPointer;
+  backgroundImageRenderer = engine->getBackgroundImageRenderer();
 
-
-  textDisplay = new NovelTextDisplay(tRenderer, spriteRenderer, resourceManager);
+  textDisplay = new NovelTextDisplay(textRenderer, spriteRenderer, resourceManager);
 
   // User input bindings for this screen (TODO: Also react to gamepad and mouse input)
   advanceEventId = inputManager->bindKeyboardEvent("novel_screen_text_advance","return", true);

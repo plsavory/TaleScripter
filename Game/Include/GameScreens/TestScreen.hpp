@@ -7,7 +7,7 @@
 
 class TestScreen: public GameScreen {
 public:
-  TestScreen(sf::RenderWindow *windowPointer, ResourceManager *rManager, SpriteRenderer *sRenderer, TextRenderer *tRenderer);
+  TestScreen(Engine *enginePointer);
   ~TestScreen();
   void init(sf::RenderWindow *windowPointer);
   void update();
@@ -18,6 +18,7 @@ private:
   ResourceManager *resourceManager;
   TextRenderer *textRenderer;
   sf::Texture *testImage;
+  Engine *engine;
 };
 
 #endif

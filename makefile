@@ -4,7 +4,7 @@ GITVER = $(shell git rev-parse --abbrev-ref HEAD)
 REVISION = $(shell git rev-parse HEAD)
 
 DIRECTORIES_TO_INCLUDE = -I Game/Include -I Libs -I Libs/SFML/include -I Libs/Lua/Include -I Libs/SQLite/Include
-FILES_TO_COMPILE = Game/Src/EntryPoint.cpp Game/Src/Misc/ParameterHandler.cpp
+FILES_TO_COMPILE = Game/Src/EntryPoint.cpp Game/Src/Misc/ParameterHandler.cpp Game/Src/Base/Engine.cpp
 GAME_FRAMEWORK_FILES = Game/Src/TileRenderer/Tile.cpp Game/Src/TileRenderer/Tilemap.cpp Game/Src/TileRenderer/TileRenderer.cpp Game/Src/GameScreens/TestScreen.cpp Game/Src/Base/Game.cpp Game/Src/Base/GameManager.cpp Game/Src/Base/GameScreen.cpp Game/Src/Misc/Utils.cpp Game/Src/SpriteRenderer/SpriteRenderer.cpp Game/Src/SpriteRenderer/Sprite.cpp
 LIBRARIES = -L Libs/SFML/lib -L Libs/SQLite -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsqlite3
 

@@ -16,6 +16,10 @@ ResourceManager::ResourceManager(BackgroundImageRenderer *backgroundImageRendere
 
   loadResourcesFromDatabase();
 
+  // Putting resource loading into a separate thread to prevent stuttering in-game as things are loaded.
+  resourceLoadThread = new std::thread(&ResourceManager::processQueue, this);
+  resourceLoadThread->detach();
+
 }
 
 ResourceManager::~ResourceManager() {
@@ -27,19 +31,23 @@ ResourceManager::~ResourceManager() {
 void ResourceManager::update() {
   // TODO: Make multithreading optional
 
-  // Putting resource loading into a separate thread to prevent stuttering in-game as things are loaded.
-  std::thread thread(&ResourceManager::processQueue, this);
-  thread.join();
 }
 
 void ResourceManager::processQueue() {
 
-  // Loop until the loading queue is empty
-  while (!isQueueEmpty()) {
-    textureManager->processQueue();
-    musicManager->processQueue();
-    fontManager->processQueue();
-    backgroundImageRenderer->processQueue();
+  // Keep running the thread until we're told to terminate it
+  while (!terminateLoadingThread) {
+
+    // Loop until the loading queue is empty
+    while (!isQueueEmpty()) {
+      textureManager->processQueue();
+      musicManager->processQueue();
+      fontManager->processQueue();
+      backgroundImageRenderer->processQueue();
+    }
+
+    // We only need to run once every few frames (15 times per second in this case)
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000/15));
   }
 }
 

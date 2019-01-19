@@ -108,6 +108,7 @@ public:
   NovelData();
   ~NovelData();
   void start();
+  void start(int cChapter, int cScene, int cSceneSegment, int cSceneSegmentLine);
   AdvanceState getNextAction();
   NovelSceneSegment* getCurrentSceneSegment();
   NovelSceneSegmentLine* getNextLine();
