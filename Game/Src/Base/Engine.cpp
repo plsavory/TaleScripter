@@ -18,6 +18,7 @@ Engine::Engine(sf::RenderWindow *windowPointer) {
   resourceManager = new ResourceManager(backgroundImageRenderer);
   spriteRenderer = new SpriteRenderer(window,resourceManager->getTextureManager());
   textRenderer = new TextRenderer(window, resourceManager->getFontManager());
+  backgroundTransitionRenderer = new BackgroundTransitionRenderer(window);
 }
 
 /**
@@ -29,4 +30,5 @@ Engine::~Engine() {
   delete(textRenderer);
   delete(inputManager);
   delete(backgroundImageRenderer);
+  delete(backgroundTransitionRenderer);
 }

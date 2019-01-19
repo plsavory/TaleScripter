@@ -5,6 +5,7 @@
 #include "SFML/Window.hpp"
 #include "SFML/Graphics.hpp"
 #include "Database/DatabaseConnection.hpp"
+#include "BackgroundRenderer/BackgroundTransitionRenderer.hpp"
 #include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
@@ -31,6 +32,9 @@ public:
   BackgroundImageRenderer* getBackgroundImageRenderer() {
     return backgroundImageRenderer;
   }
+  BackgroundTransitionRenderer* getBackgroundTransitionRenderer() {
+    return backgroundTransitionRenderer;
+  }
   sf::RenderWindow* getWindow() {
     return window;
   }
@@ -40,6 +44,7 @@ private:
   TextRenderer *textRenderer;
   InputManager *inputManager;
   BackgroundImageRenderer *backgroundImageRenderer;
+  BackgroundTransitionRenderer *backgroundTransitionRenderer;
   sf::RenderWindow *window;
 };
 

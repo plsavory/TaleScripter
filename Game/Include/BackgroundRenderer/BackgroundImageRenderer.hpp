@@ -6,15 +6,6 @@
 #include <queue>
 
 enum BackgroundStatus {bgLoaded, bgUnloaded, bgError};
-enum TransitionType {none, fate, whiteout, blink};
-
-class BackgroundTransition {
-  BackgroundTransition(TransitionType tType) {
-    transitionType = tType;
-  }
-private:
-  TransitionType transitionType;
-};
 
 class BackgroundImageAttributes {
 public:

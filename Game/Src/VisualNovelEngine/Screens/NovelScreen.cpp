@@ -17,6 +17,7 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer) {
   novel = novelPointer;
   musicManager = resourceManager->getMusicManager();
   backgroundImageRenderer = engine->getBackgroundImageRenderer();
+  backgroundTransitionRenderer = engine->getBackgroundTransitionRenderer();
 
   textDisplay = new NovelTextDisplay(textRenderer, spriteRenderer, resourceManager);
 
@@ -30,6 +31,10 @@ NovelScreen::~NovelScreen() {
 
 void NovelScreen::start() {
   nextScene();
+
+  // Wait 5 seconds before displaying anything and fade in from black
+  backgroundTransitionRenderer->startTransition(BackgroundTransition::FADE_IN, sf::Color(0,0,0,255), 2000, 2000, 1000);
+  backgroundTransitionRenderer->getCurrentTransition()->setToForeground();
 }
 
 void NovelScreen::update() {

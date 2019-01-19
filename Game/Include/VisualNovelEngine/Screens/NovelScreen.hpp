@@ -20,6 +20,7 @@ private:
   InputManager *inputManager;
   MusicManager *musicManager;
   BackgroundImageRenderer *backgroundImageRenderer;
+  BackgroundTransitionRenderer *backgroundTransitionRenderer;
   NovelData *novel;
   void advance();
   int advanceEventId;

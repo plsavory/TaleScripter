@@ -4,6 +4,8 @@
 #include "Resource/ResourceManager.hpp"
 #include "Misc/Utils.hpp"
 
+#define MULTITHREADED_RESOURCE_LOADING
+
 ResourceManager::ResourceManager(BackgroundImageRenderer *backgroundImageRendererPointer) {
 
   terminateLoadingThread = false;
@@ -16,9 +18,11 @@ ResourceManager::ResourceManager(BackgroundImageRenderer *backgroundImageRendere
 
   loadResourcesFromDatabase();
 
+  #ifdef MULTITHREADED_RESOURCE_LOADING
   // Putting resource loading into a separate thread to prevent stuttering in-game as things are loaded.
   resourceLoadThread = new std::thread(&ResourceManager::processQueue, this);
   resourceLoadThread->detach();
+  #endif
 
 }
 
@@ -29,8 +33,9 @@ ResourceManager::~ResourceManager() {
 }
 
 void ResourceManager::update() {
-  // TODO: Make multithreading optional
-
+  #ifndef MULTITHREADED_RESOURCE_LOADING
+  processQueue();
+  #endif
 }
 
 void ResourceManager::processQueue() {
@@ -56,7 +61,6 @@ void ResourceManager::processQueue() {
  * @return [description]
  */
 bool ResourceManager::isQueueEmpty() {
-  // TODO: Monitor other resources too
   return (textureManager->isQueueEmpty() && musicManager->isQueueEmpty() && fontManager->isQueueEmpty() && backgroundImageRenderer->isQueueEmpty());
 }
 

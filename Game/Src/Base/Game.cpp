@@ -50,6 +50,7 @@ void Game::run() {
   resourceManager = engine->getResourceManager();
   spriteRenderer = engine->getSpriteRenderer();
   textRenderer = engine->getTextRenderer();
+  backgroundTransitionRenderer = engine->getBackgroundTransitionRenderer();
   gameManager = new GameManager(engine);
 
   sf::Clock updateClock;
@@ -104,6 +105,7 @@ void Game::update(int gameTime) {
   backgroundImageRenderer->update();
   spriteRenderer->update();
   textRenderer->update();
+  backgroundTransitionRenderer->update();
 
   // Don't respond to input when the window isn't in focus
   inputManager->setEnabled(window->hasFocus());
@@ -119,8 +121,18 @@ void Game::draw() {
 
   gameManager->draw();
   backgroundImageRenderer->draw();
+
+  if (!backgroundTransitionRenderer->isInForeground()) {
+    backgroundTransitionRenderer->draw();
+  }
+
+
   spriteRenderer->draw();
   textRenderer->draw();
+
+  if (backgroundTransitionRenderer->isInForeground()) {
+    backgroundTransitionRenderer->draw();
+  }
 }
 
 #ifdef MULTITHREADED_RENDERING
