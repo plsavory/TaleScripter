@@ -4,7 +4,7 @@
 #include "Resource/ResourceManager.hpp"
 #include "Misc/Utils.hpp"
 
-#define MULTITHREADED_RESOURCE_LOADING
+#define MULTITHREADED_RESOURCE_LOADING_DISABLED
 
 ResourceManager::ResourceManager(BackgroundImageRenderer *backgroundImageRendererPointer) {
 
@@ -20,7 +20,7 @@ ResourceManager::ResourceManager(BackgroundImageRenderer *backgroundImageRendere
 
   #ifdef MULTITHREADED_RESOURCE_LOADING
   // Putting resource loading into a separate thread to prevent stuttering in-game as things are loaded.
-  resourceLoadThread = new std::thread(&ResourceManager::processQueue, this);
+  resourceLoadThread = new std::thread(&ResourceManager::threadFunction, this);
   resourceLoadThread->detach();
   #endif
 
@@ -38,10 +38,18 @@ void ResourceManager::update() {
   #endif
 }
 
-void ResourceManager::processQueue() {
+void ResourceManager::threadFunction() {
 
   // Keep running the thread until we're told to terminate it
   while (!terminateLoadingThread) {
+    processQueue();
+
+    // We only need to run once every few frames (15 times per second in this case)
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000/15));
+  }
+}
+
+void ResourceManager::processQueue() {
 
     // Loop until the loading queue is empty
     while (!isQueueEmpty()) {
@@ -50,10 +58,6 @@ void ResourceManager::processQueue() {
       fontManager->processQueue();
       backgroundImageRenderer->processQueue();
     }
-
-    // We only need to run once every few frames (15 times per second in this case)
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000/15));
-  }
 }
 
 /**

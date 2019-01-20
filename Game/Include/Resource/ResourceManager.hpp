@@ -34,6 +34,7 @@ private:
   void loadResourcesFromDatabase();
   DatabaseConnection *resourceDatabase;
   BackgroundImageRenderer *backgroundImageRenderer;
+  void threadFunction();
 };
 
 #endif

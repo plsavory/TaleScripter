@@ -55,8 +55,12 @@ void BackgroundImageRenderer::processQueue() {
     return;
   }
 
-  background[backgroundLoadQueue.front().getId()]->load();
+  // Do nothing if the background doesn't exist yet (Race conditions with threads)
+  if (!background[backgroundLoadQueue.front().getId()]) {
+    return;
+  }
 
+  background[backgroundLoadQueue.front().getId()]->load();
   backgroundLoadQueue.pop();
 }
 
