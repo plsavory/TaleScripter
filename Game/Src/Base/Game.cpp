@@ -117,7 +117,7 @@ void Game::update(int gameTime) {
 void Game::draw() {
   // TODO: Handle priorities for different types of rendering
   // Clear the window
-  window->clear(sf::Color::Black);
+  window->clear(*backgroundImageRenderer->getBackgroundColour());
 
   gameManager->draw();
   backgroundImageRenderer->draw();

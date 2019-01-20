@@ -14,6 +14,7 @@ BackgroundImageRenderer::BackgroundImageRenderer(sf::RenderWindow *windowPointer
 
   currentBackground = NULL;
   upcomingBackground = NULL;
+  backgroundColour = NULL;
 
 }
 
@@ -171,4 +172,24 @@ void BackgroundImageRenderer::setBackground(std::string name) {
 
   // TODO: Handle background transitions
   currentBackground = background[bgId];
+}
+
+void BackgroundImageRenderer::setBackgroundColour(sf::Color *colour) {
+
+  if (backgroundColour) {
+    delete(backgroundColour);
+    backgroundColour = NULL;
+  }
+
+  backgroundColour = colour;
+}
+
+sf::Color* BackgroundImageRenderer::getBackgroundColour() {
+
+  if (!backgroundColour) {
+    return new sf::Color(0,0,0,255);
+  }
+
+  return backgroundColour;
+
 }

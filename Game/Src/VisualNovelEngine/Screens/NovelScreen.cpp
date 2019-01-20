@@ -18,6 +18,7 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer) {
   musicManager = resourceManager->getMusicManager();
   backgroundImageRenderer = engine->getBackgroundImageRenderer();
   backgroundTransitionRenderer = engine->getBackgroundTransitionRenderer();
+  sceneTransitioning = false;
 
   textDisplay = new NovelTextDisplay(textRenderer, spriteRenderer, resourceManager);
 
@@ -38,6 +39,18 @@ void NovelScreen::start() {
 }
 
 void NovelScreen::update() {
+
+  // If a transition is going on, do nothing
+  if (!backgroundTransitionRenderer->hasTransitionCompleted()) {
+    return;
+  }
+
+  // If we need to advance the scene after a transition, do that once the transition has finished
+  if (sceneTransitioning && backgroundTransitionRenderer->hasTransitionCompleted()) {
+    nextScene();
+    return;
+  }
+
   textDisplay->update();
 
   // TODO: Allow for an auto mode which doesn't need user input
@@ -72,7 +85,7 @@ void NovelScreen::advance() {
     nextSegment();
     break;
     case AdvanceState::SceneEnd:
-    nextScene();
+    transitionToNextScene();
     break;
     default:
     break;
@@ -116,6 +129,11 @@ void NovelScreen::nextSegment() {
 }
 
 void NovelScreen::nextScene() {
+
+  // TODO: use the scene transition id and colour stored with the scene in the database
+  backgroundTransitionRenderer->startTransition(BackgroundTransition::FADE_IN, sf::Color(0,0,0,255), 2000, 2000, 1000);
+  backgroundTransitionRenderer->getCurrentTransition()->setToForeground();
+
   NovelScene *nextScene = novel->advanceToNextScene();
 
   // TODO: Disable the UI for a period of time
@@ -124,4 +142,17 @@ void NovelScreen::nextScene() {
   backgroundImageRenderer->setBackground(nextScene->getBackgroundImageName());
 
   nextSegment();
+
+  sceneTransitioning = false;
+  textDisplay->setVisible();
+}
+
+void NovelScreen::transitionToNextScene() {
+
+  // TODO: use the scene transition id and colour stored with the scene in the database
+  backgroundTransitionRenderer->startTransition(BackgroundTransition::FADE_OUT, sf::Color(0,0,0,255), 2000, 2000, 1000);
+  backgroundTransitionRenderer->getCurrentTransition()->setToForeground();
+  textDisplay->setInvisible();
+  textDisplay->clear();
+  sceneTransitioning = true;
 }

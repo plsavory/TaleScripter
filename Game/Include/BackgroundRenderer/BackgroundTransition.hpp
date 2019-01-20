@@ -3,7 +3,7 @@
 
 class BackgroundTransition {
 public:
-  BackgroundTransition(sf::RenderWindow *windowPointer, int delayBeforeStart, int transitionType, int screenWidth, int screenHeight, int delayAfterFinish, int animationLength);
+  BackgroundTransition(sf::RenderWindow *windowPointer, int delayBeforeStart, int transitionType, int screenWidth, int screenHeight, int delayAfterFinish, int animationLength, BackgroundImageRenderer *bgRenderer);
   ~BackgroundTransition();
   bool update();
   void draw();
@@ -38,6 +38,7 @@ private:
   bool transitionCompleted;
   bool foregroundTransition;
   sf::RectangleShape *rectangleShape;
+  BackgroundImageRenderer *backgroundImageRenderer;
 
   // Transition-specific init functions
   void FadeInInit();

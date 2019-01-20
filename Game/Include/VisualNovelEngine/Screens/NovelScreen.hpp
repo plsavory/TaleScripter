@@ -27,6 +27,8 @@ private:
   void nextLine();
   void nextSegment();
   void nextScene();
+  void transitionToNextScene();
+  bool sceneTransitioning; // Indicates that we need to advance the scene after an end transition
 };
 
 #endif

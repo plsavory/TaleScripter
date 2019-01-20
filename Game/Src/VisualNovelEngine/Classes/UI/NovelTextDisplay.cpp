@@ -33,6 +33,7 @@ NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer,SpriteRenderer *sRend
   nameDisplayText->setPosition(150,550);
   nameDisplayText->setOutline(sf::Color::Black, 2); // TODO: Load from game theme in database
   nameDisplayText->setString("");
+  updateNameDisplayText = false;
   maxTextWidth = 980;
 
   // TODO: Load this from the database rather than hardcoded here
@@ -53,10 +54,16 @@ void NovelTextDisplay::setText(std::string newText, std::string cName) {
   currentDisplayText = "";
   fullDisplayText = newText;
   characterName = cName;
-  nameDisplayText->setString(characterName);
+  updateNameDisplayText = true;
 }
 
 void NovelTextDisplay::update() {
+
+  if (updateNameDisplayText) {
+    // Prevent unneeded string setting
+    nameDisplayText->setString(characterName);
+    updateNameDisplayText = false;
+  }
 
   if (textCounterClock->getElapsedTime().asMilliseconds() < textCounterDelay) {
     return;
@@ -148,4 +155,31 @@ std::string NovelTextDisplay::wordWrap(std::string textToWrap, float maxWidth) {
   delete text;
 
   return Utils::implodeString(splitString," ", 0);
+}
+
+void NovelTextDisplay::setVisible() {
+  nameDisplayText->setVisible(true);
+  myText->setVisible(true);
+
+  if (backgroundSprite) {
+    backgroundSprite->setVisible(true);
+  }
+
+}
+
+void NovelTextDisplay::setInvisible() {
+  nameDisplayText->setVisible(false);
+  myText->setVisible(false);
+
+  if (backgroundSprite) {
+    backgroundSprite->setVisible(false);
+  }
+}
+
+void NovelTextDisplay::clear() {
+  currentDisplayText = "";
+  fullDisplayText = "";
+  characterName = "";
+  myText->setString("");
+  nameDisplayText->setString("");
 }

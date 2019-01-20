@@ -12,6 +12,7 @@ Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::st
   textureManager = sTextureManager;
   textureId = -1;
   textureSet = false;
+  visible = true;
 }
 
 Sprite::~Sprite() {
@@ -69,5 +70,10 @@ void Sprite::update() {
 }
 
 void Sprite::draw() {
+
+  if (!visible) {
+    return;
+  }
+  
   displayWindow->draw(*mySprite);
 }

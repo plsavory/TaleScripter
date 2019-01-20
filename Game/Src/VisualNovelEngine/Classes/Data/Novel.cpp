@@ -26,7 +26,7 @@ void NovelData::start() {
  * [NovelData::start Start the novel from the given position]
  */
 void NovelData::start(int cChapter, int cScene, int cSceneSegment, int cSceneSegmentLine) {
-  
+
   currentChapter = cChapter;
   currentScene = cScene;
   currentSceneSegment = cSceneSegment;
@@ -237,13 +237,28 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
       continue;
     }
 
-    if (!sceneData->getRow(i)->doesColumnExist("background_image_name")) {
-      continue;
+    std::string backgroundImageName("");
+
+    if (sceneData->getRow(i)->doesColumnExist("background_image_name")) {
+      backgroundImageName = sceneData->getRow(i)->getColumn("background_image_name")->getData();
+    }
+
+    int backgroundColourId = 0;
+    int transitionColourId = 0;
+
+    if (sceneData->getRow(i)->doesColumnExist("background_colour_id")) {
+      backgroundColourId = std::stoi(sceneData->getRow(i)->getColumn("background_colour_id")->getData());
+    }
+
+    if (sceneData->getRow(i)->doesColumnExist("transition_colour_id")) {
+      transitionColourId = std::stoi(sceneData->getRow(i)->getColumn("transition_colour_id")->getData());
     }
 
     scene[i] = new NovelScene(db,
       std::stoi(sceneData->getRow(i)->getColumn("id")->getData()),
-      sceneData->getRow(i)->getColumn("background_image_name")->getData());
+      backgroundImageName,
+      backgroundColourId,
+      transitionColourId);
     sceneCount++;
   }
 
@@ -275,9 +290,11 @@ int NovelChapter::getSceneCount() {
 }
 
 // Scene-specific stuff
-NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage) {
+NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int trColourId) {
   id = sId;
   backgroundImage = bgImage;
+  backgroundColourId = bgColourId;
+  transitionColourId = trColourId;
 
   segmentCount = 0;
 
@@ -300,10 +317,6 @@ NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage) {
   for (int i = 0; i < sceneSegmentData->getRowCount(); i++) {
 
     if (!sceneSegmentData->getRow(i)->doesColumnExist("id")) {
-      continue;
-    }
-
-    if (!sceneSegmentData->getRow(i)->doesColumnExist("background_music_name")) {
       continue;
     }
 

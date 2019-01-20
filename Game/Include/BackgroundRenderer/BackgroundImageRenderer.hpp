@@ -123,6 +123,8 @@ public:
   void draw();
   void setBackground(std::string name);
   int findBackground(std::string name);
+  void setBackgroundColour(sf::Color *colour);
+  sf::Color* getBackgroundColour();
 private:
   sf::RenderWindow *window;
   Background* addBackground(std::string name, std::string filename);
@@ -131,6 +133,7 @@ private:
   Background *currentBackground;
   Background *upcomingBackground; // Used for transitions
   void loadBackground(int id);
+  sf::Color *backgroundColour;
 };
 
 #endif

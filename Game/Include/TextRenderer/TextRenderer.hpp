@@ -13,6 +13,7 @@ public:
     loadAttempted = false;
     textObj->setFillColor(sf::Color::White); // TODO: Un-hardcode this
     setFont(fontName);
+    enabled = true;
   };
   ~Text() {
     delete textObj;
@@ -76,6 +77,12 @@ public:
 
     setFont(); // Attempt to load a font
   }
+  void setVisible(bool toEnable) {
+    enabled = toEnable;
+  }
+  bool isVisible() {
+    return enabled;
+  }
 private:
   std::string name;
   std::string fontName;
@@ -84,6 +91,7 @@ private:
   FontManager *fontManager;
   bool fontSet;
   bool loadAttempted;
+  bool enabled;
 };
 
 class TextRenderer {

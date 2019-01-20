@@ -9,6 +9,9 @@ public:
   void update();
   void displayWholeStringImmediately();
   void setText(std::string newText, std::string cName);
+  void setVisible();
+  void setInvisible();
+  void clear();
 private:
   std::string wordWrap(std::string textToWrap, float maxWidth);
   TextRenderer *textRenderer;
@@ -26,6 +29,7 @@ private:
   Text *nameDisplayText;
   int maxTextWidth;
   Sprite *backgroundSprite;
+  bool updateNameDisplayText;
 };
 
 #endif

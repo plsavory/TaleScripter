@@ -5,7 +5,7 @@
 
 class BackgroundTransitionRenderer {
 public:
-  BackgroundTransitionRenderer(sf::RenderWindow *windowPointer);
+  BackgroundTransitionRenderer(sf::RenderWindow *windowPointer, BackgroundImageRenderer *bgImageRenderer);
   ~BackgroundTransitionRenderer();
   void update();
   void draw();
@@ -17,6 +17,7 @@ public:
 private:
   sf::RenderWindow *window;
   BackgroundTransition *currentTransition;
+  BackgroundImageRenderer *backgroundImageRenderer;
   int screenWidth;
   int screenHeight;
 };

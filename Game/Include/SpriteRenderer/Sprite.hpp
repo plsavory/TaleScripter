@@ -10,6 +10,12 @@ public:
   std::string name;
   int priority;
   bool textureSet;
+  bool isVisible() {
+    return visible;
+  };
+  void setVisible(bool shouldBeVisible) {
+    visible = shouldBeVisible;
+  }
 private:
   sf::Sprite *mySprite;
   sf::Texture *myImage;
@@ -19,4 +25,5 @@ private:
   std::string imageName;
   int textureId;
   TextureManager *textureManager;
+  bool visible;
 };

@@ -18,7 +18,7 @@ GAME_COMPILER_FILES = Game/Src/GameCompilerEntryPoint.cpp Game/Src/GameCompiler/
 FONT_MANAGER_FILES = Game/Src/Resource/FontManager.cpp
 TEXT_RENDERER_FILES = Game/Src/TextRenderer/TextRenderer.cpp
 VISUAL_NOVEL_ENGINE_FILES = Game/Src/VisualNovelEngine/Screens/NovelScreen.cpp Game/Src/VisualNovelEngine/Classes/UI/NovelTextDisplay.cpp Game/Src/VisualNovelEngine/Classes/Data/Novel.cpp
-BACKGROUND_RENDERER_FILES = Game/Src/BackgroundRenderer/BackgroundImageRenderer.cpp Game/Src/BackgroundRenderer/BackgroundTransitionRenderer.cpp Game/Src/BackgroundRenderer/BackgroundTransition.cpp
+BACKGROUND_RENDERER_FILES = Game/Src/BackgroundRenderer/BackgroundImageRenderer.cpp Game/Src/BackgroundRenderer/BackgroundTransitionRenderer.cpp Game/Src/BackgroundRenderer/BackgroundTransition.cpp Game/Src/Misc/ColourBuilder.cpp
 
 BUILD_STRING_WITHOUT_DEFINES = $(DIRECTORIES_TO_INCLUDE) -DCURRENT_BRANCH=$(GITVER) -DCURRENT_COMMIT=$(REVISION) $(GAME_FRAMEWORK_FILES) $(AUDIO_MANAGER_FILES) $(INPUT_MANAGER_FILES) $(RESOURCE_MANAGER_FILES) $(DATABASE_FILES) $(FONT_MANAGER_FILES) $(TEXT_RENDERER_FILES) $(FILES_TO_COMPILE) $(BACKGROUND_RENDERER_FILES) $(VISUAL_NOVEL_ENGINE_FILES) $(LIBRARIES) -o build\TaleScripter-Runner
 

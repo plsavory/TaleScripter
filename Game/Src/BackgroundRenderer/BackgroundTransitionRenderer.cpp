@@ -1,8 +1,9 @@
 #include "Base/Engine.hpp"
 #include "BackgroundRenderer/BackgroundTransition.hpp"
 
-BackgroundTransitionRenderer::BackgroundTransitionRenderer(sf::RenderWindow *windowPointer) {
+BackgroundTransitionRenderer::BackgroundTransitionRenderer(sf::RenderWindow *windowPointer, BackgroundImageRenderer *bgImageRenderer) {
   window = windowPointer;
+  backgroundImageRenderer = bgImageRenderer;
   currentTransition = NULL;
 
   // Set some defaults
@@ -21,7 +22,7 @@ void BackgroundTransitionRenderer::startTransition(int transitionType, sf::Color
     currentTransition = NULL;
   }
 
-  currentTransition = new BackgroundTransition(window, transitionType, delayBeforeStart, screenWidth, screenHeight, delayBeforeEnd, animationLength);
+  currentTransition = new BackgroundTransition(window, transitionType, delayBeforeStart, screenWidth, screenHeight, delayBeforeEnd, animationLength, backgroundImageRenderer);
 
 }
 

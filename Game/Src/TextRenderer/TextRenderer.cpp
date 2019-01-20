@@ -57,6 +57,11 @@ void TextRenderer::draw() {
 
   for (int i = 0; i < MAX_TEXT_OBJECTS; i++) {
     if (text[i]) {
+
+      if (!text[i]->isVisible()) {
+        continue;
+      }
+
       window->draw(*text[i]->getTextObject());
     }
   }

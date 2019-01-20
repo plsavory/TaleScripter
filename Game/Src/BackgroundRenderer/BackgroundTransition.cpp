@@ -4,13 +4,13 @@
  */
 
 #include <iostream>
-#include "SFML/Graphics.hpp"
+#include "Base/Engine.hpp"
 #include "BackgroundRenderer/BackgroundTransition.hpp"
 
 const int BackgroundTransition::FADE_IN = 0;
 const int BackgroundTransition::FADE_OUT = 1;
 
-BackgroundTransition::BackgroundTransition(sf::RenderWindow *windowPointer, int transitionType, int delayBeforeStart, int screenWidth, int screenHeight, int delayAfterFinish, int animationLength) {
+BackgroundTransition::BackgroundTransition(sf::RenderWindow *windowPointer, int transitionType, int delayBeforeStart, int screenWidth, int screenHeight, int delayAfterFinish, int animationLength, BackgroundImageRenderer *bgRenderer) {
   window = windowPointer;
   width = screenWidth;
   height = screenHeight;
@@ -24,6 +24,7 @@ BackgroundTransition::BackgroundTransition(sf::RenderWindow *windowPointer, int 
   startDelayClock = NULL;
   drawBeforeStartDelay = true;
   foregroundTransition = false;
+  backgroundImageRenderer = bgRenderer;
 
   if (startDelay > 0) {
     startDelayClock = new sf::Clock();
@@ -91,6 +92,8 @@ bool BackgroundTransition::update() {
     }
   }
 
+  // TODO: Temporarily disable background rendering
+
   return true;
 }
 
@@ -123,6 +126,9 @@ void BackgroundTransition::FadeInInit() {
 
 void BackgroundTransition::FadeOutInit() {
   alpha = 0;
+  rectangleShape = new sf::RectangleShape(sf::Vector2f(width,height));
+  renderColour = sf::Color(primaryColour.r, primaryColour.g, primaryColour.b, alpha);
+  rectangleShape->setFillColor(renderColour);
 }
 
 // Transition-specific update functions
@@ -150,6 +156,35 @@ void BackgroundTransition::FadeInUpdate() {
 
 void BackgroundTransition::FadeOutUpdate() {
 
+  if (transitionCompleted) {
+    return;
+  }
+
+  if (alpha < 255) {
+    alpha+=(255/(60*length)); // TODO: Use current frame rate
+
+    // Prevent an overflow
+    if (alpha > 255) {
+      alpha = 255;
+    }
+
+    renderColour = sf::Color(primaryColour.r, primaryColour.g, primaryColour.b, alpha);
+    rectangleShape->setFillColor(renderColour);
+    return;
+  }
+
+  if (delay > 0) {
+    delayClock = new sf::Clock();
+  }
+
+  alpha = 255;
+  renderColour = sf::Color(primaryColour.r, primaryColour.g, primaryColour.b, alpha);
+  rectangleShape->setFillColor(renderColour);
+  // Set the background colour to match the transition
+  backgroundImageRenderer->setBackgroundColour(new sf::Color(0,0,0,255)); // TODO: Use from transition
+  // TODO: Make sure that background rendering gets re-enabled and the colour gets reset after a couple of frames
+  transitionCompleted = true;
+
 }
 
 // Transition-specific draw functions
@@ -160,5 +195,7 @@ void BackgroundTransition::FadeInDraw() {
 }
 
 void BackgroundTransition::FadeOutDraw() {
-
+  if (rectangleShape) {
+    window->draw(*rectangleShape);
+  }
 }
