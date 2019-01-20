@@ -23,6 +23,7 @@ void BackgroundTransitionRenderer::startTransition(int transitionType, sf::Color
   }
 
   currentTransition = new BackgroundTransition(window, transitionType, delayBeforeStart, screenWidth, screenHeight, delayBeforeEnd, animationLength, backgroundImageRenderer);
+  currentTransition->setPrimaryColour(primaryColour);
 
 }
 

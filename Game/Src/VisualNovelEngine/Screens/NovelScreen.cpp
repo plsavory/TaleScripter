@@ -2,6 +2,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "VisualNovelEngine/Screens/NovelScreen.hpp"
+#include "Misc/ColourBuilder.hpp"
 #include <iostream>
 
 // Objects used on this screen
@@ -32,10 +33,6 @@ NovelScreen::~NovelScreen() {
 
 void NovelScreen::start() {
   nextScene();
-
-  // Wait 5 seconds before displaying anything and fade in from black
-  backgroundTransitionRenderer->startTransition(BackgroundTransition::FADE_IN, sf::Color(0,0,0,255), 2000, 2000, 1000);
-  backgroundTransitionRenderer->getCurrentTransition()->setToForeground();
 }
 
 void NovelScreen::update() {
@@ -131,10 +128,12 @@ void NovelScreen::nextSegment() {
 void NovelScreen::nextScene() {
 
   // TODO: use the scene transition id and colour stored with the scene in the database
-  backgroundTransitionRenderer->startTransition(BackgroundTransition::FADE_IN, sf::Color(0,0,0,255), 2000, 2000, 1000);
-  backgroundTransitionRenderer->getCurrentTransition()->setToForeground();
-
   NovelScene *nextScene = novel->advanceToNextScene();
+
+  sf::Color *colour = ColourBuilder::get(novel->getCurrentScene()->getStartTransitionColourId());
+  backgroundTransitionRenderer->startTransition(BackgroundTransition::FADE_IN, *colour, 2000, 2000, 1000);
+  backgroundTransitionRenderer->getCurrentTransition()->setToForeground();
+  delete(colour);
 
   // TODO: Disable the UI for a period of time
 
@@ -150,8 +149,10 @@ void NovelScreen::nextScene() {
 void NovelScreen::transitionToNextScene() {
 
   // TODO: use the scene transition id and colour stored with the scene in the database
-  backgroundTransitionRenderer->startTransition(BackgroundTransition::FADE_OUT, sf::Color(0,0,0,255), 2000, 2000, 1000);
+  sf::Color *colour = ColourBuilder::get(novel->getCurrentScene()->getEndTransitionColourId());
+  backgroundTransitionRenderer->startTransition(BackgroundTransition::FADE_OUT, *colour, 2000, 2000, 1000);
   backgroundTransitionRenderer->getCurrentTransition()->setToForeground();
+  delete(colour);
   textDisplay->setInvisible();
   textDisplay->clear();
   sceneTransitioning = true;

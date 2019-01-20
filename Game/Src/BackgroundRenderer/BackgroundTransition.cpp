@@ -55,6 +55,19 @@ BackgroundTransition::~BackgroundTransition() {
 }
 
 /**
+ * [setPrimaryColour Sets the primary colour of this transition]
+ * @param colour [SFML Colour]
+ */
+void BackgroundTransition::setPrimaryColour(sf::Color colour) {
+  primaryColour = colour;
+
+  if (rectangleShape) {
+    renderColour = sf::Color(primaryColour.r, primaryColour.g, primaryColour.b, alpha);
+    rectangleShape->setFillColor(renderColour);
+  }
+}
+
+/**
  * [BackgroundTransition::update Performs the transition/animation]
  * @return [True if finished]
  */
@@ -180,8 +193,12 @@ void BackgroundTransition::FadeOutUpdate() {
   alpha = 255;
   renderColour = sf::Color(primaryColour.r, primaryColour.g, primaryColour.b, alpha);
   rectangleShape->setFillColor(renderColour);
-  // Set the background colour to match the transition
-  backgroundImageRenderer->setBackgroundColour(new sf::Color(0,0,0,255)); // TODO: Use from transition
+
+  // Set the background colour to match the transition (A bit hacky I suppose, but it prevents the flicker between transitions)
+  sf::Color *colour = new sf::Color(primaryColour.r,primaryColour.g,primaryColour.b,255);
+  backgroundImageRenderer->setBackgroundColour(colour);
+  backgroundImageRenderer->disableImageDrawing();
+
   // TODO: Make sure that background rendering gets re-enabled and the colour gets reset after a couple of frames
   transitionCompleted = true;
 

@@ -61,7 +61,6 @@ public:
 
     myTexture->loadFromFile(fileName);
     mySprite->setTexture(*myTexture, true);
-
     if (attributes) {
       // Apply the attributes onto the sprite object
       mySprite->setScale(attributes->getMaxWidth()/myTexture->getSize().x,attributes->getMaxHeight()/myTexture->getSize().y);
@@ -124,6 +123,9 @@ public:
   void setBackground(std::string name);
   int findBackground(std::string name);
   void setBackgroundColour(sf::Color *colour);
+  void disableImageDrawing();
+  void enableImageDrawing();
+  bool isDrawingEnabled();
   sf::Color* getBackgroundColour();
 private:
   sf::RenderWindow *window;
@@ -134,6 +136,7 @@ private:
   Background *upcomingBackground; // Used for transitions
   void loadBackground(int id);
   sf::Color *backgroundColour;
+  bool drawingEnabled;
 };
 
 #endif

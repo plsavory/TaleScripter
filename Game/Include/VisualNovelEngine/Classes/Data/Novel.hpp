@@ -73,7 +73,7 @@ private:
 
 class NovelScene {
 public:
-  NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int trColourId);
+  NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int strColourId, int etrColourId);
   ~NovelScene();
   NovelSceneSegment* getSceneSegment(int id);
   int getSegmentCount();
@@ -81,13 +81,16 @@ public:
   std::string getBackgroundImageName();
   int getBackgroundColourId();
   int getTransitionColourId();
+  int getStartTransitionColourId();
+  int getEndTransitionColourId();
 private:
   int id;
   std::string backgroundImage;
   NovelSceneSegment *segment[MAX_SEGMENTS];
   int segmentCount;
   int backgroundColourId;
-  int transitionColourId;
+  int startTransitionColourId;
+  int endTransitionColourId;
 };
 
 class NovelChapter {

@@ -129,7 +129,8 @@ void GameCompiler::createResourceDatabase() {
     scenesTable->addColumn("chapter_id", ColumnType::tInteger, false, "");
     scenesTable->addColumn("background_image_name", ColumnType::tText, false, "");
     scenesTable->addColumn("background_colour_id", ColumnType::tInteger, false, "");
-    scenesTable->addColumn("transition_colour_id", ColumnType::tInteger, false, "");
+    scenesTable->addColumn("start_transition_colour_id", ColumnType::tInteger, false, "");
+    scenesTable->addColumn("end_transition_colour_id", ColumnType::tInteger, false, "");
     scenesTable->addColumn("start_transition_type_id", ColumnType::tInteger, false, "");
     scenesTable->addColumn("end_transition_type_id", ColumnType::tInteger, false, "");
 

@@ -244,21 +244,27 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
     }
 
     int backgroundColourId = 0;
-    int transitionColourId = 0;
+    int startTransitionColourId = 0;
+    int endTransitionColourId = 0;
 
     if (sceneData->getRow(i)->doesColumnExist("background_colour_id")) {
       backgroundColourId = std::stoi(sceneData->getRow(i)->getColumn("background_colour_id")->getData());
     }
 
-    if (sceneData->getRow(i)->doesColumnExist("transition_colour_id")) {
-      transitionColourId = std::stoi(sceneData->getRow(i)->getColumn("transition_colour_id")->getData());
+    if (sceneData->getRow(i)->doesColumnExist("start_transition_colour_id")) {
+      startTransitionColourId = std::stoi(sceneData->getRow(i)->getColumn("start_transition_colour_id")->getData());
+    }
+
+    if (sceneData->getRow(i)->doesColumnExist("end_transition_colour_id")) {
+      endTransitionColourId = std::stoi(sceneData->getRow(i)->getColumn("end_transition_colour_id")->getData());
     }
 
     scene[i] = new NovelScene(db,
       std::stoi(sceneData->getRow(i)->getColumn("id")->getData()),
       backgroundImageName,
       backgroundColourId,
-      transitionColourId);
+      startTransitionColourId,
+      endTransitionColourId);
     sceneCount++;
   }
 
@@ -290,11 +296,12 @@ int NovelChapter::getSceneCount() {
 }
 
 // Scene-specific stuff
-NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int trColourId) {
+NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int strColourId, int etrColourId) {
   id = sId;
   backgroundImage = bgImage;
   backgroundColourId = bgColourId;
-  transitionColourId = trColourId;
+  startTransitionColourId = strColourId;
+  endTransitionColourId = etrColourId;
 
   segmentCount = 0;
 
@@ -357,6 +364,26 @@ int NovelScene::getId() {
 
 std::string NovelScene::getBackgroundImageName() {
   return backgroundImage;
+}
+
+int NovelScene::getStartTransitionColourId() {
+
+  // Check for null value
+  if (!startTransitionColourId) {
+    return 0;
+  }
+
+  return startTransitionColourId;
+}
+
+int NovelScene::getEndTransitionColourId() {
+
+  // Check for null value
+  if (!endTransitionColourId) {
+    return 0;
+  }
+
+  return endTransitionColourId;
 }
 
 // Segment-specific stuff

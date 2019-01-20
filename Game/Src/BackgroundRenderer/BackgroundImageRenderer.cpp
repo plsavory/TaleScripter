@@ -15,6 +15,7 @@ BackgroundImageRenderer::BackgroundImageRenderer(sf::RenderWindow *windowPointer
   currentBackground = NULL;
   upcomingBackground = NULL;
   backgroundColour = NULL;
+  drawingEnabled = true;
 
 }
 
@@ -71,6 +72,10 @@ bool BackgroundImageRenderer::isQueueEmpty() {
 void BackgroundImageRenderer::draw() {
   // Possible error that may occur here: currentBackground or upcomingBackground may be null and cause a crash
   // TODO: Do something about this.
+
+  if (!drawingEnabled) {
+    return;
+  }
 
   if (upcomingBackground) {
     if (upcomingBackground->getStatus() == bgLoaded) {
@@ -174,8 +179,9 @@ void BackgroundImageRenderer::setBackground(std::string name) {
     return;
   }
 
-  // TODO: Handle background transitions
+  // TODO: Handle background fade transitions
   currentBackground = background[bgId];
+  enableImageDrawing();
 }
 
 void BackgroundImageRenderer::setBackgroundColour(sf::Color *colour) {
@@ -196,4 +202,16 @@ sf::Color* BackgroundImageRenderer::getBackgroundColour() {
 
   return backgroundColour;
 
+}
+
+void BackgroundImageRenderer::disableImageDrawing() {
+  drawingEnabled = false;
+}
+
+void BackgroundImageRenderer::enableImageDrawing() {
+  drawingEnabled = true;
+}
+
+bool BackgroundImageRenderer::isDrawingEnabled() {
+  return drawingEnabled;
 }
