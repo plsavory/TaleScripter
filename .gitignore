@@ -3,3 +3,4 @@ build
 Libs\SFML
 Libs\SQLite
 Libs\Lua
+Libs
