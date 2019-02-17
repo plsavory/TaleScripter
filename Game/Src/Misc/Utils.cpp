@@ -134,7 +134,7 @@ std::vector<std::string> Utils::explodeString(const std::string &string, char de
  * [Utils::implodeString Takes a vector of strings and a delimiter, returns them all as one string]
  * @param  explodedString [The vector of strings to join]
  * @param  glue           [A string to separate each element]
- * @param  count          [Max number of elements to add to the string]
+ * @param  count          [Max number of elements to add to the string, 0 if no limit]
  * @return                [The imploded string]
  */
 std::string Utils::implodeString(std::vector<std::string> explodedString, std::string glue, unsigned int count) {

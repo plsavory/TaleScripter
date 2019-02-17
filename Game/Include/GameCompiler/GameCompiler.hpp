@@ -1,7 +1,9 @@
 class GameCompiler {
 public:
-  GameCompiler();
+  GameCompiler(GameCompilerOptions *gameCompilerOptions);
   ~GameCompiler();
 private:
   void createResourceDatabase();
+  void createNovelDatabase();
+  GameCompilerOptions *compilerOptions;
 };
