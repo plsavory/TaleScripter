@@ -13,7 +13,7 @@ Engine::Engine(sf::RenderWindow *windowPointer) {
 
   window = windowPointer;
 
-  inputManager = new InputManager();
+  inputManager = new InputManager(window);
   backgroundImageRenderer = new BackgroundImageRenderer(window);
   resourceManager = new ResourceManager(backgroundImageRenderer);
   spriteRenderer = new SpriteRenderer(window,resourceManager->getTextureManager());

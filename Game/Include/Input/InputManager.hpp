@@ -7,7 +7,7 @@
 
 class InputManager {
 public:
-  InputManager();
+  InputManager(sf::RenderWindow *windowPointer);
   ~InputManager();
   void update();
   int bindKeyboardEvent(std::string name, std::string key, bool onlyTriggerOnPress);

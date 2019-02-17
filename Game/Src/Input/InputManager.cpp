@@ -1,12 +1,12 @@
 #include <SFML/System.hpp>
-#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 #include "Input/InputManager.hpp"
 #include <iostream>
 
-InputManager::InputManager() {
+InputManager::InputManager(sf::RenderWindow *windowPointer) {
 
   // Create classes which we rely on
-  mouseHandler = new MouseHandler();
+  mouseHandler = new MouseHandler(windowPointer);
   keyboardHandler = new KeyboardHandler();
   gamepadHandler = new GamepadHandler();
 
