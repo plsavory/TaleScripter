@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Misc/Utils.hpp"
 #include "Database/DatabaseSchema.hpp"
+#include "Database/DatabaseConnection.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
 
@@ -17,12 +18,32 @@ GameCompiler::~GameCompiler() {
 
 }
 
+bool GameCompiler::process() {
+
+  // Open the appropriate databases
+  // Open up the newly-created Novel database
+  DatabaseConnection *novel = new DatabaseConnection("novel");
+  DatabaseConnection *resource = new DatabaseConnection("resource");
+
+  if (!novel->isUsable()) {
+    throw "GameCompiler: Unable to continue - could not open Novel database.";
+  }
+
+  if (!resource->isUsable()) {
+    throw "GameCompiler: Unable to continue - could not open Resource database.";
+  }
+
+  // Create an instance of ProjectBuilder to read the main project.json file
+  ProjectBuilder *projectBuilder = new ProjectBuilder(compilerOptions->getProjectFilePath(), novel, resource);
+  projectBuilder->process();
+  return false;
+}
+
 void GameCompiler::createResourceDatabase() {
 
-  if (!Utils::fileExists("db\\resource.db")) {
-    std::cout<<"Creatng resource.db..."<<std::endl;
+    std::cout<<"Creatng resource database..."<<std::endl;
 
-    DatabaseSchema *resourceDb = new DatabaseSchema("resource");
+    DatabaseSchema *resourceDb = new DatabaseSchema("resources");
 
     // Create music table
     DatabaseTable *musicTable = resourceDb->addTable("music");
@@ -83,9 +104,6 @@ void GameCompiler::createResourceDatabase() {
 
     // Create the Database
     resourceDb->createDatabase();
-
-
-  }
 
 }
 

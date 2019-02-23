@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "Database/DatabaseConnection.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
 #include "misc/Utils.hpp"
@@ -75,6 +76,7 @@ int main(int argc, char* argv[]) {
     }
 
     GameCompiler *compiler = new GameCompiler(compilerOptions);
+    compiler->process();
   } catch (const char *e) {
     std::cout<<"An error has occurred: "<<e<<std::endl;
     exit(1);

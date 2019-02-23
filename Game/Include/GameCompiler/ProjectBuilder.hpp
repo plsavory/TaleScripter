@@ -1,3 +1,4 @@
+// TODO: Move this - I have no clue what I was thinking last weekend.
 class GameCompilerOptions {
 public:
   GameCompilerOptions() {
@@ -16,6 +17,11 @@ private:
 
 class ProjectBuilder {
   public:
-    ProjectBuilder(std::string fileName);
+    ProjectBuilder(std::string fileName, DatabaseConnection *novelDb, DatabaseConnection *resourceDb);
     ~ProjectBuilder();
+    bool process();
+  private:
+    std::string projectFileName;
+    DatabaseConnection *novel;
+    DatabaseConnection *resource;
 };

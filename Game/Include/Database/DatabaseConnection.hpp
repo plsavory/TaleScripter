@@ -177,11 +177,15 @@ public:
   DatabaseConnection(std::string name);
   ~DatabaseConnection();
   void executeQuery(std::string query, DataSet *destinationDataSet);
+  bool isUsable() {
+    return usable;
+  }
 private:
   std::string name;
   sqlite3 *db;
   char *zErrMsg;
   int rc;
+  bool usable;
 };
 
 #endif
