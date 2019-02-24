@@ -43,7 +43,7 @@ void GameCompiler::createResourceDatabase() {
 
     std::cout<<"Creatng resource database..."<<std::endl;
 
-    DatabaseSchema *resourceDb = new DatabaseSchema("resources");
+    DatabaseSchema *resourceDb = new DatabaseSchema("resource");
 
     // Create music table
     DatabaseTable *musicTable = resourceDb->addTable("music");
@@ -140,7 +140,8 @@ void GameCompiler::createNovelDatabase() {
   chaptersTable->addPrimaryKey();
   chaptersTable->addColumn("title", ColumnType::tText, false, "");
   chaptersTable->addColumn("accessible_name", ColumnType::tText, false, "");
-  chaptersTable->addColumn("hidden_from_chapter_menu", ColumnType::tBoolean, false, "");
+  chaptersTable->addColumn("description", ColumnType::tText, false, "");
+  chaptersTable->addColumn("hidden", ColumnType::tBoolean, false, "");
   chaptersTable->addColumn("requirement_id", ColumnType::tInteger, false, "");
 
   /*

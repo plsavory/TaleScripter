@@ -12,6 +12,7 @@
 #define DATA_TYPE_STRING 1
 #define DATA_TYPE_DATE 2
 #define DATA_TYPE_DATE_TIME 3
+#define DATA_TYPE_BOOLEAN 4
 
 enum FetchMode {None, All, One};
 
@@ -183,8 +184,9 @@ public:
   DatabaseConnection(std::string name);
   ~DatabaseConnection();
   void executeQuery(std::string query, DataSet *destinationDataSet);
-  void executeQuery(std::string query);
-  void insert(std::string tableName, std::vector<std::string> columns, std::vector<std::string> values, std::vector<int> types);
+  int executeQuery(std::string query);
+  int getLastInsertId();
+  int insert(std::string tableName, std::vector<std::string> columns, std::vector<std::string> values, std::vector<int> types);
   bool isUsable() {
     return usable;
   }
@@ -194,6 +196,7 @@ private:
   char *zErrMsg;
   int rc;
   bool usable;
+  std::string sanitizeString(std::string);
 };
 
 #endif

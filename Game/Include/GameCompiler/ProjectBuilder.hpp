@@ -19,7 +19,7 @@ class ProjectBuilder {
   public:
     ProjectBuilder(std::string fileName, DatabaseConnection *novelDb, DatabaseConnection *resourceDb);
     ~ProjectBuilder();
-    bool process();
+    void process();
   private:
     std::string projectFileName;
     DatabaseConnection *novel;

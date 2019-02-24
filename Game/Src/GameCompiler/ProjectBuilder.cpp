@@ -1,11 +1,12 @@
 #include <iostream>
 #include "Database/DatabaseConnection.hpp"
-#include "GameCompiler/ProjectBuilder.hpp"
-#include <fstream>
 #include "nlohmann/json.hpp"
-#include "Misc/Utils.hpp"
-
 using json = nlohmann::json;
+#include "GameCompiler/ProjectBuilder.hpp"
+#include "GameCompiler/ChapterBuilder.hpp"
+#include <fstream>
+#include <regex>
+#include "Misc/Utils.hpp"
 
 #define VERBOSE_PROJECT_BUILDER_MESSAGES
 
@@ -29,12 +30,16 @@ ProjectBuilder::~ProjectBuilder() {
 
 }
 
-bool ProjectBuilder::process() {
+void ProjectBuilder::process() {
 
   // Open the project.json file and parse it
   #ifdef VERBOSE_PROJECT_BUILDER_MESSAGES
   std::cout<<"Opening project.json..."<<std::endl;
   #endif
+
+  // Get the project directory
+  std::regex regex("project\\.json$");
+  std::string projectDirectory = std::regex_replace(projectFileName, regex, "");
 
   std::ifstream stream(projectFileName);
   json projectJson = json::parse(stream);
@@ -104,4 +109,31 @@ bool ProjectBuilder::process() {
 
   novel->insert("game_information", columns, values, types);
 
+  // Process each chapter
+  if (projectJson.find("chapters") == projectJson.end()) {
+    throw "No 'chapters' attribute found in project.json";
+  }
+
+  json chapters = projectJson["chapters"];
+  int numberOfChapters = 0;
+
+  for (auto& chapter : chapters.items()) {
+    numberOfChapters++;
+
+    // Get the path to the chapter file
+    std::vector<std::string> explodedFilePath = {
+      projectDirectory,
+      Utils::removeQuotationsFromString(chapter.value())
+    };
+
+    std::string chapterFilePath = Utils::implodeString(explodedFilePath, "", 0);
+
+    ChapterBuilder *chapterBuilder = new ChapterBuilder(chapterFilePath, novel);
+    chapterBuilder->process();
+    delete(chapterBuilder);
+  }
+
+  if (numberOfChapters == 0) {
+    throw "No chapters were listed to be processed in the 'chapters' attribute of project.json.";
+  }
 }

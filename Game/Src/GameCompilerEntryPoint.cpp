@@ -8,7 +8,6 @@
 #include <sstream>
 
 int main(int argc, char* argv[]) {
-  std::cout<<"Game compiler test, builds the required database tables..."<<std::endl;
 
   try {
 
