@@ -32,7 +32,8 @@ bool DatabaseSchema::createDatabase() {
   char *zErrMsg = 0;
   int rc;
 
-  std::string filename = name;
+  std::string filename = std::string("db\\");
+  filename.append(name);
 
   // Convert the string to a char array TODO: Move this into its own function
   char *fName = new char[filename.length() + 1];

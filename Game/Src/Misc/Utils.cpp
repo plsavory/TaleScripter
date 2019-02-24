@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <string>
 #include <fstream>
+#include <regex>
 
 /**
  * [Utils::setBit Sets or unsets a bit on the provided 8-bit variable]
@@ -170,4 +171,17 @@ std::string Utils::implodeString(std::vector<std::string> explodedString, std::s
 
   return returnValue;
 
+}
+
+/**
+ * [Utils::removeQuotationsFromString Used often when using JSON, as the JSON library that I use returns quotation marks with strings in arrays]
+ * @param  string [The string to operate on]
+ * @return        [String with quotation marks removed from the start and end]
+ */
+std::string Utils::removeQuotationsFromString(std::string string) {
+
+  std::regex start("$\"");
+  std::regex end("\"^");
+
+  return std::regex_replace(std::regex_replace(string, end, ""), start, "");
 }

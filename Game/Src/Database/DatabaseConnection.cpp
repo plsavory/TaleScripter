@@ -3,6 +3,9 @@
 #include <string>
 #include <sstream>
 #include "Database/DatabaseConnection.hpp"
+#include "Misc/Utils.hpp"
+
+#define PRINT_QUERIES
 
 DatabaseConnection::DatabaseConnection(std::string name) {
 
@@ -84,7 +87,6 @@ void DatabaseConnection::executeQuery(std::string query, DataSet *destinationDat
 
         rows++;
 
-
       } else {
         break;
       }
@@ -109,5 +111,86 @@ void DatabaseConnection::executeQuery(std::string query, DataSet *destinationDat
   }
 
   return;
+
+}
+
+/**
+ * [DatabaseConnection::executeQuery Execute a query with no result data - this should be used for writing data]
+ * @param query [Query string]
+ */
+void DatabaseConnection::executeQuery(std::string query) {
+  sqlite3_stmt *statement;
+
+  #ifdef DATABASE_DEBUG
+    std::cout<<"Execute SQL statement: "<<query<<std::endl;
+  #endif
+
+  char *queryString = new char[query.length() + 1];
+  std::strcpy(queryString, query.c_str());
+
+  if (sqlite3_prepare_v2(db, queryString, -1, &statement, 0) == SQLITE_OK) {
+    sqlite3_step(statement);
+    sqlite3_finalize(statement);
+    return;
+  }
+
+  // TODO: Add some nicer error handling here
+  std::string error = sqlite3_errmsg(db);
+
+  if (error != "not an error") {
+    std::cout<<"An SQL error occurred: " << error << std::endl;
+    std::cout<<std::endl<<"---------------------"<<std::endl;
+    std::cout<<query<<std::endl;
+  }
+
+  return;
+}
+
+/**
+ * [DatabaseConnection::insert Inserts a row into the database]
+ * @param tableName [The name of the table]
+ * @param columns   [Array of strings with column names]
+ * @param values    [Array of strings containing the values]
+ * @param valuesCount [The number of values to insert]
+ */
+void DatabaseConnection::insert(std::string tableName, std::vector<std::string> columns, std::vector<std::string> values, std::vector<int> types) {
+
+  if (columns.size() != values.size() || types.size() != columns.size()) {
+    throw "The number of given columns and the number of given values does not match.";
+  }
+
+  for (unsigned int i = 0; i < values.size(); i++) {
+
+    std::stringstream ss;
+
+    switch (types[i]) {
+      case DATA_TYPE_STRING:
+      ss << "'" << values[i] << "'";
+      values[i] = ss.str();
+      break;
+      default:
+      break;
+    }
+  }
+
+  std::string queryPortionColumns = Utils::implodeString(columns, ", ", 0);
+  std::ostringstream columnsStream;
+  columnsStream << "(" << queryPortionColumns << ")";
+  queryPortionColumns = columnsStream.str();
+
+  // TODO: Create an overloaded function which can handle inserting multiple rows at once
+  std::string queryPortionValues = Utils::implodeString(values, ", ", 0);
+  std::ostringstream valuesStream;
+  valuesStream << "VALUES (" << queryPortionValues << ")";
+  queryPortionValues = valuesStream.str();
+
+  std::ostringstream ss;
+  ss << "INSERT INTO `" << tableName << "` " << queryPortionColumns << " " << queryPortionValues << ";";
+
+  #ifdef PRINT_QUERIES
+  std::cout<<ss.str()<<std::endl;
+  #endif
+
+  this->executeQuery(ss.str());
 
 }

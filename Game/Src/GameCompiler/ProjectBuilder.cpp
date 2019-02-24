@@ -48,19 +48,60 @@ bool ProjectBuilder::process() {
 
   bool storeCredits;
 
+  std::string* contributors[100];
+
   if (projectJson.find("credits") == projectJson.end()) {
     storeCredits = false;
   } else {
 
-    json credits = projectJson["credits"];
+    json credits = projectJson["contributors"];
 
+    // Store all of the names in the Credits array. TODO: Create a more comprehensive solution for game ending cvredits later
+    for (int i = 0; i < 100; i++) {
+      contributors[i] = NULL;
+    }
+
+    int contributorsCount = -1;
     for (auto& element : credits.items()) {
-      std::cout<<element<<std::endl;
+      contributors[++contributorsCount] = new std::string(Utils::removeQuotationsFromString(element.value()));
     }
   }
 
-  #ifdef VERBOSE_PROJECT_BUILDER_MESSAGES
-  std::cout<<"Project Title: "<<projectTitle<<std::endl;
-  #endif
+  std::string versionNumber;
+  if (projectJson.find("version_number") == projectJson.end()) {
+    versionNumber = "1.0";
+  } else {
+    versionNumber = projectJson["version_number"];
+  }
+
+  // TODO: Store the contributors in the database when we have an appropriate location for it
+
+  std::string buildDate;
+
+  if (projectJson.find("date") == projectJson.end()) {
+    buildDate = projectJson["date"];
+  } else {
+    buildDate = "NOW()";
+  }
+
+  // Write the extracted data to the database
+  std::vector<std::string> columns = {"game_title", "author_name", "version_number", "text_display_type"};
+
+  std::vector<std::string> values = {
+    projectTitle,
+    storeCredits ? *contributors[0] : std::string("Unknown"),
+    versionNumber,
+    std::string("1") // TODO: Implement this
+  };
+
+  // This didn't differ as much as I thought it would...
+  std::vector<int> types = {
+    DATA_TYPE_STRING,
+    DATA_TYPE_STRING,
+    DATA_TYPE_STRING,
+    DATA_TYPE_STRING
+  };
+
+  novel->insert("game_information", columns, values, types);
 
 }

@@ -3,9 +3,15 @@
 
 #include "SQLite/sqlite3.h"
 #include <iostream>
+#include <vector>
 
 #define DATA_SET_MAX_ROWS 1000
 #define DATA_SET_MAX_COLUMNS 50
+
+#define DATA_TYPE_NUMBER 0
+#define DATA_TYPE_STRING 1
+#define DATA_TYPE_DATE 2
+#define DATA_TYPE_DATE_TIME 3
 
 enum FetchMode {None, All, One};
 
@@ -177,6 +183,8 @@ public:
   DatabaseConnection(std::string name);
   ~DatabaseConnection();
   void executeQuery(std::string query, DataSet *destinationDataSet);
+  void executeQuery(std::string query);
+  void insert(std::string tableName, std::vector<std::string> columns, std::vector<std::string> values, std::vector<int> types);
   bool isUsable() {
     return usable;
   }
