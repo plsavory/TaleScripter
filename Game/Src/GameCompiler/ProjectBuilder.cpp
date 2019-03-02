@@ -3,6 +3,7 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 #include "GameCompiler/ProjectBuilder.hpp"
+#include "GameCompiler/ResourceBuilder.hpp"
 #include "GameCompiler/ChapterBuilder.hpp"
 #include <fstream>
 #include <regex>
@@ -40,6 +41,10 @@ void ProjectBuilder::process() {
   // Get the project directory
   std::regex regex("project\\.json$");
   std::string projectDirectory = std::regex_replace(projectFileName, regex, "");
+
+  // Process the novel's resources
+  ResourceBuilder *resourceBuilder = new ResourceBuilder(resource, projectDirectory);
+  resourceBuilder->process();
 
   std::ifstream stream(projectFileName);
   json projectJson = json::parse(stream);
