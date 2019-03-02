@@ -1,5 +1,5 @@
 #define PROJECT_NAME "TaleScripter"
-#define PROJECT_VERSION "v0.0.2"
+#define PROJECT_VERSION "v0.3.0"
 
 
 
