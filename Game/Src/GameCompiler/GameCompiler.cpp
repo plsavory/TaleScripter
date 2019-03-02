@@ -9,6 +9,17 @@ GameCompiler::GameCompiler(GameCompilerOptions *gameCompilerOptions) {
 
   compilerOptions = gameCompilerOptions;
 
+  // If we have no project file path, set it as the default
+  if (compilerOptions->getProjectFilePath() == "") {
+
+    if (!Utils::fileExists("projects/Default/project.json")) {
+      throw "No project has been specified, and there is no project located at 'projects/Default/project.json'";
+    }
+
+    compilerOptions->setProjectFilePath("projects/default/project.json");
+
+  }
+
   // Create the database structure required for the game
   createResourceDatabase();
   createNovelDatabase();
@@ -40,8 +51,6 @@ bool GameCompiler::process() {
 }
 
 void GameCompiler::createResourceDatabase() {
-
-    std::cout<<"Creatng resource database..."<<std::endl;
 
     DatabaseSchema *resourceDb = new DatabaseSchema("resource");
 
@@ -235,6 +244,7 @@ void GameCompiler::createNovelDatabase() {
   charactersTable->addColumn("surname", ColumnType::tText, false, "");
   charactersTable->addColumn("bio", ColumnType::tText, false, "");
   charactersTable->addColumn("age", ColumnType::tText, false, "");
+  charactersTable->addColumn("showOnCharacterMenu", ColumnType::tBoolean, false, "TRUE");
 
   novelDb->createDatabase();
 

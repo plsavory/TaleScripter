@@ -41,6 +41,8 @@ void ProjectBuilder::process() {
   // Get the project directory
   std::regex regex("project\\.json$");
   std::string projectDirectory = std::regex_replace(projectFileName, regex, "");
+  projectPath = projectDirectory;
+
 
   // Process the novel's resources
   ResourceBuilder *resourceBuilder = new ResourceBuilder(resource, projectDirectory);
@@ -119,6 +121,9 @@ void ProjectBuilder::process() {
     throw "No 'chapters' attribute found in project.json";
   }
 
+  // Process all of the characters
+  processCharacters();
+
   json chapters = projectJson["chapters"];
   int numberOfChapters = 0;
 
@@ -141,4 +146,86 @@ void ProjectBuilder::process() {
   if (numberOfChapters == 0) {
     throw "No chapters were listed to be processed in the 'chapters' attribute of project.json.";
   }
+}
+
+void ProjectBuilder::processCharacters() {
+  std::string characterJsonFileName = projectPath;
+  characterJsonFileName.append("Characters/Characters.json");
+
+  if (!Utils::fileExists(characterJsonFileName)) {
+    std::cout<<"WARNING: No Characters.json file found in characters directory, certain features will not work."<<std::endl;
+    return;
+  }
+
+  int numberOfCharacters = 0;
+
+  std::ifstream stream(characterJsonFileName);
+  json charactersJson = json::parse(stream);
+
+  for (auto& datum : charactersJson.items()) {
+    json character = datum.value();
+
+    numberOfCharacters++;
+
+    std::string characterId;
+    std::string firstName;
+    std::string surname = "";
+    std::string bio = "";
+    std::string age = "0";
+    std::string showOnCharacterMenu = "TRUE";
+
+    if (character.find("firstName") == character.end()) {
+      throw "A character must have a firstName.";
+    }
+
+    if (character.find("characterId") == character.end()) {
+      throw "A character must have a characterId (It should be numeric)";
+    }
+
+    characterId = character["characterId"];
+    firstName = character["firstName"];
+
+    if (character.find("surname") != character.end()) {
+      surname = character["surname"];
+    }
+
+    if (character.find("bio") != character.end()) {
+      bio = character["bio"];
+    }
+
+    if (character.find("age") != character.end()) {
+      age = character["age"];
+    }
+
+    if (character.find("showOnCharacterMenu") != character.end()) {
+      showOnCharacterMenu = character["showOnCharacterMenu"];
+    }
+
+    // Check if a character with this ID already exists
+    std::vector<std::string> query = {
+      "SELECT * FROM characters WHERE id = ",
+      characterId,
+      ";"
+    };
+
+    std::string queryString = Utils::implodeString(query, "");
+
+    DataSet *dataSet = new DataSet();
+
+    novel->executeQuery(queryString, dataSet);
+
+    if (dataSet->getRowCount() > 0) {
+      std::string existingCharacterName = dataSet->getRow(0)->getColumn("first_name")->getData();
+      std::vector<std::string> error = {"Character ID's must be unique, character '", firstName, "' conflicts with character '", existingCharacterName, "'"};
+      throw Utils::implodeString(error, "");
+    }
+
+    std::vector<std::string> columns = {"id", "first_name", "surname", "bio", "age", "showOnCharacterMenu"};
+    std::vector<std::string> values = {characterId, firstName, surname, bio, age, showOnCharacterMenu};
+    std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_STRING, DATA_TYPE_STRING, DATA_TYPE_STRING, DATA_TYPE_NUMBER, DATA_TYPE_BOOLEAN};
+
+    novel->insert("characters", columns, values, types);
+
+  }
+
 }

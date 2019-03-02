@@ -309,6 +309,17 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
 
   }
 
+  if (lineJson.find("spoken") != lineJson.end()) {
+      if (lineJson["spoken"] == "TRUE" || lineJson["spoken"] == "true") {
+        // There is probably a better way of doing this...
+        std::string tempText = "\"";
+        tempText.append(text);
+        tempText.append("\"");
+        text = tempText;
+      }
+  }
+
+
   std::vector<std::string> columns = {"scene_segment_id", "language_id", "character_id", "override_character_name", "text"};
   std::vector<std::string> values = {std::to_string(sceneSegmentId), languageId, characterId, overrideCharacterName, text};
   std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_STRING, DATA_TYPE_STRING};

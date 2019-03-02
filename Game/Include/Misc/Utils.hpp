@@ -10,6 +10,7 @@ public:
   static bool fileExists(const std::string &fileName);
   static std::vector<std::string> explodeString(const std::string &s, char delimiter);
   static std::string implodeString(std::vector<std::string> explodedString, std::string glue, unsigned int count);
+  static std::string implodeString(std::vector<std::string> explodedString, std::string glue);
   static std::string removeQuotationsFromString(std::string string);
 private:
 };

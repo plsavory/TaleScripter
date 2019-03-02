@@ -6,8 +6,6 @@
 #include "Misc/Utils.hpp"
 #include <regex>
 
-#define PRINT_QUERIES
-
 DatabaseConnection::DatabaseConnection(std::string name) {
 
   // Initialise values and open database connection

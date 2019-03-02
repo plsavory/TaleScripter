@@ -22,6 +22,8 @@ class ProjectBuilder {
     void process();
   private:
     std::string projectFileName;
+    std::string projectPath;
     DatabaseConnection *novel;
     DatabaseConnection *resource;
+    void processCharacters();
 };
