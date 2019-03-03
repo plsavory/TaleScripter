@@ -1,4 +1,4 @@
-#ifndef FONT_MANAHER_INCLUDED
+#ifndef FONT_MANAGER_INCLUDED
 #define FONT_MANAGER_INCLUDED
 
 #include <queue>

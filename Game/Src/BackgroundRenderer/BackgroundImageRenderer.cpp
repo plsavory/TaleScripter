@@ -111,7 +111,7 @@ void BackgroundImageRenderer::addAllFromDatabase(DatabaseConnection *db) {
     std::string fname = result->getRow(i)->getColumn("filename")->getData();
     std::string id = result->getRow(i)->getColumn("id")->getData();
 
-    std::string fullFileName = "resource\\backgrounds\\";
+    std::string fullFileName = "resource/backgrounds/";
     fullFileName.append(fname);
 
     Background *addedBackground = addBackground(name, fullFileName);

@@ -5,7 +5,7 @@
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
 #include "Misc/ParameterHandler.hpp"
-#include "misc/Utils.hpp"
+#include "Misc/Utils.hpp"
 #include <sstream>
 
 int main(int argc, char* argv[]) {

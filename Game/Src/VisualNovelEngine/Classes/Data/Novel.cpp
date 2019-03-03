@@ -448,7 +448,7 @@ NovelSceneSegment::~NovelSceneSegment() {
   }
 }
 
-NovelSceneSegment::getLineCount() {
+int NovelSceneSegment::getLineCount() {
   return lineCount;
 }
 

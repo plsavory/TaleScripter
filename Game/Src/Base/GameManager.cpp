@@ -21,7 +21,6 @@ GameManager::GameManager(Engine *enginePointer) {
   window->setTitle(windowTitle);
 
   // Create each game GameScreen
-  testScreen = new TestScreen(engine);
   novelScreen = new NovelScreen(engine, novel);
 }
 
@@ -39,9 +38,6 @@ void GameManager::update() {
     case GameState::Novel:
     novelScreen->update();
     return;
-    case GameState::Test:
-    testScreen->update();
-    return;
     default:
     break;
   }
@@ -57,9 +53,6 @@ void GameManager::draw() {
   switch (currentGameState) {
     case GameState::Novel:
     novelScreen->draw();
-    return;
-    case GameState::Test:
-    testScreen->draw();
     return;
     default:
     break;

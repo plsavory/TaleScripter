@@ -4,7 +4,6 @@
 #define BASE_GAME_MANAGER_INCLUDED
 
 // Include all of the game GameScreens
-#include "GameScreens/TestScreen.hpp"
 #include "VisualNovelEngine/Screens/NovelScreen.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 
@@ -26,7 +25,6 @@ private:
   GameState currentGameState;
   Engine *engine;
   InputManager *inputManager;
-  TestScreen *testScreen;
   NovelScreen *novelScreen;
   NovelData *novel;
   ResourceManager *resourceManager;
