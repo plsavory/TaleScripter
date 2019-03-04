@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Database/DatabaseConnection.hpp"
 #include "Resource/TextureManager.hpp"
 
 /**
@@ -145,4 +146,28 @@ Texture* TextureManager::getTexture(std::string name) {
 
   std::cout<<"Texture with name (" << name << ") not found."<<std::endl;
   return NULL;
+}
+
+/**
+ * [TextureManager::loadAllFromDatabase Reads all textures from the database and creates the neccesary class instances]
+ */
+void TextureManager::loadAllFromDatabase(DatabaseConnection *resource) {
+  /*
+  TODO: Memory manage this so that we don't just have all of them loaded.
+  This is outside of the scope of this class. Once we have the memory management, we can
+  create all of the class instances but don't set the images to load into memory immediately by default.
+  For instance, for every chapter or scene, we can load or unload textures for character sprites as required if they appear in that scene/chapter or not.
+  */
+
+ DataSet *dataSet = new DataSet();
+ resource->executeQuery("SELECT * FROM textures;", dataSet);
+
+ int numberOfTextures = dataSet->getRowCount();
+
+ for (int i = 0; i < numberOfTextures; i++) {
+   std::string name = dataSet->getRow(i)->getColumn("name")->getData();
+   std::string fileName = "resource/textures/";
+   fileName.append(dataSet->getRow(i)->getColumn("filename")->getData());
+   loadTexture(fileName, name);
+ }
 }

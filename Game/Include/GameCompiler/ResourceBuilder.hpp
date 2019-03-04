@@ -11,7 +11,7 @@ private:
   std::string resourceDirectory;
   std::string assetDirectory;
   void processBackgroundImages();
-  void processImages();
+  void processTextures();
   void processSprites();
   void processFonts();
   void processMusic();

@@ -104,6 +104,13 @@ void GameCompiler::createResourceDatabase() {
     backgroundImageAttributesTable->addColumn("offset_left", ColumnType::tInteger, false, "");
     backgroundImageAttributesTable->addColumn("offset_top", ColumnType::tInteger, false, "");
 
+    // Create textures table
+    DatabaseTable *texturesTable = resourceDb->addTable("textures");
+    texturesTable->addPrimaryKey();
+    texturesTable->addColumn("name", ColumnType::tText, false, "");
+    texturesTable->addColumn("filename", ColumnType::tText, false, "");
+    texturesTable->addColumn("enabled", ColumnType::tBoolean, false, "");
+
     // TODO: Pull in the Lua library to allow the script system to work
     DatabaseTable *scriptsTable = resourceDb->addTable("scripts");
     scriptsTable->addPrimaryKey();

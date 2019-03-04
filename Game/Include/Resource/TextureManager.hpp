@@ -54,10 +54,12 @@ public:
   Texture* getTexture(std::string name);
   bool isQueueEmpty();
   void processQueue();
+  void loadAllFromDatabase(DatabaseConnection *resource);
 private:
   std::queue<TextureLoadRequest> textureLoadQueue;
   Texture *texture[MAX_TEXTURES];
   void assignTexture(std::string fname, std::string name, int id);
+  DatabaseConnection *resource;
 };
 
 #endif

@@ -37,7 +37,7 @@ void ResourceBuilder::process() {
 
   // Process each type of resource
   processBackgroundImages();
-  processImages();
+  processTextures();
   processSprites();
   processFonts();
   processMusic();
@@ -145,9 +145,61 @@ void ResourceBuilder::processBackgroundImages() {
 
 }
 
-void ResourceBuilder::processImages() {
+void ResourceBuilder::processTextures() {
+  std::cout<<"Processing Textures..."<<std::endl;
+
   std::string imagesDirectory = resourceDirectory;
-  imagesDirectory.append("images/");
+  imagesDirectory.append("textures/");
+
+  std::string textureJsonFileName = imagesDirectory;
+  textureJsonFileName.append("Textures.json");
+
+  if (!Utils::fileExists(textureJsonFileName)) {
+    std::vector<std::string> errorVector = {"Could not locate textures, unable to find file: ", textureJsonFileName};
+    throw Utils::implodeString(errorVector, "",0);
+  }
+
+  // Start parsing the JSON file
+  // TODO: Make a function for handling this for all resource types rather than duplicating the code.
+  std::ifstream stream(textureJsonFileName);
+  json textureJson = json::parse(stream);
+
+  int numberOfTextureEntries = 0;
+
+  for (auto& element : textureJson.items()) {
+
+    json texture = element.value();
+
+    std::string name;
+    std::string fileName;
+    std::string enabled;
+
+    // Some error handling...
+    if (texture.find("name") == texture.end()) {
+      throw "Each texture must have a 'name' attribute";
+    }
+
+    if (texture.find("fileName") == texture.end()) {
+      throw "Each texture must have a 'fileName' attribute";
+    }
+
+    if (texture.find("enabled") != texture.end()) {
+      enabled = texture["enabled"];
+    } else {
+      enabled = "TRUE"; // If not stated otherwise, assume that it is enabled
+    }
+
+    name = texture["name"];
+    fileName = texture["fileName"];
+
+    std::vector<std::string> columns = {"name", "filename","enabled"};
+    std::vector<std::string> values = {name, fileName, enabled};
+    std::vector<int> types = {DATA_TYPE_STRING, DATA_TYPE_STRING, DATA_TYPE_BOOLEAN};
+
+    resource->insert("textures", columns, values, types);
+
+    numberOfTextureEntries++;
+  }
 }
 
 void ResourceBuilder::processSprites() {

@@ -37,7 +37,7 @@ NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer,SpriteRenderer *sRend
   maxTextWidth = 980;
 
   // TODO: Load this from the database rather than hardcoded here
-  resourceManager->loadTexture("resource/sprites/vn_line.png", "novel_text_display_background");
+  resourceManager->loadTexture("resource/textures/vn_line.png", "novel_text_display_background");
   backgroundSprite = spriteRenderer->addSprite("novel_text_display_background", "novel_text_display_background",2);
 
   if (backgroundSprite) {

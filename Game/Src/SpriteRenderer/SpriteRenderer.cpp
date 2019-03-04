@@ -1,5 +1,6 @@
 #include "SFML/Graphics.hpp"
 #include <iostream>
+#include "Database/DatabaseConnection.hpp"
 #include "Resource/TextureManager.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
 

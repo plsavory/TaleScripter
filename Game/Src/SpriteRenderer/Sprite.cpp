@@ -1,5 +1,6 @@
 #include <iostream>
 #include "SFML/Graphics.hpp"
+#include "Database/DatabaseConnection.hpp"
 #include "Resource/TextureManager.hpp"
 #include "SpriteRenderer/Sprite.hpp"
 
@@ -74,6 +75,6 @@ void Sprite::draw() {
   if (!visible) {
     return;
   }
-  
+
   displayWindow->draw(*mySprite);
 }

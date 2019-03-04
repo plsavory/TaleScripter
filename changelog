@@ -1,3 +1,10 @@
+---- Current ----
+
+Changes from v0.3.1:
+
+Textures information is now read from the database and texture files are loaded into memory.
+Textures are now read from Textures/Textures.json and saved into the database by the GameCompiler.
+
 ---- v0.3.1 ----
 
 Changes from v0.3.0:
