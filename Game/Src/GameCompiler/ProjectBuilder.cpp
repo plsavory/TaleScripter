@@ -149,6 +149,7 @@ void ProjectBuilder::process() {
 }
 
 void ProjectBuilder::processCharacters() {
+  std::cout<<"Processing characters..."<<std::endl;
   std::string characterJsonFileName = projectPath;
   characterJsonFileName.append("Characters/Characters.json");
 
@@ -226,6 +227,99 @@ void ProjectBuilder::processCharacters() {
 
     novel->insert("characters", columns, values, types);
 
+    // Process character sprites and do some validation while we're at it
+    if (character.find("sprites") != character.end()) {
+      json characterSprites = character["sprites"];
+
+      std::string textureId = "";
+      std::string name = "";
+
+      for (auto& element : characterSprites.items()) {
+        json characterSprite = element.value();
+
+        if (characterSprite.find("textureName") == characterSprite.end()) {
+          std::vector<std::string> errorMessage = {
+            "Could not process character ",
+            firstName,
+            ": A character sprite must have a textureName attribute linked to it."
+          };
+
+          throw Utils::implodeString(errorMessage, "");
+        }
+
+        if (characterSprite.find("name") == characterSprite.end()) {
+          std::vector<std::string> errorMessage = {
+            "Could not process character ",
+            firstName,
+            ": A character sprite must have a name attribute linked to it."
+          };
+
+          throw Utils::implodeString(errorMessage, "");
+        }
+
+        name = characterSprite["name"];
+
+        {
+          std::vector<std::string> query = {
+            "SELECT id FROM textures WHERE name = '",
+            characterSprite["textureName"],
+            "';"
+          };
+
+          DataSet *dataSet = new DataSet();
+          resource->executeQuery(Utils::implodeString(query, ""), dataSet);
+
+          if (dataSet->getRowCount() == 0) {
+            std::vector<std::string> errorMessage = {
+              "Could not process character ",
+              firstName,
+              ": No texture named ",
+              characterSprite["textureName"],
+              "exists."
+            };
+
+            throw Utils::implodeString(errorMessage, "");
+          }
+          
+          textureId = dataSet->getRow(0)->getColumn("id")->getData();
+
+          delete(dataSet);
+        }
+
+        {
+          // Validate that no two sprites linked to the same character have the same name
+          std::vector<std::string> query = {
+            "SELECT * FROM character_sprites WHERE character_id = ",
+            characterId,
+            " AND name = '",
+            characterSprite["name"],
+            "';"
+          };
+
+          DataSet *dataSet = new DataSet();
+          novel->executeQuery(Utils::implodeString(query, ""), dataSet);
+
+          if (dataSet->getRowCount() > 0) {
+            std::vector<std::string> errorMessage = {
+              "Could not process character ",
+              firstName,
+              ": There are multiple sprites with the same name (",
+              characterSprite["name"],
+              ") linked to this character."
+            };
+
+            throw Utils::implodeString(errorMessage, "");
+          }
+        }
+
+        // If we're here, all validation has passed so write to the database.
+        std::vector<std::string> columns = {"character_id", "name", "texture_id"};
+        std::vector<std::string> values = {characterId, name, textureId};
+        std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_STRING, DATA_TYPE_NUMBER};
+
+        novel->insert("character_sprites", columns, values, types);
+      }
+    }
   }
 
 }

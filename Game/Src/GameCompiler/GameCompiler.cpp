@@ -253,6 +253,12 @@ void GameCompiler::createNovelDatabase() {
   charactersTable->addColumn("age", ColumnType::tText, false, "");
   charactersTable->addColumn("showOnCharacterMenu", ColumnType::tBoolean, false, "TRUE");
 
+  DatabaseTable *characterSpritesTable = novelDb->addTable("character_sprites");
+  characterSpritesTable->addPrimaryKey();
+  characterSpritesTable->addColumn("character_id", ColumnType::tInteger, true, "");
+  characterSpritesTable->addColumn("name", ColumnType::tText, false, "");
+  characterSpritesTable->addColumn("texture_id", ColumnType::tInteger, true, "");
+
   novelDb->createDatabase();
 
 }
