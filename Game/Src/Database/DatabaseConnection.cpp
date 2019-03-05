@@ -226,6 +226,16 @@ int DatabaseConnection::insert(std::string tableName, std::vector<std::string> c
 
 }
 
+int DatabaseConnection::insert(std::string tableName) {
+  std::vector<std::string> query = {
+    "INSERT INTO `",
+    tableName,
+    "` DEFAULT VALUES"
+  };
+
+  return executeQuery(Utils::implodeString(query, ""));
+}
+
 /**
  * [DatabaseConnection::sanitizeString Remove any offending characters and escape things that need it]
  * @param  string [The string]

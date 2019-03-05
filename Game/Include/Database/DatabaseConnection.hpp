@@ -187,6 +187,7 @@ public:
   int executeQuery(std::string query);
   int getLastInsertId();
   int insert(std::string tableName, std::vector<std::string> columns, std::vector<std::string> values, std::vector<int> types);
+  int insert(std::string tableName);
   bool isUsable() {
     return usable;
   }

@@ -207,6 +207,7 @@ void GameCompiler::createNovelDatabase() {
   segmentLinesTable->addColumn("character_id", ColumnType::tInteger, false, "");
   segmentLinesTable->addColumn("override_character_name", ColumnType::tText, false, "");
   segmentLinesTable->addColumn("text", ColumnType::tText, true, "");
+  segmentLinesTable->addColumn("character_state_group_id", ColumnType::tInteger, false, "");
 
   /*
     When a row in this table is linked to a segment line, the given action will happen with the given argument
@@ -258,6 +259,20 @@ void GameCompiler::createNovelDatabase() {
   characterSpritesTable->addColumn("character_id", ColumnType::tInteger, true, "");
   characterSpritesTable->addColumn("name", ColumnType::tText, false, "");
   characterSpritesTable->addColumn("texture_id", ColumnType::tInteger, true, "");
+
+  // Create Character States table - This refers to the appearance of one character at any point within a group
+  DatabaseTable *characterStatesTable = novelDb->addTable("character_states");
+  characterStatesTable->addPrimaryKey();
+  characterStatesTable->addColumn("character_sprite_id", ColumnType::tInteger, true, "");
+  characterStatesTable->addColumn("character_state_group_id", ColumnType::tInteger, true, "");
+
+  /*
+    Create Character State Groups table. This table links a segment_line to many character_states.
+    Having this table allows us to prevent massive duplication of data within the database
+    related to character sprite states.
+   */
+  DatabaseTable *characterStateGroupsTable = novelDb->addTable("character_state_groups");
+  characterStateGroupsTable->addPrimaryKey();
 
   novelDb->createDatabase();
 

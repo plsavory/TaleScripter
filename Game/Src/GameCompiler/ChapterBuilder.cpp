@@ -284,6 +284,7 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
   std::string overrideCharacterName = "NULL";
   std::string characterId = "NULL";
   std::string text = "NULL";
+  std::string characterStateGroupId = "NULL";
 
   if (lineJson.find("characterName") != lineJson.end()) {
     // TODO: Validate that the character exists in the database
@@ -319,10 +320,114 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
       }
   }
 
+  // See if any character state changes are on this line, add them to the database if they are
+  if (lineJson.find("characterStates") != lineJson.end()) {
+    // Create a character state group
+    // TODO: If one which looks the same already exists, use it rather than creating a new one.
+    characterStateGroupId = std::to_string(novel->insert("character_state_groups"));
 
-  std::vector<std::string> columns = {"scene_segment_id", "language_id", "character_id", "override_character_name", "text"};
-  std::vector<std::string> values = {std::to_string(sceneSegmentId), languageId, characterId, overrideCharacterName, text};
-  std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_STRING, DATA_TYPE_STRING};
+    json characterStates = lineJson["characterStates"];
+
+    for (auto& element : characterStates.items()) {
+      json characterState = element.value();
+
+      std::string characterId = "";
+      std::string spriteName;
+
+      std::string characterSpriteId;
+
+
+      if (characterState.find("characterId") == characterState.end()) {
+
+        if (characterState.find("characterFirstName") != characterState.end()) {
+
+          std::string characterFirstName = characterState["characterFirstName"];
+
+          DataSet *dataSet = new DataSet();
+
+          std::vector<std::string> query = {
+            "SELECT * FROM characters WHERE first_name = '",
+            characterFirstName,
+            "';"
+          };
+
+          novel->executeQuery(Utils::implodeString(query, ""), dataSet);
+
+          if (dataSet->getRowCount() == 0) {
+            std::vector<std::string> error = {
+              "Error adding character sprite to a line, no character with name: ",
+              characterFirstName,
+              " exists."
+            };
+
+            throw Utils::implodeString(error, "");
+          }
+
+          if (dataSet->getRowCount() > 1) {
+
+            std::vector<std::string> error = {
+              "Error adding character sprite to a line, multiple characters exist with name: ",
+              characterFirstName,
+              "exists."
+            };
+
+            throw Utils::implodeString(error, "");
+          }
+
+          characterId = dataSet->getRow(0)->getColumn("id")->getData();
+
+        } else {
+          throw "Each character state item must have a characterId or characterFirstName attribute";
+        }
+
+      } else {
+        characterId = characterState["characterId"];
+      }
+
+      if (characterState.find("spriteName") == characterState.end()) {
+        throw "Each character state item must have a spriteName";
+      }
+
+      spriteName = characterState["spriteName"];
+
+      // TODO: Validate that a character exists with this ID (if it wasn't selected by name)
+
+      DataSet *dataSet = new DataSet();
+
+      std::vector<std::string> query = {
+        "SELECT * FROM character_sprites WHERE character_id = ",
+        characterId,
+        " AND name = '",
+        spriteName,
+        "';"
+      };
+
+      novel->executeQuery(Utils::implodeString(query, ""), dataSet);
+
+      if (dataSet->getRowCount() == 0) {
+        std::vector<std::string> error = {
+          "Could not link character sprite to line: no character sprite linked to character",
+          characterId,
+          "with sprite name",
+          spriteName,
+          "was found."
+        };
+
+        throw Utils::implodeString(error, " ");
+      }
+
+      characterSpriteId = dataSet->getRow(0)->getColumn("id")->getData();
+
+      std::vector<std::string> columns = {"character_sprite_id", "character_state_group_id"};
+      std::vector<std::string> values = {characterSpriteId, characterStateGroupId};
+      std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER};
+      novel->insert("character_states", columns, values, types);
+    }
+  }
+
+  std::vector<std::string> columns = {"scene_segment_id", "language_id", "character_id", "override_character_name", "text", "character_state_group_id"};
+  std::vector<std::string> values = {std::to_string(sceneSegmentId), languageId, characterId, overrideCharacterName, text, characterStateGroupId};
+  std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_STRING, DATA_TYPE_STRING, DATA_TYPE_STRING};
   novel->insert("segment_lines", columns, values, types);
 
 }
