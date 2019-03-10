@@ -24,6 +24,9 @@ public:
   FontManager* getFontManager() {
     return fontManager;
   }
+  DatabaseConnection* getResourceDatabase() {
+    return resourceDatabase;
+  }
 private:
   void processQueue();
   TextureManager *textureManager;

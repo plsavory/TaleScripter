@@ -18,7 +18,7 @@ public:
   std::string getFirstName() {
     return firstName;
   }
-  std::string getsurname() {
+  std::string getSurname() {
     return surname;
   }
   std::string getBio() {
@@ -30,6 +30,8 @@ public:
   bool getShowOnCharacterMenu() {
     return showOnCharacterMenu;
   }
+  CharacterSprite* getSprite(int id);
+  CharacterSprite* getSprite(std::string name);
 private:
   int id;
   std::string firstName;

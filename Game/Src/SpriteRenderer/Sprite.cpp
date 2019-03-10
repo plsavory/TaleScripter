@@ -4,7 +4,7 @@
 #include "Resource/TextureManager.hpp"
 #include "SpriteRenderer/Sprite.hpp"
 
-Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::string sName, std::string sImageName, int sPriority) {
+Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::string sName, std::string sImageName, int sPriority, int myId) {
   mySprite = new sf::Sprite();
   displayWindow = window;
   name = sName;
@@ -14,6 +14,7 @@ Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::st
   textureId = -1;
   textureSet = false;
   visible = true;
+  id = myId;
 }
 
 Sprite::~Sprite() {

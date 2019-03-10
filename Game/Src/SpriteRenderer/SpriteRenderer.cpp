@@ -174,7 +174,7 @@ Sprite* SpriteRenderer::addSprite(std::string imageName, std::string name, int p
 
   for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
     if (!sprite[i]) {
-      sprite[i] = new Sprite(textureManager,displayWindow, name, imageName, priority);
+      sprite[i] = new Sprite(textureManager,displayWindow, name, imageName, priority, i);
       return sprite[i];
     }
   }

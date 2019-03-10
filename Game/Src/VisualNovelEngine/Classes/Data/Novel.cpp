@@ -202,16 +202,7 @@ ProjectInformation* NovelData::getProjectInformation() {
 }
 
 Character* NovelData::getCharacter(int id) {
-
-  for (int i = 0; i < MAX_CHARACTERS; i++) {
-    if (character[i]) {
-      if (character[i]->getId() == id) {
-        return character[i];
-      }
-    }
-  }
-
-  return NULL;
+  return character[id];
 }
 
 // Chapter-specific stuff

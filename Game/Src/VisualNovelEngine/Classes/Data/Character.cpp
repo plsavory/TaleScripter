@@ -19,6 +19,14 @@ Character::Character(int cId, std::string cFirstName, std::string cSurname, std:
   // Load any character sprites related to this sprite from the database
   DataSet *dataSet = new DataSet();
 
+  std::vector<std::string> spriteQuery = {
+    "SELECT * FROM character_sprites WHERE character_id = ",
+    std::to_string(id),
+    ";"
+  };
+
+  novelDb->executeQuery(Utils::implodeString(spriteQuery, ""), dataSet);
+
   int spriteCount = dataSet->getRowCount();
 
   for (int i = 0; i < spriteCount; i++) {
@@ -28,6 +36,8 @@ Character::Character(int cId, std::string cFirstName, std::string cSurname, std:
     characterSprite[i] = new CharacterSprite(name, id, textureId);
   }
 
+  delete(dataSet);
+
 }
 
 Character::~Character() {
@@ -36,4 +46,24 @@ Character::~Character() {
 
 Character::Character(DataSetRow *data) {
   throw "This is currently unimplemented.";
+}
+
+CharacterSprite* Character::getSprite(int id) {
+  return characterSprite[id];
+}
+
+CharacterSprite* Character::getSprite(std::string name) {
+
+  for (int i = 0; i < MAX_CHARACTER_SPRITES; i++) {
+
+    if (!characterSprite[i]) {
+      continue;
+    }
+
+    if (characterSprite[i]->getName() == name) {
+      return characterSprite[i];
+    }
+  }
+
+  return NULL;
 }

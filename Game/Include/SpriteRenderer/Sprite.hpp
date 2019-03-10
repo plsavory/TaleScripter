@@ -1,6 +1,6 @@
 class Sprite {
 public:
-  Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::string sName, std::string sImageName, int sPriority);
+  Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::string sName, std::string sImageName, int sPriority, int myId);
   ~Sprite();
   sf::Sprite* getSfmlSprite();
   bool setImage(sf::Texture *image);
@@ -16,6 +16,9 @@ public:
   void setVisible(bool shouldBeVisible) {
     visible = shouldBeVisible;
   }
+  int getId() {
+    return id;
+  }
 private:
   sf::Sprite *mySprite;
   sf::Texture *myImage;
@@ -26,4 +29,5 @@ private:
   int textureId;
   TextureManager *textureManager;
   bool visible;
+  int id;
 };
