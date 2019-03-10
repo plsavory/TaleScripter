@@ -280,7 +280,8 @@ void ProjectBuilder::processCharacters() {
 
             throw Utils::implodeString(errorMessage, "");
           }
-          
+
+          dataSet->debugOutputContents();
           textureId = dataSet->getRow(0)->getColumn("id")->getData();
 
           delete(dataSet);

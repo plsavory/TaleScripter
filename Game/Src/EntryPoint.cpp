@@ -1,8 +1,8 @@
 // Dev.cpp - A test suite for Tiler during development
 #include <iostream>
 #include "Database/DatabaseConnection.hpp"
-#include "Base/Engine.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
+#include "Base/Engine.hpp"
 #include "Base/GameManager.hpp"
 #include <thread>
 #include "Base/Game.hpp"

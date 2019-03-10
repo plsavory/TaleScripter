@@ -7,8 +7,8 @@
 
 #include <iostream>
 #include "Database/DatabaseConnection.hpp"
-#include "Base/Engine.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
+#include "Base/Engine.hpp"
 #include "Base/GameManager.hpp"
 #include <thread>
 #include <chrono>
@@ -50,6 +50,7 @@ void Game::run() {
   resourceManager = engine->getResourceManager();
   spriteRenderer = engine->getSpriteRenderer();
   textRenderer = engine->getTextRenderer();
+  characterSpriteRenderer = engine->getCharacterSpriteRenderer();
   backgroundTransitionRenderer = engine->getBackgroundTransitionRenderer();
   gameManager = new GameManager(engine);
 
@@ -106,6 +107,7 @@ void Game::update(int gameTime) {
   spriteRenderer->update();
   textRenderer->update();
   backgroundTransitionRenderer->update();
+  characterSpriteRenderer->update();
 
   // Don't respond to input when the window isn't in focus
   inputManager->setEnabled(window->hasFocus());
@@ -121,6 +123,7 @@ void Game::draw() {
 
   gameManager->draw();
   backgroundImageRenderer->draw();
+  characterSpriteRenderer->draw(); // Probably not needed. TODO: Remove this when this is determined.
 
   if (!backgroundTransitionRenderer->isInForeground()) {
     backgroundTransitionRenderer->draw();

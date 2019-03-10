@@ -1,8 +1,8 @@
 // GameManager.cpp - Manages the current game control flow. Calls the appropriate objects depending on the current state of the game.
 
 #include "Database/DatabaseConnection.hpp"
-#include "Base/Engine.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
+#include "Base/Engine.hpp"
 #include "Base/GameManager.hpp"
 #include <sstream>
 
@@ -16,6 +16,7 @@ GameManager::GameManager(Engine *enginePointer) {
 
   // Create other objects
   novel = new NovelData();
+  engine->getCharacterSpriteRenderer()->initData(novel);
 
   std::string windowTitle = novel->getProjectInformation()->getGameTitle();
   window->setTitle(windowTitle);

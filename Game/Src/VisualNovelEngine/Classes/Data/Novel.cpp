@@ -131,6 +131,7 @@ void NovelData::loadFromDatabase() {
       std::string surname("");
       std::string bio("");
       std::string age("");
+      bool showOnCharacterMenu = false;
 
       if (characterData->getRow(i)->doesColumnExist("id")) {
        id = std::stoi(characterData->getRow(i)->getColumn("id")->getData());
@@ -152,7 +153,12 @@ void NovelData::loadFromDatabase() {
         age = characterData->getRow(i)->getColumn("age")->getData();
       }
 
-      character[i] = new Character(id,firstName,surname,bio,age);
+      if (characterData->getRow(i)->doesColumnExist("showOnCharacterMenu")) {
+        std::string comparison = characterData->getRow(i)->getColumn("showOnCharacterMenu")->getData();
+        showOnCharacterMenu = (comparison == "TRUE" || comparison == "true");
+      }
+
+      character[i] = new Character(id,firstName,surname,bio,age, showOnCharacterMenu, novelDb);
     }
   }
 
@@ -528,21 +534,4 @@ ProjectInformation::ProjectInformation(DatabaseConnection *db) {
 
   delete projectInformationDataSet;
 
-}
-
-// Character-specific stuff
-Character::Character(int cId, std::string cFirstName, std::string cSurname, std::string cBio, std::string cAge) {
-  id = cId;
-  firstName = cFirstName;
-  surname = cSurname;
-  bio = cBio;
-  age = cAge;
-}
-
-std::string Character::getFirstName() {
-  return firstName;
-}
-
-int Character::getId() {
-  return id;
 }

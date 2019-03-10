@@ -19,6 +19,7 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer) {
   musicManager = resourceManager->getMusicManager();
   backgroundImageRenderer = engine->getBackgroundImageRenderer();
   backgroundTransitionRenderer = engine->getBackgroundTransitionRenderer();
+  characterSpriteRenderer = engine->getCharacterSpriteRenderer();
   sceneTransitioning = false;
 
   textDisplay = new NovelTextDisplay(textRenderer, spriteRenderer, resourceManager);

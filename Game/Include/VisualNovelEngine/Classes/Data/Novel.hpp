@@ -7,21 +7,11 @@
 #define MAX_LINES 1000
 #define MAX_CHARACTERS 50
 
+// Include headers for other classes which we need
+#include "VisualNovelEngine/Classes/Data/Character.hpp"
+
 enum AdvanceState {
   ChapterEnd, SceneEnd, SceneSegmentEnd, NextLine
-};
-
-class Character {
-public:
-  Character(int cId, std::string cFirstName, std::string cSurname, std::string cBio, std::string cAge);
-  int getId();
-  std::string getFirstName();
-private:
-  int id;
-  std::string firstName;
-  std::string surname;
-  std::string bio;
-  std::string age;
 };
 
 class ProjectInformation {
