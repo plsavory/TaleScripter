@@ -7,6 +7,11 @@ CharacterSpriteRenderer::CharacterSpriteRenderer(ResourceManager *rManager, Spri
   resourceManager = rManager;
   spriteRenderer = sRenderer;
   resource = resourceManager->getResourceDatabase();
+
+  // Create our sprite slots
+  for (int i = 0; i < MAX_CHARACTER_SPRITE_SLOTS; i++) {
+    spriteSlot[i] = new CharacterSpriteSlot(spriteRenderer, resourceManager, i);
+  }
 }
 
 CharacterSpriteRenderer::~CharacterSpriteRenderer() {
@@ -14,7 +19,9 @@ CharacterSpriteRenderer::~CharacterSpriteRenderer() {
 }
 
 void CharacterSpriteRenderer::update() {
-
+  for (int i = 0; i < MAX_CHARACTER_SPRITE_SLOTS; i++) {
+    spriteSlot[i]->update();
+  }
 }
 
 void CharacterSpriteRenderer::draw() {
@@ -54,18 +61,7 @@ void CharacterSpriteRenderer::initData(NovelData *novelData) {
         throw Utils::implodeString(error, "");
       }
 
-      std::string imageName = dataSet->getRow(0)->getColumn("name")->getData();
-
-      std::vector<std::string> spriteIdentifier = {
-        "spr",
-        character->getFirstName(),
-        character->getSurname(),
-        sprite->getName()
-      };
-
-      Sprite *newSprite = spriteRenderer->addSprite(imageName, Utils::implodeString(spriteIdentifier,"_"), 5);
-
-      sprite->setSpriteId(newSprite->getId());
+      sprite->setTextureName(dataSet->getRow(0)->getColumn("name")->getData());
 
       delete(dataSet);
 
@@ -76,6 +72,19 @@ void CharacterSpriteRenderer::initData(NovelData *novelData) {
   }
 }
 
-void CharacterSpriteRenderer::push(CharacterSprite *characterSprite) {
+/**
+ * [CharacterSpriteRenderer::push Takes a vector of sprite draw requests and adds them all to the sprite renderer]
+ * @param sprites [description]
+ */
+void CharacterSpriteRenderer::push(std::vector<CharacterSpriteDrawRequest*> sprites) {
+
+  for (unsigned int i = 0; i < sprites.size(); i++) {
+    // TODO: Handle optional parameters
+    spriteSlot[i]->push(sprites[i]);
+  }
+
+}
+
+void CharacterSpriteRenderer::clear() {
 
 }

@@ -9,10 +9,14 @@ public:
   std::string getName();
   int getTextureId();
   void setSpriteId(int id);
+  void setTextureName(std::string name) {
+    textureName = name;
+  }
 private:
   int id;
   int textureId;
   std::string name;
+  std::string textureName;
   int spriteId;
 };
 

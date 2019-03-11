@@ -183,6 +183,18 @@ Sprite* SpriteRenderer::addSprite(std::string imageName, std::string name, int p
 
 }
 
+Sprite* SpriteRenderer::addSprite(std::string name) {
+
+  for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
+    if (!sprite[i]) {
+      sprite[i] = new Sprite(textureManager,displayWindow, name, i);
+      return sprite[i];
+    }
+  }
+
+  return NULL;
+}
+
 void SpriteRenderer::removeSprite(int id) {
 
 }

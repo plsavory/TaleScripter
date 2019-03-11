@@ -4,17 +4,30 @@
 #include "Resource/TextureManager.hpp"
 #include "SpriteRenderer/Sprite.hpp"
 
-Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::string sName, std::string sImageName, int sPriority, int myId) {
+Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::string sName, std::string stextureName, int sPriority, int myId) {
   mySprite = new sf::Sprite();
   displayWindow = window;
   name = sName;
-  imageName = sImageName;
+  textureName = stextureName;
   priority = sPriority;
   textureManager = sTextureManager;
   textureId = -1;
   textureSet = false;
   visible = true;
   id = myId;
+}
+
+Sprite::Sprite(TextureManager *sTextureManager, sf::RenderWindow *window, std::string sName, int myId) {
+  mySprite = new sf::Sprite();
+  textureManager = sTextureManager;
+  displayWindow = window;
+  name = sName;
+  textureName = "";
+  textureId = -1;
+  textureSet = false;
+  visible = false;
+  id = myId;
+  priority = 5;
 }
 
 Sprite::~Sprite() {
@@ -26,6 +39,12 @@ bool Sprite::setImage(sf::Texture *image) {
   mySprite->setTexture(*myImage);
   textureSet = true;
   return true;
+}
+
+void Sprite::setTextureName(std::string name) {
+  textureName = name;
+  textureSet = false;
+  textureId = -1;
 }
 
 void Sprite::setPosition(int x, int y) {
@@ -40,13 +59,13 @@ void Sprite::update() {
     return;
   }
 
-  if (imageName == "") {
+  if (textureName == "") {
     return;
   }
 
   if (textureId == -1) {
     // Texture has not been loaded, attempt to load it...
-    int fetchedTextureId = textureManager->findTexture(imageName);
+    int fetchedTextureId = textureManager->findTexture(textureName);
 
     if (fetchedTextureId == -1) {
       return;
@@ -72,6 +91,10 @@ void Sprite::update() {
 }
 
 void Sprite::draw() {
+
+  if (!textureSet) {
+    return;
+  }
 
   if (!visible) {
     return;

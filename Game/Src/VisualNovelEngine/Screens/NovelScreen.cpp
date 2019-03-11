@@ -104,7 +104,7 @@ void NovelScreen::nextLine() {
   }
 
   if (characterId > 0 && characterName.empty()) {
-    Character* character = novel->getCharacter(characterId);
+    Character* character = novel->getCharacter(characterId-1);
 
     if (character) {
       characterName = character->getFirstName();

@@ -21,6 +21,7 @@ public:
   Sprite* getSprite(int id);
   Sprite* getSprite(std::string name);
   Sprite* addSprite(std::string imageName, std::string name, int priority);
+  Sprite* addSprite(std::string name);
   void removeSprite(int id);
   void setCameraPosition(int x, int y);
 private:
