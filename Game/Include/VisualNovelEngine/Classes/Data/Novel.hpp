@@ -34,7 +34,7 @@ private:
 
 class CharacterState {
 public:
-  CharacterState(int myId, DatabaseConnection *db);
+  CharacterState(int myId, DatabaseConnection *db, Character *character[]);
   ~CharacterState();
 private:
   int id;
@@ -43,7 +43,7 @@ private:
 
 class CharacterStateGroup {
 public:
-  CharacterStateGroup(int myId, DatabaseConnection *db);
+  CharacterStateGroup(int myId, DatabaseConnection *db, Character *character[]);
   ~CharacterStateGroup();
   int getId() {
     return id;
@@ -55,7 +55,7 @@ private:
 
 class NovelSceneSegmentLine {
 public:
-  NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, std::string sslOverrideCharacterName);
+  NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, std::string sslOverrideCharacterName, Character *character[]);
   ~NovelSceneSegmentLine();
   std::string getText();
   int getCharacterId();
@@ -71,7 +71,7 @@ private:
 
 class NovelSceneSegment {
 public:
-  NovelSceneSegment(DatabaseConnection *db, int ssId, std::string ssBackgroundMusicName, std::string ssVisualEffectName);
+  NovelSceneSegment(DatabaseConnection *db, int ssId, std::string ssBackgroundMusicName, std::string ssVisualEffectName, Character *character[]);
   ~NovelSceneSegment();
   int getLineCount();
   NovelSceneSegmentLine* getLine(int id);
@@ -86,7 +86,7 @@ private:
 
 class NovelScene {
 public:
-  NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int strColourId, int etrColourId);
+  NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int strColourId, int etrColourId, Character *character[]);
   ~NovelScene();
   NovelSceneSegment* getSceneSegment(int id);
   int getSegmentCount();
@@ -108,7 +108,7 @@ private:
 
 class NovelChapter {
 public:
-  NovelChapter(DatabaseConnection *db, std::string chapterTitle, int chapterId);
+  NovelChapter(DatabaseConnection *db, std::string chapterTitle, int chapterId, Character *character[]);
   ~NovelChapter();
   std::string getTitle();
   int getId();

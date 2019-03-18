@@ -76,36 +76,6 @@ void NovelData::loadFromDatabase() {
     exit(0);
   }
 
-  for (int i = 0; i < MAX_CHAPTERS; i++) {
-    chapter[i] = NULL;
-  }
-
-  novelDb = new DatabaseConnection("novel");
-
-  // Load project information from Database
-  projectInformation = new ProjectInformation(novelDb);
-
-  DataSet *chapterData = new DataSet();
-
-  novelDb->executeQuery("SELECT * FROM chapters", chapterData);
-
-  for (int i = 0; i < chapterData->getRowCount(); i++) {
-
-    if (!chapterData->getRow(i)->doesColumnExist("id")) {
-      continue;
-    }
-
-    if (!chapterData->getRow(i)->doesColumnExist("title")) {
-      continue;
-    }
-
-    chapter[i] = new NovelChapter(novelDb,
-      chapterData->getRow(i)->getColumn("title")->getData(),
-      std::stoi(chapterData->getRow(i)->getColumn("id")->getData()));
-
-    chapterCount++;
-  }
-
   // Empty the character array
   for (int i = 0; i<MAX_CHARACTERS; i++) {
     if (character[i]) {
@@ -113,6 +83,8 @@ void NovelData::loadFromDatabase() {
       character[i] = NULL;
     }
   }
+
+  novelDb = new DatabaseConnection("novel");
 
   // Load all of the characters
   DataSet *characterData = new DataSet();
@@ -162,6 +134,35 @@ void NovelData::loadFromDatabase() {
     }
   }
 
+  for (int i = 0; i < MAX_CHAPTERS; i++) {
+    chapter[i] = NULL;
+  }
+
+  // Load project information from Database
+  projectInformation = new ProjectInformation(novelDb);
+
+  DataSet *chapterData = new DataSet();
+
+  novelDb->executeQuery("SELECT * FROM chapters", chapterData);
+
+  for (int i = 0; i < chapterData->getRowCount(); i++) {
+
+    if (!chapterData->getRow(i)->doesColumnExist("id")) {
+      continue;
+    }
+
+    if (!chapterData->getRow(i)->doesColumnExist("title")) {
+      continue;
+    }
+
+    chapter[i] = new NovelChapter(novelDb,
+      chapterData->getRow(i)->getColumn("title")->getData(),
+      std::stoi(chapterData->getRow(i)->getColumn("id")->getData()),
+      character);
+
+    chapterCount++;
+  }
+
   // Cleanup
   delete(characterData);
   delete(chapterData);
@@ -206,7 +207,7 @@ Character* NovelData::getCharacter(int id) {
 }
 
 // Chapter-specific stuff
-NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int chapterId) {
+NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int chapterId, Character *character[]) {
   title = chapterTitle;
   id = chapterId;
   sceneCount = 0;
@@ -261,7 +262,8 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
       backgroundImageName,
       backgroundColourId,
       startTransitionColourId,
-      endTransitionColourId);
+      endTransitionColourId,
+      character);
     sceneCount++;
   }
 
@@ -293,7 +295,7 @@ int NovelChapter::getSceneCount() {
 }
 
 // Scene-specific stuff
-NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int strColourId, int etrColourId) {
+NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int strColourId, int etrColourId, Character *character[]) {
   id = sId;
   backgroundImage = bgImage;
   backgroundColourId = bgColourId;
@@ -330,7 +332,8 @@ NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int
     segment[i] = new NovelSceneSegment(db,
       std::stoi(sceneSegmentData->getRow(i)->getColumn("id")->getData()),
       backgroundMusicName,
-      visualEffectName);
+      visualEffectName,
+      character);
 
     segmentCount++;
   }
@@ -384,7 +387,7 @@ int NovelScene::getEndTransitionColourId() {
 }
 
 // Segment-specific stuff
-NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId, std::string ssBackgroundMusicName, std::string ssVisualEffectName) {
+NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId, std::string ssBackgroundMusicName, std::string ssVisualEffectName, Character *character[]) {
   id = ssId;
   backgroundMusicName = ssBackgroundMusicName;
   visualEffectName = ssVisualEffectName;
@@ -428,7 +431,8 @@ NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId, std::stri
       std::stoi(lineData->getRow(i)->getColumn("id")->getData()),
       std::stoi(characterId),
       lineData->getRow(i)->getColumn("text")->getData(),
-      overrideCharacterName
+      overrideCharacterName,
+      character
     );
 
     lineCount++;
@@ -458,7 +462,7 @@ std::string NovelSceneSegment::getBackgroundMusicName() {
 }
 
 // Line-specific stuff
-NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, std::string sslOverrideCharacterName) {
+NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, std::string sslOverrideCharacterName, Character *character[]) {
   id = sslId;
   characterId = sslCharacterId;
   overrideCharacterName = sslOverrideCharacterName;
@@ -482,7 +486,7 @@ NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, 
   db->executeQuery(Utils::implodeString(characterStateGroupQuery), dataSet);
 
   if (dataSet->getRowCount() > 0) {
-    characterStateGroup = new CharacterStateGroup(std::stoi(dataSet->getRow(0)->getColumn("id")->getData()), db);
+    characterStateGroup = new CharacterStateGroup(std::stoi(dataSet->getRow(0)->getColumn("id")->getData()), db, character);
   }
 
 }
@@ -549,7 +553,7 @@ ProjectInformation::ProjectInformation(DatabaseConnection *db) {
 }
 
 // Character sprite group stuff
-CharacterStateGroup::CharacterStateGroup(int myId, DatabaseConnection *db) {
+CharacterStateGroup::CharacterStateGroup(int myId, DatabaseConnection *db, Character *character[]) {
   id = myId;
 
   DataSet *dataSet = new DataSet();
@@ -567,7 +571,7 @@ CharacterStateGroup::CharacterStateGroup(int myId, DatabaseConnection *db) {
   if (numberOfStates > 0) {
 
     for (int i = 0; i < numberOfStates; i++) {
-      characterState.push_back(new CharacterState(std::stoi(dataSet->getRow(i)->getColumn("id")->getData()),db));
+      characterState.push_back(new CharacterState(std::stoi(dataSet->getRow(i)->getColumn("id")->getData()),db, character));
     }
 
   }
@@ -578,7 +582,7 @@ CharacterStateGroup::~CharacterStateGroup() {
 }
 
 // Character state stuff
-CharacterState::CharacterState(int myId, DatabaseConnection *db) {
+CharacterState::CharacterState(int myId, DatabaseConnection *db, Character *character[]) {
   id = myId;
 
   std::vector<std::string> query = {
@@ -590,6 +594,59 @@ CharacterState::CharacterState(int myId, DatabaseConnection *db) {
   DataSet *dataSet = new DataSet();
 
   db->executeQuery(Utils::implodeString(query), dataSet);
+
+  std::string characterSpriteId = dataSet->getRow(0)->getColumn("character_sprite_id")->getData();
+
+  if (dataSet->getRowCount() > 0) {
+
+    std::vector<std::string> query = {
+      "SELECT * FROM character_sprites WHERE id = ",
+      characterSpriteId,
+      ";"
+    };
+
+    DataSet *dataSet = new DataSet();
+
+    db->executeQuery(Utils::implodeString(query), dataSet);
+
+    if (dataSet->getRowCount() == 0) {
+      std::vector<std::string> error = {
+        "Unable to find a character sprite with id ",
+        characterSpriteId
+      };
+
+      throw Utils::implodeString(error);
+    }
+
+    std::string characterId = dataSet->getRow(0)->getColumn("character_id")->getData();
+    std::string characterSpriteName = dataSet->getRow(0)->getColumn("name")->getData();
+
+    characterSprite = character[std::stoi(characterId)-1]->getSprite(characterSpriteName);
+
+    if (!characterSprite) {
+      std::vector<std::string> error = {
+        "Could not find sprite for character ",
+        characterId,
+        " with name: ",
+        characterSpriteName
+      };
+
+      throw Utils::implodeString(error);
+    }
+
+    delete(dataSet);
+
+  } else {
+    std::vector<std::string> error = {
+      "No character state with id ",
+      std::to_string(id),
+      " could be found."
+    };
+
+    throw Utils::implodeString(error);
+  }
+
+  delete(dataSet);
 }
 
 CharacterState::~CharacterState() {
