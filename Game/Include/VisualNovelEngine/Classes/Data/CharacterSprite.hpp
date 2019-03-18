@@ -12,6 +12,9 @@ public:
   void setTextureName(std::string name) {
     textureName = name;
   }
+  std::string getTextureName() {
+    return textureName;
+  }
 private:
   int id;
   int textureId;

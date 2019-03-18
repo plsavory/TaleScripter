@@ -32,6 +32,27 @@ private:
   std::string versionNumber;
 };
 
+class CharacterState {
+public:
+  CharacterState(int myId, DatabaseConnection *db);
+  ~CharacterState();
+private:
+  int id;
+  CharacterSprite *characterSprite;
+};
+
+class CharacterStateGroup {
+public:
+  CharacterStateGroup(int myId, DatabaseConnection *db);
+  ~CharacterStateGroup();
+  int getId() {
+    return id;
+  }
+private:
+  int id;
+  std::vector<CharacterState*> characterState;
+};
+
 class NovelSceneSegmentLine {
 public:
   NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, std::string sslOverrideCharacterName);
@@ -39,11 +60,13 @@ public:
   std::string getText();
   int getCharacterId();
   std::string getOverrideCharacterName();
+  CharacterStateGroup* getCharacterStateGroup();
 private:
   int id;
   int characterId;
   std::string text;
   std::string overrideCharacterName;
+  CharacterStateGroup *characterStateGroup;
 };
 
 class NovelSceneSegment {

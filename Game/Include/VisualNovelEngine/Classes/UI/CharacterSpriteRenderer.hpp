@@ -15,7 +15,7 @@ public:
 
 #include "VisualNovelEngine/Classes/UI/CharacterSpriteSlot.hpp"
 
-#define MAX_CHARACTER_SPRITE_SLOTS 16
+#define MAX_CHARACTER_SPRITE_SLOTS 128
 
 class CharacterSpriteRenderer {
 public:
@@ -26,12 +26,17 @@ public:
   void initData(NovelData *novelData);
   void push(std::vector<CharacterSpriteDrawRequest*> sprites);
   void clear();
+  bool hasProcessedPositioning() {
+    return processedPositioning;
+  };
 private:
   ResourceManager *resourceManager;
   SpriteRenderer *spriteRenderer;
   NovelData *novel;
   DatabaseConnection *resource;
   CharacterSpriteSlot *spriteSlot[MAX_CHARACTER_SPRITE_SLOTS];
+  bool processedPositioning;
+  int activeSpriteCount;
 };
 
 #endif

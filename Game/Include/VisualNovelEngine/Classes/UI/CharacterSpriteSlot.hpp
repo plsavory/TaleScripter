@@ -7,6 +7,7 @@ public:
   ~CharacterSpriteSlot();
   void update();
   void push(CharacterSpriteDrawRequest *drawRequest);
+  Sprite* getSprite();
 private:
   Sprite *sprite[2]; // We need 2 of them for fade effects.
   SpriteRenderer *spriteRenderer;

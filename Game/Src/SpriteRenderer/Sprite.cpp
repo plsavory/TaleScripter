@@ -102,3 +102,15 @@ void Sprite::draw() {
 
   displayWindow->draw(*mySprite);
 }
+
+sf::FloatRect Sprite::getSize() {
+  if (textureSet) {
+    return mySprite->getGlobalBounds();
+  }
+
+  return sf::FloatRect(0,0,0,0);
+}
+
+void Sprite::setOrigin(int x, int y) {
+  mySprite->setOrigin((float)x, (float) y);
+}

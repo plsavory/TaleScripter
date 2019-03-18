@@ -3,7 +3,7 @@
 
 #include "VisualNovelEngine/Classes/Data/CharacterSprite.hpp"
 
-#define MAX_CHARACTER_SPRITES 50
+#define MAX_CHARACTER_SPRITES 128
 
 class Character {
 public:

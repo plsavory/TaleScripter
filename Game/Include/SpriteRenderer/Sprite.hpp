@@ -8,9 +8,9 @@ public:
   void update();
   void draw();
   void setPosition(int x, int y);
+  void setOrigin(int x, int y);
   std::string name;
   int priority;
-  bool textureSet;
   bool isVisible() {
     return visible;
   };
@@ -20,7 +20,11 @@ public:
   int getId() {
     return id;
   }
+  bool isLoaded() {
+    return textureSet;
+  }
   void setTextureName(std::string name);
+  sf::FloatRect getSize();
 private:
   sf::Sprite *mySprite;
   sf::Texture *myImage;
@@ -32,4 +36,5 @@ private:
   TextureManager *textureManager;
   bool visible;
   int id;
+  bool textureSet;
 };

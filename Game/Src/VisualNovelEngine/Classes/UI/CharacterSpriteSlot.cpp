@@ -29,5 +29,12 @@ void CharacterSpriteSlot::update() {
 }
 
 void CharacterSpriteSlot::push(CharacterSpriteDrawRequest *drawRequest) {
+  sprite[0]->setTextureName(drawRequest->characterSprite->getTextureName());
+  sprite[0]->setVisible(true);
+  // Todo: Handle priority and positioning
+}
 
+Sprite* CharacterSpriteSlot::getSprite() {
+  // TODO: Handle transitioning sprites
+  return sprite[0];
 }

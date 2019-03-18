@@ -464,10 +464,27 @@ NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, 
   overrideCharacterName = sslOverrideCharacterName;
 
   text = sslText;
+  characterStateGroup = NULL;
 
   #ifdef DEBUG_NOVEL_DATA
     std::cout<<"Added line \""<<text<<"\""<<std::endl;
   #endif
+
+  // Find if we have a character sprite group attached to this line
+  std::vector<std::string> characterStateGroupQuery = {
+    "SELECT * FROM character_state_groups WHERE id = ",
+    std::to_string(id),
+    ";"
+  };
+
+  DataSet *dataSet = new DataSet();
+
+  db->executeQuery(Utils::implodeString(characterStateGroupQuery), dataSet);
+
+  if (dataSet->getRowCount() > 0) {
+    characterStateGroup = new CharacterStateGroup(std::stoi(dataSet->getRow(0)->getColumn("id")->getData()), db);
+  }
+
 }
 
 NovelSceneSegmentLine::~NovelSceneSegmentLine() {
@@ -488,6 +505,10 @@ int NovelSceneSegmentLine::getCharacterId() {
 
 std::string NovelSceneSegmentLine::getOverrideCharacterName() {
   return overrideCharacterName;
+}
+
+CharacterStateGroup* NovelSceneSegmentLine::getCharacterStateGroup() {
+  return characterStateGroup;
 }
 
 // ProjectInformation specific things
@@ -524,5 +545,53 @@ ProjectInformation::ProjectInformation(DatabaseConnection *db) {
   }
 
   delete projectInformationDataSet;
+
+}
+
+// Character sprite group stuff
+CharacterStateGroup::CharacterStateGroup(int myId, DatabaseConnection *db) {
+  id = myId;
+
+  DataSet *dataSet = new DataSet();
+
+  std::vector<std::string> query = {
+    "SELECT * FROM character_states WHERE character_state_group_id = ",
+    std::to_string(id),
+    ";"
+  };
+
+  db->executeQuery(Utils::implodeString(query), dataSet);
+
+  int numberOfStates = dataSet->getRowCount();
+
+  if (numberOfStates > 0) {
+
+    for (int i = 0; i < numberOfStates; i++) {
+      characterState.push_back(new CharacterState(std::stoi(dataSet->getRow(i)->getColumn("id")->getData()),db));
+    }
+
+  }
+}
+
+CharacterStateGroup::~CharacterStateGroup() {
+
+}
+
+// Character state stuff
+CharacterState::CharacterState(int myId, DatabaseConnection *db) {
+  id = myId;
+
+  std::vector<std::string> query = {
+    "SELECT * FROM character_states WHERE id = ",
+    std::to_string(id),
+    ";"
+  };
+
+  DataSet *dataSet = new DataSet();
+
+  db->executeQuery(Utils::implodeString(query), dataSet);
+}
+
+CharacterState::~CharacterState() {
 
 }

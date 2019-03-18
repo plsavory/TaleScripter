@@ -184,6 +184,15 @@ std::string Utils::implodeString(std::vector<std::string> explodedString, std::s
 }
 
 /**
+ * [Utils::implodeString Takes a vector of strings and implodes them]
+ * @param  explodedString [Vector of strings to join]
+ * @return                [The imploded string]
+ */
+std::string Utils::implodeString(std::vector<std::string> explodedString) {
+  return implodeString(explodedString, "", 0); // I got tired of writing the extra 0...
+}
+
+/**
  * [Utils::removeQuotationsFromString Used often when using JSON, as the JSON library that I use returns quotation marks with strings in arrays]
  * @param  string [The string to operate on]
  * @return        [String with quotation marks removed from the start and end]

@@ -104,7 +104,7 @@ void SpriteRenderer::prioritiseSprites() {
         continue;
       }
 
-      if (!sprite[iSprite]->textureSet) {
+      if (!sprite[iSprite]->isLoaded()) {
         continue;
       }
 
@@ -201,4 +201,13 @@ void SpriteRenderer::removeSprite(int id) {
 
 void SpriteRenderer::setCameraPosition(int x, int y) {
 
+}
+
+/**
+ * [SpriteRenderer::getAvailableDrawArea Returns the available area to this sprite manager]
+ * @return [description]
+ */
+sf::Vector2u SpriteRenderer::getRenderArea() {
+  // TODO: Allow for other draw areas than just the main window, this could work for split screen operations.
+  return displayWindow->getSize();
 }
