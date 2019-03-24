@@ -23,6 +23,10 @@ void CharacterSpriteRenderer::update() {
     spriteSlot[i]->update();
   }
 
+  if (activeSpriteCount == 0) {
+    return;
+  }
+
   if (!processedPositioning) {
 
     // Make sure that all of the sprites are positioned and scaled correctly
@@ -37,6 +41,7 @@ void CharacterSpriteRenderer::update() {
 
     // Reduce the spacing between all of the sprite until they will all fit on screen.
     while (activeSpriteCount*spacingBetweenSprites > fullDisplayArea) {
+
       spacingBetweenSprites--;
 
       // Just in case...
@@ -121,16 +126,6 @@ void CharacterSpriteRenderer::initData(NovelData *novelData) {
     count++;
   }
 
-  // Put some characters onto the screen as a test
-  std::vector<CharacterSpriteDrawRequest*> drawRequest = {
-    new CharacterSpriteDrawRequest(novel->getCharacter(1)->getSprite(0)),
-    new CharacterSpriteDrawRequest(novel->getCharacter(2)->getSprite(0)),
-    new CharacterSpriteDrawRequest(novel->getCharacter(3)->getSprite(0)),
-    new CharacterSpriteDrawRequest(novel->getCharacter(4)->getSprite(1))
-  };
-
-  push(drawRequest);
-
 }
 
 /**
@@ -146,9 +141,14 @@ void CharacterSpriteRenderer::push(std::vector<CharacterSpriteDrawRequest*> spri
 
   std::vector<sf::FloatRect> spriteSizes;
 
-  for (int i = 0; i < spriteCount; i++) {
+  for (int i = 0; i < MAX_CHARACTER_SPRITE_SLOTS; i++) {
     // TODO: Handle optional parameters
-    spriteSlot[i]->push(sprites[i]);
+    if (i < spriteCount) {
+      spriteSlot[i]->push(sprites[i]);
+      continue;
+    }
+
+    spriteSlot[i]->push(NULL);
   }
 
   processedPositioning = false;

@@ -36,6 +36,9 @@ class CharacterState {
 public:
   CharacterState(int myId, DatabaseConnection *db, Character *character[]);
   ~CharacterState();
+  CharacterSprite* getCharacterSprite() {
+    return characterSprite;
+  }
 private:
   int id;
   CharacterSprite *characterSprite;
@@ -48,6 +51,7 @@ public:
   int getId() {
     return id;
   }
+  std::vector<CharacterState*> getCharacterStates();
 private:
   int id;
   std::vector<CharacterState*> characterState;
@@ -55,7 +59,7 @@ private:
 
 class NovelSceneSegmentLine {
 public:
-  NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, std::string sslOverrideCharacterName, Character *character[]);
+  NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, int sslCharacterStateGroupId, std::string sslOverrideCharacterName, Character *character[]);
   ~NovelSceneSegmentLine();
   std::string getText();
   int getCharacterId();

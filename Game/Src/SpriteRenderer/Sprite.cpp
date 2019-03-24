@@ -37,6 +37,8 @@ Sprite::~Sprite() {
 bool Sprite::setImage(sf::Texture *image) {
   myImage = image;
   mySprite->setTexture(*myImage);
+  sf::IntRect rect = sf::IntRect(0,0,myImage->getSize().x, myImage->getSize().y);
+  mySprite->setTextureRect(rect);
   textureSet = true;
   return true;
 }

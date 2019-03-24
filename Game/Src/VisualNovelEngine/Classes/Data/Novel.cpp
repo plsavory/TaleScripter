@@ -412,12 +412,18 @@ NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId, std::stri
 
   for (int i = 0; i < lineData->getRowCount(); i++) {
 
+    int characterStateGroupId = 0;
+
     if (!lineData->getRow(i)->doesColumnExist("id")) {
       continue;
     }
 
     if (!lineData->getRow(i)->doesColumnExist("text")) {
       continue;
+    }
+
+    if (lineData->getRow(i)->doesColumnExist("character_state_group_id")) {
+      characterStateGroupId = std::stoi(lineData->getRow(i)->getColumn("character_state_group_id")->getData());
     }
 
     std::string characterId = lineData->getRow(i)->doesColumnExist("character_id") ? lineData->getRow(i)->getColumn("character_id")->getData() : "0";
@@ -431,6 +437,7 @@ NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId, std::stri
       std::stoi(lineData->getRow(i)->getColumn("id")->getData()),
       std::stoi(characterId),
       lineData->getRow(i)->getColumn("text")->getData(),
+      characterStateGroupId,
       overrideCharacterName,
       character
     );
@@ -462,7 +469,7 @@ std::string NovelSceneSegment::getBackgroundMusicName() {
 }
 
 // Line-specific stuff
-NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, std::string sslOverrideCharacterName, Character *character[]) {
+NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, int sslCharacterId, std::string sslText, int sslCharacterStateGroupId, std::string sslOverrideCharacterName, Character *character[]) {
   id = sslId;
   characterId = sslCharacterId;
   overrideCharacterName = sslOverrideCharacterName;
@@ -475,9 +482,13 @@ NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, 
   #endif
 
   // Find if we have a character sprite group attached to this line
+  if (sslCharacterStateGroupId == 0) {
+    return;
+  }
+
   std::vector<std::string> characterStateGroupQuery = {
     "SELECT * FROM character_state_groups WHERE id = ",
-    std::to_string(id),
+    std::to_string(sslCharacterStateGroupId),
     ";"
   };
 
@@ -575,10 +586,16 @@ CharacterStateGroup::CharacterStateGroup(int myId, DatabaseConnection *db, Chara
     }
 
   }
+  
+  delete(dataSet);
 }
 
 CharacterStateGroup::~CharacterStateGroup() {
 
+}
+
+std::vector<CharacterState*> CharacterStateGroup::getCharacterStates() {
+  return characterState;
 }
 
 // Character state stuff

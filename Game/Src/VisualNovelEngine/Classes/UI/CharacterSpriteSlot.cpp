@@ -29,6 +29,12 @@ void CharacterSpriteSlot::update() {
 }
 
 void CharacterSpriteSlot::push(CharacterSpriteDrawRequest *drawRequest) {
+
+  if (!drawRequest) {
+    sprite[0]->setVisible(false);
+    return;
+  }
+
   sprite[0]->setTextureName(drawRequest->characterSprite->getTextureName());
   sprite[0]->setVisible(true);
   // Todo: Handle priority and positioning
