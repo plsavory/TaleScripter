@@ -103,6 +103,7 @@ void ResourceManager::loadResourcesFromDatabase() {
   resourceDatabase = new DatabaseConnection("resource");
 
   // Load all resources from the database
+  textureManager->loadAllFromDatabase(resourceDatabase);
   musicManager->loadAllFromDatabase(resourceDatabase);
   fontManager->loadAllFromDatabase(resourceDatabase);
   backgroundImageRenderer->addAllFromDatabase(resourceDatabase);

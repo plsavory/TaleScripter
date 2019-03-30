@@ -11,6 +11,8 @@
 #include "SpriteRenderer/SpriteRenderer.hpp"
 #include "TextRenderer/TextRenderer.hpp"
 #include "Input/InputManager.hpp"
+#include "VisualNovelEngine/Classes/Data/Novel.hpp"
+#include "VisualNovelEngine/Classes/UI/CharacterSpriteRenderer.hpp"
 
 class Engine {
 public:
@@ -35,6 +37,9 @@ public:
   BackgroundTransitionRenderer* getBackgroundTransitionRenderer() {
     return backgroundTransitionRenderer;
   }
+  CharacterSpriteRenderer* getCharacterSpriteRenderer() {
+    return characterSpriteRenderer;
+  }
   sf::RenderWindow* getWindow() {
     return window;
   }
@@ -45,6 +50,7 @@ private:
   InputManager *inputManager;
   BackgroundImageRenderer *backgroundImageRenderer;
   BackgroundTransitionRenderer *backgroundTransitionRenderer;
+  CharacterSpriteRenderer *characterSpriteRenderer;
   sf::RenderWindow *window;
 };
 

@@ -21,6 +21,7 @@ private:
   MusicManager *musicManager;
   BackgroundImageRenderer *backgroundImageRenderer;
   BackgroundTransitionRenderer *backgroundTransitionRenderer;
+  CharacterSpriteRenderer *characterSpriteRenderer;
   NovelData *novel;
   void advance();
   int advanceEventId;

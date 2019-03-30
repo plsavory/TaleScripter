@@ -25,15 +25,15 @@ std::string DatabaseSchema::getName() {
  * @return [True if successful, false if failure]
  */
 bool DatabaseSchema::createDatabase() {
-  std::cout<<"Creating database " << name << ".db..." << std::endl;
+  std::cout<<"Creating database " << name << std::endl;
 
   // Database connection
   sqlite3 *db;
   char *zErrMsg = 0;
   int rc;
 
-  std::string filename = name;
-  filename.append(".db");
+  std::string filename = std::string("db\\");
+  filename.append(name);
 
   // Convert the string to a char array TODO: Move this into its own function
   char *fName = new char[filename.length() + 1];
@@ -53,6 +53,23 @@ bool DatabaseSchema::createDatabase() {
   for (int i = 0; i < MAX_TABLES; i++) {
     if (table[i]) {
 
+      // Drop the table if it already exists
+      std::stringstream ss;
+      ss << "DROP TABLE IF EXISTS "<<table[i]->getName()<<";";
+      std::string dropQuery = ss.str();
+      char *dropSql = new char[dropQuery.length() + 1];
+      std::strcpy(dropSql, dropQuery.c_str());
+      rc = sqlite3_exec(db, dropSql, NULL, 0, &zErrMsg);
+
+      if (rc != SQLITE_OK) {
+        std::cout<<"-----------"<<std::endl<<"Sql error:"<<std::endl<< zErrMsg << std::endl;
+        std::cout<<std::endl<<"---------------------"<<std::endl;
+        std::cout<<dropQuery<<std::endl;
+        sqlite3_free(zErrMsg);
+        continue;
+      }
+
+      // Create the table
       std::string query = table[i]->getCreationQuery();
       char *sql = new char[query.length() + 1];
       std::strcpy(sql, query.c_str());

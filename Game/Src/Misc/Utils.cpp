@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <string>
 #include <fstream>
+#include <regex>
 
 /**
  * [Utils::setBit Sets or unsets a bit on the provided 8-bit variable]
@@ -134,7 +135,7 @@ std::vector<std::string> Utils::explodeString(const std::string &string, char de
  * [Utils::implodeString Takes a vector of strings and a delimiter, returns them all as one string]
  * @param  explodedString [The vector of strings to join]
  * @param  glue           [A string to separate each element]
- * @param  count          [Max number of elements to add to the string]
+ * @param  count          [Max number of elements to add to the string, 0 if no limit]
  * @return                [The imploded string]
  */
 std::string Utils::implodeString(std::vector<std::string> explodedString, std::string glue, unsigned int count) {
@@ -170,4 +171,36 @@ std::string Utils::implodeString(std::vector<std::string> explodedString, std::s
 
   return returnValue;
 
+}
+
+/**
+ * [Utils::implodeString Takes a vector of strings and a delimiter, returns them all as one string]
+ * @param  explodedString [The vector of strings to join]
+ * @param  glue           [A string to separate each element]
+ * @return                [The imploded string]
+ */
+std::string Utils::implodeString(std::vector<std::string> explodedString, std::string glue) {
+  return implodeString(explodedString, glue, 0); // I got tired of writing the extra 0...
+}
+
+/**
+ * [Utils::implodeString Takes a vector of strings and implodes them]
+ * @param  explodedString [Vector of strings to join]
+ * @return                [The imploded string]
+ */
+std::string Utils::implodeString(std::vector<std::string> explodedString) {
+  return implodeString(explodedString, "", 0); // I got tired of writing the extra 0...
+}
+
+/**
+ * [Utils::removeQuotationsFromString Used often when using JSON, as the JSON library that I use returns quotation marks with strings in arrays]
+ * @param  string [The string to operate on]
+ * @return        [String with quotation marks removed from the start and end]
+ */
+std::string Utils::removeQuotationsFromString(std::string string) {
+
+  std::regex start("$\"");
+  std::regex end("\"^");
+
+  return std::regex_replace(std::regex_replace(string, end, ""), start, "");
 }

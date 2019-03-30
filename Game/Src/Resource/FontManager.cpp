@@ -97,7 +97,7 @@ void FontManager::loadAllFromDatabase(DatabaseConnection *database) {
     std::string name = result->getRow(i)->getColumn("name")->getData();
     std::string fname = result->getRow(i)->getColumn("filename")->getData();
 
-    std::string fullFileName = "resource\\fonts\\";
+    std::string fullFileName = "resource/fonts/";
     fullFileName.append(fname);
 
     addFont(name, fullFileName);

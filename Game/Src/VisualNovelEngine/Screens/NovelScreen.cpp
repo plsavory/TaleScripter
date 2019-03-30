@@ -19,6 +19,7 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer) {
   musicManager = resourceManager->getMusicManager();
   backgroundImageRenderer = engine->getBackgroundImageRenderer();
   backgroundTransitionRenderer = engine->getBackgroundTransitionRenderer();
+  characterSpriteRenderer = engine->getCharacterSpriteRenderer();
   sceneTransitioning = false;
 
   textDisplay = new NovelTextDisplay(textRenderer, spriteRenderer, resourceManager);
@@ -103,15 +104,34 @@ void NovelScreen::nextLine() {
   }
 
   if (characterId > 0 && characterName.empty()) {
-    Character* character = novel->getCharacter(characterId);
+    Character* character = novel->getCharacter(characterId-1);
 
     if (character) {
       characterName = character->getFirstName();
     }
   }
 
-  textDisplay->setText(nextLine->getText(), characterName);
+  // Handle character sprite drawing
+  CharacterStateGroup* characterStateGroup = nextLine->getCharacterStateGroup();
+  if (characterStateGroup) {
+    std::vector<CharacterState*> states = characterStateGroup->getCharacterStates();
 
+    std::vector<CharacterSpriteDrawRequest*> requests;
+
+    for (unsigned int i = 0; i < states.size(); i++) {
+      requests.push_back(new CharacterSpriteDrawRequest(states[i]->getCharacterSprite()));
+    }
+
+    characterSpriteRenderer->push(requests);
+
+    // Delete the now-unneeded data
+    for (unsigned int i = 0; i < requests.size(); i++) {
+      delete(requests[i]);
+    }
+
+  }
+
+  textDisplay->setText(nextLine->getText(), characterName);
 }
 
 void NovelScreen::nextSegment() {

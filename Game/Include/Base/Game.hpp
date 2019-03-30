@@ -22,6 +22,7 @@ private:
   InputManager *inputManager;
   BackgroundImageRenderer *backgroundImageRenderer;
   BackgroundTransitionRenderer *backgroundTransitionRenderer;
+  CharacterSpriteRenderer *characterSpriteRenderer;
   #ifdef MULTITHREADED_RENDERING
   std::thread *renderingThread;
   void renderingThreadFunction();

@@ -154,7 +154,7 @@ void MusicManager::loadAllFromDatabase(DatabaseConnection *database) {
     std::string name = result->getRow(i)->getColumn("name")->getData();
     std::string fname = result->getRow(i)->getColumn("filename")->getData();
 
-    std::string fullFileName = "resource\\music\\";
+    std::string fullFileName = "resource/music/";
     fullFileName.append(fname);
 
     addStream(name, fullFileName);

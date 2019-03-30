@@ -1,7 +1,7 @@
 #ifndef SPRITE_RENDERER_INCLUDED
 #define SPRITE_RENDERER_INCLUDED
 
-#define MAX_SPRITE_COUNT 50
+#define MAX_SPRITE_COUNT 256
 #define SPRITE_RENDERER_UPDATE_DELAY 250
 #define SPRITE_RENDERER_PRIORITISE_DELAY 500
 #define SPRITE_RENDERER_MAX_PRIORITIES 5
@@ -21,8 +21,10 @@ public:
   Sprite* getSprite(int id);
   Sprite* getSprite(std::string name);
   Sprite* addSprite(std::string imageName, std::string name, int priority);
+  Sprite* addSprite(std::string name);
   void removeSprite(int id);
   void setCameraPosition(int x, int y);
+  sf::Vector2u getRenderArea();
 private:
   void prioritiseSprites();
   void renderSprites();

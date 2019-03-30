@@ -4,6 +4,8 @@
   engine core functions.
  */
 
+#include <iostream>
+#include "Database/DatabaseConnection.hpp"
 #include "Base/Engine.hpp"
 
 /**
@@ -19,6 +21,7 @@ Engine::Engine(sf::RenderWindow *windowPointer) {
   spriteRenderer = new SpriteRenderer(window,resourceManager->getTextureManager());
   textRenderer = new TextRenderer(window, resourceManager->getFontManager());
   backgroundTransitionRenderer = new BackgroundTransitionRenderer(window, backgroundImageRenderer);
+  characterSpriteRenderer = new CharacterSpriteRenderer(resourceManager, spriteRenderer);
 }
 
 /**

@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 #include "Database/DatabaseConnection.hpp"
+#include "Misc/Utils.hpp"
+#include <regex>
 
 DatabaseConnection::DatabaseConnection(std::string name) {
 
@@ -21,8 +23,11 @@ DatabaseConnection::DatabaseConnection(std::string name) {
 
   if (rc) {
     std::cout<<"Error opening/creating database"<<std::endl;
+    usable = false;
   }
-  
+
+  usable = true;
+
 }
 
 DatabaseConnection::~DatabaseConnection() {
@@ -81,7 +86,6 @@ void DatabaseConnection::executeQuery(std::string query, DataSet *destinationDat
 
         rows++;
 
-
       } else {
         break;
       }
@@ -96,15 +100,149 @@ void DatabaseConnection::executeQuery(std::string query, DataSet *destinationDat
     return;
   }
 
-  // TODO: Add some nicer error handling here
   std::string error = sqlite3_errmsg(db);
 
   if (error != "not an error") {
-    std::cout<<"An SQL error occurred: " << error << std::endl;
-    std::cout<<std::endl<<"---------------------"<<std::endl;
-    std::cout<<query<<std::endl;
+    std::vector<std::string> errorVector = {
+      "An SQL error has occurred:\n",
+      error,
+      "\n\n",
+      query
+    };
+
+    throw Utils::implodeString(errorVector, "", 0);
   }
 
   return;
 
+}
+
+/**
+ * [DatabaseConnection::executeQuery Execute a query with no result data - this should be used for writing data]
+ * @param query [Query string]
+ * @return last insert ID
+ */
+int DatabaseConnection::executeQuery(std::string query) {
+  sqlite3_stmt *statement;
+
+  #ifdef DATABASE_DEBUG
+    std::cout<<"Execute SQL statement: "<<query<<std::endl;
+  #endif
+
+  char *queryString = new char[query.length() + 1];
+  std::strcpy(queryString, query.c_str());
+
+  if (sqlite3_prepare_v2(db, queryString, -1, &statement, 0) == SQLITE_OK) {
+    sqlite3_step(statement);
+    sqlite3_finalize(statement);
+    return this->getLastInsertId();
+  }
+
+  std::string error = sqlite3_errmsg(db);
+
+  if (error != "not an error") {
+    std::vector<std::string> errorVector = {
+      "An SQL error has occurred:\n",
+      error,
+      "\n\n",
+      query
+    };
+
+    throw Utils::implodeString(errorVector, "", 0);
+  }
+
+  return 0;
+
+}
+
+int DatabaseConnection::getLastInsertId() {
+
+  DataSet *dataSet = new DataSet();
+  this->executeQuery("SELECT last_insert_rowid() as last_insert_id", dataSet);
+
+  if (!dataSet->getRow(0)->doesColumnExist("last_insert_id")) {
+    throw "Failed to get the last insert ID";
+  }
+
+  int lastInsertId = std::stoi(dataSet->getRow(0)->getColumn("last_insert_id")->getData());
+  delete(dataSet);
+  return lastInsertId;
+
+}
+
+/**
+ * [DatabaseConnection::insert Inserts a row into the database]
+ * @param tableName [The name of the table]
+ * @param columns   [Array of strings with column names]
+ * @param values    [Array of strings containing the values]
+ * @param valuesCount [The number of values to insert]
+ * @return last insert ID
+ */
+int DatabaseConnection::insert(std::string tableName, std::vector<std::string> columns, std::vector<std::string> values, std::vector<int> types) {
+
+  if (columns.size() != values.size() || types.size() != columns.size()) {
+    throw "The number of given columns and the number of given values does not match.";
+  }
+
+  for (unsigned int i = 0; i < values.size(); i++) {
+
+    std::stringstream ss;
+
+    switch (types[i]) {
+      case DATA_TYPE_STRING:
+
+      // If we actually want to set a string column to null...
+      if (values[i] == "NULL") {
+        continue;
+      }
+
+      ss << "'" << sanitizeString(values[i]) << "'";
+      values[i] = ss.str();
+      break;
+      default:
+      break;
+    }
+  }
+
+  std::string queryPortionColumns = Utils::implodeString(columns, ", ", 0);
+  std::ostringstream columnsStream;
+  columnsStream << "(" << queryPortionColumns << ")";
+  queryPortionColumns = columnsStream.str();
+
+  // TODO: Create an overloaded function which can handle inserting multiple rows at once
+  std::string queryPortionValues = Utils::implodeString(values, ", ", 0);
+  std::ostringstream valuesStream;
+  valuesStream << "VALUES (" << queryPortionValues << ")";
+  queryPortionValues = valuesStream.str();
+
+  std::ostringstream ss;
+  ss << "INSERT INTO `" << tableName << "` " << queryPortionColumns << " " << queryPortionValues << ";";
+
+  #ifdef PRINT_QUERIES
+  std::cout<<ss.str()<<std::endl;
+  #endif
+
+  return this->executeQuery(ss.str());
+
+}
+
+int DatabaseConnection::insert(std::string tableName) {
+  std::vector<std::string> query = {
+    "INSERT INTO `",
+    tableName,
+    "` DEFAULT VALUES"
+  };
+
+  return executeQuery(Utils::implodeString(query, ""));
+}
+
+/**
+ * [DatabaseConnection::sanitizeString Remove any offending characters and escape things that need it]
+ * @param  string [The string]
+ * @return        [The sanitized string]
+ */
+std::string DatabaseConnection::sanitizeString(std::string string) {
+  // TODO: There are probably more things that I need to put here.
+  std::regex apostropheRegex = std::regex("\'");
+  return regex_replace(string, apostropheRegex, "''");
 }
