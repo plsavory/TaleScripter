@@ -11,9 +11,14 @@ public:
   ~InputManager();
   void update();
   int bindKeyboardEvent(std::string name, std::string key, bool onlyTriggerOnPress);
+  MouseEvent* bindMouseEvent(std::string name, MouseEventType mouseEventType);
+  MouseEvent* bindMouseEvent(std::string name, MouseEventType mouseEventType, int areaX, int areaY, int areaWidth, int areaHeight);
   bool isEventPressed(int id);
   bool isEventPressed(std::string name);
   void setEnabled(bool isEnabled);
+  MouseHandler* getMouseHandler() {
+    return mouseHandler;
+  }
 private:
   MouseHandler *mouseHandler;
   KeyboardHandler *keyboardHandler;

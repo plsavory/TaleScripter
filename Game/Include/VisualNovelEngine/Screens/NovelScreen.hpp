@@ -22,6 +22,7 @@ private:
   BackgroundImageRenderer *backgroundImageRenderer;
   BackgroundTransitionRenderer *backgroundTransitionRenderer;
   CharacterSpriteRenderer *characterSpriteRenderer;
+  MouseEvent* advanceMouseEvent;
   NovelData *novel;
   void advance();
   int advanceEventId;

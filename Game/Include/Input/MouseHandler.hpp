@@ -1,17 +1,24 @@
 #ifndef INPUT_MOUSE_HANDLER_INCLUDED
 #define INPUT_MOUSE_HANDLER_INCLUDED
 
-enum MouseEventType {LeftClick, MiddleClick, RightClick, MouseInsideArea, GlobalLeftClick, GlobalMiddleClick, GlobalRightClick};
+enum MouseEventType {LeftClick, MiddleClick, RightClick, MouseInsideArea};
 
 class MouseEvent {
 public:
-  MouseEvent(MouseEventType eventType, int areaX, int areaY, int areaWidth, int areaHeight);
-  MouseEvent(MouseEventType eventType);
+  MouseEvent(std::string name, MouseEventType mouseEventType, int areaX, int areaY, int areaWidth, int areaHeight);
+  MouseEvent(std::string name, MouseEventType mouseEventType);
   std::string name;
-  int EventType;
-  bool isEventPressed();
+  bool conditionsMet();
+  void update();
+  void setMousePosition(sf::Vector2i mPos) {
+    mousePosition = mPos;
+  }
 private:
-  sf::Vector2i myBounds; // The area in which the mouse event becomes active (if neccessary)
+  sf::IntRect myBounds; // The area in which the mouse event becomes active (if neccessary)
+  bool enabled;
+  MouseEventType eventType;
+  sf::Vector2i mousePosition;
+  bool hasFired;
 };
 
 class MouseHandler {
@@ -20,14 +27,14 @@ public:
   ~MouseHandler();
   void update();
   void draw();
-  MouseEvent addEvent(std::string name, MouseEventType eventType);
-  MouseEvent addEvent(std::string name, MouseEventType eventType, int areaX, int areaY, int areaWidth, int areaHeight);
+  MouseEvent* addEvent(std::string eventName, MouseEventType eventType);
+  MouseEvent* addEvent(std::string eventName, MouseEventType eventType, int areaX, int areaY, int areaWidth, int areaHeight);
 private:
   bool enabled;
   sf::RenderWindow *window;
   sf::Vector2i mousePosition;
   sf::Vector2i getMousePosition();
-  private validateEventType(MoustEventType eventType ,bool requiresAreaCoordinates);
+  std::vector<MouseEvent*> events;
 };
 
 #endif

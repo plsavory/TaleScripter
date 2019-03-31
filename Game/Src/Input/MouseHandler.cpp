@@ -1,7 +1,9 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <nlohmann/json.hpp>
+#include <vector>
 #include "Input/MouseHandler.hpp"
+#include <iostream>
 
 MouseHandler::MouseHandler(sf::RenderWindow *windowPointer) {
   window = windowPointer;
@@ -18,6 +20,14 @@ void MouseHandler::update() {
 
   // Store the current mouse mouse position
   mousePosition = sf::Mouse::getPosition(*window);
+
+  unsigned int eventCount = events.size();
+
+  for (unsigned int i = 0; i < eventCount; i++) {
+    events[i]->setMousePosition(mousePosition);
+    events[i]->update();
+  }
+
 }
 
 sf::Vector2i MouseHandler::getMousePosition() {
@@ -35,11 +45,15 @@ void MouseHandler::draw() {
 
 }
 
-MouseEvent MouseHandler::addEvent(std::string name, MouseEventType eventType) {
-
+MouseEvent* MouseHandler::addEvent(std::string name, MouseEventType eventType) {
+  events.push_back(new MouseEvent(name, eventType));
+  return events.back();
 }
 
-MouseEvent MouseHandler::addEvent(std::string name, MouseEventType eventType, int areaX, int areaY, int areaWidth, int areaHeight)
+MouseEvent* MouseHandler::addEvent(std::string name, MouseEventType eventType, int areaX, int areaY, int areaWidth, int areaHeight) {
+  events.push_back(new MouseEvent(name, eventType, areaX, areaY, areaWidth, areaHeight));
+  return events.back();
+}
 
 // MouseEvent stuff
 
@@ -47,19 +61,16 @@ MouseEvent MouseHandler::addEvent(std::string name, MouseEventType eventType, in
  * [MouseEvent::MouseEvent Mouse event constructor where a bounding box is not required]
  * @param eventType [Mouse event type]
  */
-MouseEvent::MouseEvent(MouseEventType eventType) {
+MouseEvent::MouseEvent(std::string eventName, MouseEventType mouseEventType) {
 
-  switch (eventType) {
-    case MouseEventType::MouseInsideArea:
-    case MouseEventType::GlobalLeftClick:
-    case MouseEventType::GlobalMiddleClick:
-    case MouseEventType::GlobalRightClick:
-    throw "Global mouse event must provided with bounding box coordinates (Use other constructor overload.)";
-    default:
-    break;
-  }
-
-  MouseEvent(eventType, 0,0,0,0);
+  // TODO: Use configured display mode when this feature is supported
+  enabled = true;
+  eventType = mouseEventType;
+  myBounds.left = 0;
+  myBounds.top = 0;
+  myBounds.width = 1280;
+  myBounds.height = 720;
+  hasFired = false;
 
 }
 
@@ -71,28 +82,83 @@ MouseEvent::MouseEvent(MouseEventType eventType) {
  * @param areaWidth  [Area Width (If applicable)]
  * @param areaHeight [Area Height (If applicable)]
  */
-MouseEvent::MouseEvent(MouseEventType eventType, int areaX, int areaY, int areaWidth, int areaHeight) {
-  // Is the mouse event global or not
-  bool global = false;
+MouseEvent::MouseEvent(std::string eventName, MouseEventType mouseEventType, int areaX, int areaY, int areaWidth, int areaHeight) {
+
+  enabled = true;
+  eventType = mouseEventType;
+  myBounds.left = areaX;
+  myBounds.top = areaY;
+  myBounds.width = areaWidth;
+  myBounds.height = areaHeight;
+  hasFired = false;
+
+};
+
+/**
+ * [MouseEvent::getEventStatue Returns whether the conditions of a mouse event have been met or not]
+ * @return [description]
+ */
+bool MouseEvent::conditionsMet() {
+
+  // TODO: Add support for the scroll wheel when we need it for the UI.
+
+  if (!enabled) {
+    return false;
+  }
+
+  if (hasFired) {
+    return false;
+  }
+
+
+  bool mouseInsideBounds = (mousePosition.x >= myBounds.left && mousePosition.x <= (myBounds.left + myBounds.width) &&
+    (mousePosition.y >= myBounds.top && mousePosition.y <= (myBounds.top + myBounds.height)));
+
+  sf::Mouse::Button mouseButton;
 
   switch (eventType) {
     case MouseEventType::MouseInsideArea:
-    case MouseEventType::GlobalLeftClick:
-    case MouseEventType::GlobalMiddleClick:
-    case MouseEventType::GlobalRightClick:
-    global = true;
-    break;
+    return mouseInsideBounds;
     case MouseEventType::LeftClick:
-    case MouseEventType::MiddleClick:
-    case MouseEventType::RightClick:
-    global = false;
+      mouseButton = sf::Mouse::Button::Left;
     break;
+    case MouseEventType::MiddleClick:
+      mouseButton = sf::Mouse::Button::Middle;
+    break;
+    case MouseEventType::RightClick:
+      mouseButton = sf::Mouse::Button::Right;
+    break;
+    default:
+      throw "Unknown mouse event type";
   }
 
-  // If the mouse event is global, we require the mouse bound coordinates of the event to continue
-  if (global) {
-    if (!(areaWidth > 0 && areaY > 0)) {
-      throw "Global mouse event requires bounding area.";
-    }
+  if (sf::Mouse::isButtonPressed(mouseButton) && mouseInsideBounds) {
+    hasFired = true;
+    return true;
   }
-};
+
+  return false;
+}
+
+void MouseEvent::update() {
+
+  sf::Mouse::Button mouseButton;
+
+  switch (eventType) {
+    case MouseEventType::LeftClick:
+      mouseButton = sf::Mouse::Button::Left;
+    break;
+    case MouseEventType::MiddleClick:
+      mouseButton = sf::Mouse::Button::Middle;
+    break;
+    case MouseEventType::RightClick:
+      mouseButton = sf::Mouse::Button::Right;
+    break;
+    default:
+      throw "Unknown mouse event type";
+  }
+
+  if (hasFired) {
+    hasFired = sf::Mouse::isButtonPressed(mouseButton);
+  }
+}

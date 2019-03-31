@@ -44,3 +44,11 @@ bool InputManager::isEventPressed(std::string name) {
 void InputManager::setEnabled(bool isEnabled) {
   keyboardHandler->setEnabled(isEnabled);
 }
+
+MouseEvent* InputManager::bindMouseEvent(std::string name, MouseEventType mouseEventType) {
+  return mouseHandler->addEvent(name, mouseEventType);
+}
+
+MouseEvent* InputManager::bindMouseEvent(std::string name, MouseEventType mouseEventType, int areaX, int areaY, int areaWidth, int areaHeight) {
+  return mouseHandler->addEvent(name, mouseEventType, areaX, areaY, areaWidth, areaHeight);
+}

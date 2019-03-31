@@ -26,6 +26,7 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer) {
 
   // User input bindings for this screen (TODO: Also react to gamepad and mouse input)
   advanceEventId = inputManager->bindKeyboardEvent("novel_screen_text_advance","return", true);
+  advanceMouseEvent = inputManager->getMouseHandler()->addEvent("novel_screen_text_advance", MouseEventType::LeftClick);
 }
 
 NovelScreen::~NovelScreen() {
@@ -52,7 +53,7 @@ void NovelScreen::update() {
   textDisplay->update();
 
   // TODO: Allow for an auto mode which doesn't need user input
-  if (inputManager->isEventPressed(advanceEventId)) {
+  if (inputManager->isEventPressed(advanceEventId) || advanceMouseEvent->conditionsMet()) {
 
     // If text display has not drawn all characters yet, force it to draw them all
     if (!textDisplay->hasTextFinished()) {
