@@ -7,7 +7,7 @@
 NovelData::NovelData() {
 
   for (int i = 0; i<MAX_CHARACTERS; i++) {
-      character[i] = NULL;
+      character[i] = nullptr;
   }
 
   chapterCount = 0;
@@ -80,7 +80,7 @@ void NovelData::loadFromDatabase() {
   for (int i = 0; i<MAX_CHARACTERS; i++) {
     if (character[i]) {
       delete(character[i]);
-      character[i] = NULL;
+      character[i] = nullptr;
     }
   }
 
@@ -135,7 +135,7 @@ void NovelData::loadFromDatabase() {
   }
 
   for (int i = 0; i < MAX_CHAPTERS; i++) {
-    chapter[i] = NULL;
+    chapter[i] = nullptr;
   }
 
   // Load project information from Database
@@ -217,7 +217,7 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
   #endif
 
   for (int i = 0; i < MAX_SCENES; i++) {
-    scene[i] = NULL;
+    scene[i] = nullptr;
   }
 
   // Get all of the scenes within the chapter
@@ -305,7 +305,7 @@ NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int
   segmentCount = 0;
 
   for (int i = 0; i < MAX_SEGMENTS; i++) {
-    segment[i] = NULL;
+    segment[i] = nullptr;
   }
 
   #ifdef DEBUG_NOVEL_DATA
@@ -394,7 +394,7 @@ NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId, std::stri
   lineCount = 0;
 
   for (int i = 0; i < MAX_LINES; i++) {
-    line[i] = NULL;
+    line[i] = nullptr;
   }
 
   #ifdef DEBUG_NOVEL_DATA
@@ -475,7 +475,7 @@ NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, 
   overrideCharacterName = sslOverrideCharacterName;
 
   text = sslText;
-  characterStateGroup = NULL;
+  characterStateGroup = nullptr;
 
   #ifdef DEBUG_NOVEL_DATA
     std::cout<<"Added line \""<<text<<"\""<<std::endl;

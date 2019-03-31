@@ -1,4 +1,4 @@
-// Dev.cpp - A test suite for Tiler during development
+// EntryPoint.cpp - The entry point for the main TaleScripter-Runner executable
 #include <iostream>
 #include "Database/DatabaseConnection.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"

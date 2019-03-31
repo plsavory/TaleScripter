@@ -8,6 +8,24 @@ set(COMPILER_EXECUTABLE_NAME "TaleScripter-Compiler")
 
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
+# Git branch & commit details - Executes when cmake is run as far as I know.
+execute_process(
+        COMMAND git rev-parse --abbrev-ref HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_BRANCH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+        COMMAND git log -1 --format=%h
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_COMMIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+add_definitions("-DCURRENT_COMMIT=${GIT_COMMIT_HASH}")
+add_definitions("-DCURRENT_BRANCH=${GIT_BRANCH}")
+
 include_directories(Game/Include)
 include_directories(Game/Include/BackgroundRenderer)
 include_directories(Game/Include/Base)

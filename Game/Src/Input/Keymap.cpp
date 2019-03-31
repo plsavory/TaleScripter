@@ -13,7 +13,7 @@ sf::Keyboard::Key Keymap::getKeycode(std::string name) {
 
   for (int i = 0;i<0xFF;i++) {
     if (keycodes[i]) {
-      keycodes[i] = NULL;
+      keycodes[i] = nullptr;
     }
   }
 

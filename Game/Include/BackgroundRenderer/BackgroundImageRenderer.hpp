@@ -40,7 +40,7 @@ public:
     name = bName;
     fileName = bFilename;
     myStatus = BackgroundStatus::bgUnloaded;
-    myTexture = NULL;
+    myTexture = nullptr;
     mySprite = new sf::Sprite();
     mySprite->setPosition(sf::Vector2f(0.f,0.f));
     window = windowPointer;
@@ -93,7 +93,7 @@ private:
   sf::Sprite *mySprite;
   BackgroundStatus myStatus;
   sf::RenderWindow *window;
-  BackgroundImageAttributes *attributes = NULL;
+  BackgroundImageAttributes *attributes = nullptr;
 };
 
 class BackgroundLoadRequest {

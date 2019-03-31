@@ -29,7 +29,7 @@ private:
 struct AudioStream {
 public:
   AudioStream(std::string asName, std::string asFname) {
-    music = NULL;
+    music = nullptr;
     state = AudioStreamState::Unloaded;
     name = asName;
     fileName = asFname;
@@ -80,7 +80,7 @@ public:
 
       if (unload) {
         delete music;
-        music = NULL;
+        music = nullptr;
         state = AudioStreamState::Unloaded;
         return;
       }

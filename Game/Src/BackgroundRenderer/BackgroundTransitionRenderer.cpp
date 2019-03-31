@@ -4,7 +4,7 @@
 BackgroundTransitionRenderer::BackgroundTransitionRenderer(sf::RenderWindow *windowPointer, BackgroundImageRenderer *bgImageRenderer) {
   window = windowPointer;
   backgroundImageRenderer = bgImageRenderer;
-  currentTransition = NULL;
+  currentTransition = nullptr;
 
   // Set some defaults
   setScreenSize(1280,720);
@@ -19,7 +19,7 @@ void BackgroundTransitionRenderer::startTransition(int transitionType, sf::Color
 // If we're already doing a transition, delete it
   if (currentTransition) {
     delete(currentTransition);
-    currentTransition = NULL;
+    currentTransition = nullptr;
   }
 
   currentTransition = new BackgroundTransition(window, transitionType, delayBeforeStart, screenWidth, screenHeight, delayBeforeEnd, animationLength, backgroundImageRenderer);
@@ -33,7 +33,7 @@ void BackgroundTransitionRenderer::update() {
   if (currentTransition) {
     if (currentTransition->update()) {
       delete(currentTransition);
-      currentTransition = NULL;
+      currentTransition = nullptr;
     }
   }
 

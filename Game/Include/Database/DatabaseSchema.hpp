@@ -19,53 +19,78 @@
 
 #include <iostream>
 
-enum ColumnType {tText,tInteger,tDouble,tDate,tTimestamp,tBoolean};
+enum ColumnType {
+    tText, tInteger, tDouble, tDate, tTimestamp, tBoolean
+};
 
 class DatabaseSchemaUtils {
 public:
-  static std::string getType(ColumnType columnType);
+    static std::string getType(ColumnType columnType);
 };
 
 class DatabaseColumn {
 public:
-  DatabaseColumn(std::string cName, ColumnType cType, bool cNotNull, std::string cDefaultValue, bool cPrimaryKey);
-  ColumnType getType();
-  std::string getTypeAsString();
-  void outputColumnInfo();
-  std::string getCreationQuery();
+    DatabaseColumn(const std::string &cName, ColumnType cType, bool cNotNull, const std::string &cDefaultValue,
+                   bool cPrimaryKey);
+
+    ColumnType getType();
+
+    std::string getTypeAsString();
+
+    void outputColumnInfo();
+
+    std::string getCreationQuery();
+
 private:
-  std::string name;
-  ColumnType type;
-  bool primaryKey;
-  bool notNull;
-  std::string defaultValue;
+    std::string name;
+    ColumnType type;
+    bool primaryKey;
+    bool notNull;
+    std::string defaultValue;
 };
 
 class DatabaseTable {
 public:
-  DatabaseTable(std::string tName);
-  std::string getName();
-  DatabaseColumn* addColumn(std::string cName, ColumnType cType, bool cNotNull, std::string cDefaultValue);
-  DatabaseColumn* addPrimaryKey();
-  DatabaseColumn* addForeignKey(std::string cName, std::string foreignTableName, std::string foreignTableId);
-  void outputTableInfo();
-  std::string getCreationQuery();
+    explicit DatabaseTable(const std::string &tName);
+
+    std::string getName();
+
+    DatabaseColumn *
+    addColumn(const std::string &cName, ColumnType cType, bool cNotNull, const std::string &cDefaultValue);
+
+    DatabaseColumn *addPrimaryKey();
+
+    DatabaseColumn *
+    addForeignKey(const std::string &cName, const std::string &foreignTableName, const std::string &foreignTableId);
+
+    void outputTableInfo();
+
+    std::string getCreationQuery();
+
 private:
-  std::string name;
-  DatabaseColumn *column[MAX_COLUMNS];
-  DatabaseColumn* addColumnInternal(std::string cName, ColumnType cType, bool cNotNull, std::string cDefaultValue, bool cPrimaryKey);
+    std::string name;
+    DatabaseColumn *column[MAX_COLUMNS]{};
+
+    DatabaseColumn *
+    addColumnInternal(const std::string &cName, ColumnType cType, bool cNotNull, const std::string &cDefaultValue,
+                      bool cPrimaryKey);
 };
 
 class DatabaseSchema {
 public:
-  DatabaseSchema(std::string dName);
-  std::string getName();
-  DatabaseTable* addTable(std::string name);
-  DatabaseTable* getTable(std::string name);
-  bool createDatabase();
+    explicit DatabaseSchema(const std::string &dName);
+
+    std::string getName();
+
+    DatabaseTable *addTable(const std::string &tableName);
+
+    DatabaseTable *getTable(const std::string &tableName);
+
+    bool createDatabase();
+
 private:
-  std::string name;
-  DatabaseTable *table[MAX_TABLES];
+    std::string name;
+    DatabaseTable *table[MAX_TABLES]{};
 };
 
 #endif

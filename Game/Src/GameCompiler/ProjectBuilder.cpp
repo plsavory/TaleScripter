@@ -70,7 +70,7 @@ void ProjectBuilder::process() {
 
     // Store all of the names in the Credits array. TODO: Create a more comprehensive solution for game ending cvredits later
     for (int i = 0; i < 100; i++) {
-      contributors[i] = NULL;
+      contributors[i] = nullptr;
     }
 
     int contributorsCount = -1;

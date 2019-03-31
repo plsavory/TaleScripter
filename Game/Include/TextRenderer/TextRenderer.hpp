@@ -51,7 +51,7 @@ public:
   }
 
   bool hasFontLoaded() {
-    return !(font == NULL);
+    return !(font == nullptr);
   }
   sf::Text* getTextObject() {
     return textObj;

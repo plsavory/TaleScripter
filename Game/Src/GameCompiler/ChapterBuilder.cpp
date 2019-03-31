@@ -118,37 +118,37 @@ void ChapterBuilder::processScene(json sceneJson, int chapterId) {
   if (sceneJson.find("backgroundImageName") != sceneJson.end()) {
     backgroundImageName = sceneJson["backgroundImageName"];
   } else {
-    backgroundImageName = "NULL";
+    backgroundImageName = "nullptr";
   }
 
   if (sceneJson.find("backgroundColourId") != sceneJson.end()) {
     backgroundColourId = sceneJson["backgroundColourId"];
   } else {
-    backgroundColourId = "NULL";
+    backgroundColourId = "nullptr";
   }
 
   if (sceneJson.find("startTransitionColourId") != sceneJson.end()) {
     startTransitionColourId = sceneJson["startTransitionColourId"];
   } else {
-    startTransitionColourId = "NULL";
+    startTransitionColourId = "nullptr";
   }
 
   if (sceneJson.find("endTransitionColourId") != sceneJson.end()) {
     endTransitionColourId = sceneJson["endTransitionColourId"];
   } else {
-    endTransitionColourId = "NULL";
+    endTransitionColourId = "nullptr";
   }
 
   if (sceneJson.find("startTransitionTypeId") != sceneJson.end()) {
     startTransitionTypeId = sceneJson["startTransitionTypeId"];
   } else {
-    startTransitionTypeId = "NULL";
+    startTransitionTypeId = "nullptr";
   }
 
   if (sceneJson.find("endTransitionTypeId") != sceneJson.end()) {
     endTransitionTypeId = sceneJson["endTransitionTypeId"];
   } else {
-    endTransitionTypeId = "NULL";
+    endTransitionTypeId = "nullptr";
   }
 
   // Insert the data into the database...
@@ -226,7 +226,7 @@ void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
     // TODO: Deal with music effects/transformations
     json musicJson = sceneSegmentJson["music"];
 
-    backgroundMusicName = "NULL";
+    backgroundMusicName = "nullptr";
 
     if (musicJson.find("name") != musicJson.end()) {
       // TODO: Validate that the music actually exists im the resource database when it is working
@@ -237,7 +237,7 @@ void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
   if (sceneSegmentJson.find("visualEffectName") != sceneSegmentJson.end()) {
     visualEffectName = sceneSegmentJson["visualEffectName"];
   } else {
-    visualEffectName = "NULL";
+    visualEffectName = "nullptr";
   }
 
   std::vector<std::string> columns = {"scene_id","background_music_name","visual_effect_name"};
@@ -281,10 +281,10 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
 
   // TODO: Support multiple languages in one distribution, on second thought it might be better to do this at a chapter level.
   std::string languageId = "1";
-  std::string overrideCharacterName = "NULL";
-  std::string characterId = "NULL";
-  std::string text = "NULL";
-  std::string characterStateGroupId = "NULL";
+  std::string overrideCharacterName = "nullptr";
+  std::string characterId = "nullptr";
+  std::string text = "nullptr";
+  std::string characterStateGroupId = "nullptr";
 
   if (lineJson.find("characterName") != lineJson.end()) {
     // TODO: Validate that the character exists in the database
@@ -302,7 +302,7 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
 
   if (lineJson.find("characterId") != lineJson.end()) {
 
-    if (overrideCharacterName != "NULL") {
+    if (overrideCharacterName != "nullptr") {
       std::cout<<"Warning: both characterId and characterName are present on the same line - characterName will override characterId."<<std::endl;
     } else {
       characterId = lineJson["characterId"];

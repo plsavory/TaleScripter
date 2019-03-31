@@ -15,13 +15,13 @@ BackgroundTransition::BackgroundTransition(sf::RenderWindow *windowPointer, int 
   width = screenWidth;
   height = screenHeight;
   delay = delayAfterFinish;
-  delayClock = NULL;
+  delayClock = nullptr;
   type = transitionType;
   transitionCompleted = false;
-  rectangleShape = NULL;
+  rectangleShape = nullptr;
   length = animationLength ? (animationLength/1000) : 1;
   startDelay = delayBeforeStart;
-  startDelayClock = NULL;
+  startDelayClock = nullptr;
   drawBeforeStartDelay = true;
   foregroundTransition = false;
   backgroundImageRenderer = bgRenderer;
@@ -81,7 +81,7 @@ bool BackgroundTransition::update() {
     }
 
     delete(startDelayClock);
-    startDelayClock = NULL;
+    startDelayClock = nullptr;
   }
 
   switch(type) {

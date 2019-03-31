@@ -13,7 +13,7 @@ Character::Character(int cId, std::string cFirstName, std::string cSurname, std:
   showOnCharacterMenu = cShowOnCharacterMenu;
 
   for (int i = 0; i < MAX_CHARACTER_SPRITES; i++) {
-    characterSprite[i] = NULL;
+    characterSprite[i] = nullptr;
   }
 
   // Load any character sprites related to this sprite from the database
@@ -65,5 +65,5 @@ CharacterSprite* Character::getSprite(std::string name) {
     }
   }
 
-  return NULL;
+  return nullptr;
 }

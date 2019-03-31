@@ -9,7 +9,7 @@ TextRenderer::TextRenderer(sf::RenderWindow *windowPointer, FontManager *fontMan
   fontManager = fontManagerPointer;
 
   for (int i = 0; i < MAX_TEXT_OBJECTS; i++) {
-    text[i] = NULL;
+    text[i] = nullptr;
   }
 
   retryLoadClock = new sf::Clock();
@@ -35,7 +35,7 @@ Text* TextRenderer::addText(std::string name, std::string font) {
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void TextRenderer::update() {

@@ -7,7 +7,7 @@ KeyboardHandler::KeyboardHandler() {
 
   // Make sure all keyboard event objects are null
   for (int i = 0; i<0xFF;i++) {
-    keyboardEvent[i] = NULL;
+    keyboardEvent[i] = nullptr;
   }
 
   enabled = true;

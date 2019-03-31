@@ -9,12 +9,12 @@ BackgroundImageRenderer::BackgroundImageRenderer(sf::RenderWindow *windowPointer
   window = windowPointer;
 
   for (int i = 0; i < MAX_BACKGROUNDS; i++) {
-    background[i] = NULL;
+    background[i] = nullptr;
   }
 
-  currentBackground = NULL;
-  upcomingBackground = NULL;
-  backgroundColour = NULL;
+  currentBackground = nullptr;
+  upcomingBackground = nullptr;
+  backgroundColour = nullptr;
   drawingEnabled = true;
 
 }
@@ -43,7 +43,7 @@ Background* BackgroundImageRenderer::addBackground(std::string name, std::string
     }
   }
 
-  return NULL;
+  return nullptr;
 
 }
 
@@ -188,7 +188,7 @@ void BackgroundImageRenderer::setBackgroundColour(sf::Color *colour) {
 
   if (backgroundColour) {
     delete(backgroundColour);
-    backgroundColour = NULL;
+    backgroundColour = nullptr;
   }
 
   backgroundColour = colour;

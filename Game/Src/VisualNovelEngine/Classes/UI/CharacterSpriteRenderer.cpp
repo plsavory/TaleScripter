@@ -148,7 +148,7 @@ void CharacterSpriteRenderer::push(std::vector<CharacterSpriteDrawRequest*> spri
       continue;
     }
 
-    spriteSlot[i]->push(NULL);
+    spriteSlot[i]->push(nullptr);
   }
 
   processedPositioning = false;

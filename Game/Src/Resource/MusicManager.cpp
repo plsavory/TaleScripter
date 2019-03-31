@@ -5,7 +5,7 @@
 MusicManager::MusicManager() {
   // Null-out the audio audio streams
   for (int i = 0; i < MAX_AUDIO_STREAMS; i++) {
-    audioStream[i] = NULL;
+    audioStream[i] = nullptr;
   }
 }
 
@@ -29,7 +29,7 @@ AudioStream* MusicManager::addStream(std::string name, std::string fname) {
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -104,7 +104,7 @@ AudioStream* MusicManager::getAudioStream(int id) {
     return audioStream[id];
   }
 
-  return NULL;
+  return nullptr;
 
 }
 
@@ -116,7 +116,7 @@ AudioStream* MusicManager::getAudioStream(std::string name) {
     return audioStream[id];
   }
 
-  return NULL;
+  return nullptr;
 
 }
 

@@ -3,12 +3,12 @@
 #include "Resource/TextureManager.hpp"
 
 /**
- * [TextureManager::TextureManager Usual NULL initialisation so that if statements will work]
+ * [TextureManager::TextureManager Usual nullptr initialisation so that if statements will work]
  */
 TextureManager::TextureManager() {
 
   for (int i = 0; i<MAX_TEXTURES; i++) {
-    texture[i] = NULL;
+    texture[i] = nullptr;
   }
 
 }
@@ -135,7 +135,7 @@ Texture* TextureManager::getTexture(int id) {
  * only be used once to get a pointer to it]
  * @param  name [Name of the texture]
  * @return      [Success: Texture object pointer
- *               Failure: NULL]
+ *               Failure: nullptr]
  */
 Texture* TextureManager::getTexture(std::string name) {
   int textureId = findTexture(name);
@@ -145,7 +145,7 @@ Texture* TextureManager::getTexture(std::string name) {
   }
 
   std::cout<<"Texture with name (" << name << ") not found."<<std::endl;
-  return NULL;
+  return nullptr;
 }
 
 /**

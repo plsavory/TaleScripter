@@ -22,7 +22,7 @@ public:
   Font(std::string fontName, std::string filename) {
 
     // Set default values on our variables
-    myFont = NULL;
+    myFont = nullptr;
     name = fontName;
     fontFilename = filename;
     state = FontState::fsUnloaded;

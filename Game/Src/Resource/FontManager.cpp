@@ -7,7 +7,7 @@
 FontManager::FontManager() {
   // Null-out all font slots
   for (int i = 0; i < MAX_FONTS; i++) {
-    font[i] = NULL;
+    font[i] = nullptr;
   }
 
   loadFontImmediately = true;
@@ -43,7 +43,7 @@ Font* FontManager::addFont(std::string name, std::string filename) {
     }
   }
 
-  return NULL;
+  return nullptr;
 
 }
 
@@ -109,7 +109,7 @@ Font* FontManager::getFont(std::string name) {
   int fontId = findFont(name);
 
   if (fontId < 0) {
-    return NULL;
+    return nullptr;
   }
 
   return font[fontId];

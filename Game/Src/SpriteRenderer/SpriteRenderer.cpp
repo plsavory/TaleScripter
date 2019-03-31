@@ -11,7 +11,7 @@ SpriteRenderer::SpriteRenderer(sf::RenderWindow *window, TextureManager *tManage
 
   // Initialise all sprite pointers to null and priority matrix to -1 so that we can test whether a sprite exists or not
   for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
-    sprite[i] = NULL;
+    sprite[i] = nullptr;
     priorityMatrix[i] = -1;
   }
 
@@ -23,7 +23,7 @@ SpriteRenderer::SpriteRenderer(sf::RenderWindow *window, TextureManager *tManage
     // TODO: Allow this to be switched on and off at will
     spritePriorityClock = new sf::Clock();
   } else {
-    spritePriorityClock = NULL;
+    spritePriorityClock = nullptr;
   }
 
 }
@@ -160,7 +160,7 @@ Sprite* SpriteRenderer::getSprite(std::string name) {
     }
   }
 
-  return NULL;
+  return nullptr;
 
 }
 
@@ -173,13 +173,14 @@ Sprite* SpriteRenderer::getSprite(std::string name) {
 Sprite* SpriteRenderer::addSprite(std::string imageName, std::string name, int priority) {
 
   for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
-    if (!sprite[i]) {
+    if (sprite[i] == nullptr) {
       sprite[i] = new Sprite(textureManager,displayWindow, name, imageName, priority, i);
       return sprite[i];
     }
   }
 
-  return NULL;
+  // TODO: Re-write the sprite renderer to use a vector so that this will never happen - should be done by v0.4.0 (Added to my to-to list)
+  throw "Maximum number of sprites have been assigned - Consider increasing in engine compile options. (This issue will be fixed in future)";
 
 }
 
@@ -192,7 +193,7 @@ Sprite* SpriteRenderer::addSprite(std::string name) {
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void SpriteRenderer::removeSprite(int id) {
