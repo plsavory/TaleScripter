@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Database/DatabaseConnection.hpp"
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/ResourceBuilder.hpp"

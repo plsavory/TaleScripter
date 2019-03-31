@@ -1,9 +1,9 @@
 #ifndef ENGINE_INCLUDED
 #define ENGINE_INCLUDED
 
-#include "SFML/System.hpp"
-#include "SFML/Window.hpp"
-#include "SFML/Graphics.hpp"
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 #include "Database/DatabaseConnection.hpp"
 #include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 #include "BackgroundRenderer/BackgroundTransitionRenderer.hpp"

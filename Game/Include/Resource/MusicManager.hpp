@@ -7,7 +7,7 @@
 #ifndef AUDIO_STREAM_INCLUDED
 #define AUDIO_STREAM_INCLUDED
 
-#include "SFML/Audio.hpp"
+#include <SFML/Audio.hpp>
 #include <queue>
 
 #define MAX_AUDIO_STREAMS 50

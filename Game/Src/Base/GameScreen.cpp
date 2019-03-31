@@ -1,6 +1,6 @@
 // GameScreen.cpp - Contains function definitions which will be common on each Game State/screen
 
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 #include "Database/DatabaseConnection.hpp"
 #include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 #include "Base/GameScreen.hpp"

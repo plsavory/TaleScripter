@@ -11,7 +11,7 @@ DatabaseConnection::DatabaseConnection(std::string name) {
   // Initialise values and open database connection
   zErrMsg = 0;
 
-  std::string filename = "db\\";
+  std::string filename = "db/";
   filename.append(name);
 
   // Convert the string to a char array TODO: Move this into its own function

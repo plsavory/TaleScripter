@@ -3,7 +3,7 @@
   This class will also handle sanity checks for errors which could make it into the game's database.
  */
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 #include "Database/DatabaseConnection.hpp"

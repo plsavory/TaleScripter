@@ -1,5 +1,5 @@
-#include "SFML/System.hpp"
-#include "SFML/Graphics.hpp"
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
 #include <queue>
 #include "Database/DatabaseConnection.hpp"
 #include "Resource/FontManager.hpp"

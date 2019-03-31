@@ -1,7 +1,7 @@
 #include <iostream>
 #include <queue>
 #include <sstream>
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 #include "Database/DatabaseConnection.hpp"
 #include "BackgroundRenderer/BackgroundImageRenderer.hpp"
 

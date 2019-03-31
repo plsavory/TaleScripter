@@ -1,4 +1,4 @@
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 #include "Database/DatabaseConnection.hpp"
 #include "GameCompiler/GameCompilerChapterParser.hpp"
 

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 #include "Misc/ColourBuilder.hpp"
 
 sf::Color* ColourBuilder::get(int id) {

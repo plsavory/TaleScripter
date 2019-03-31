@@ -7,7 +7,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "GameCompiler/ResourceBuilder.hpp"
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 /**

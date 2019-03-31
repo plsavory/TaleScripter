@@ -1,7 +1,7 @@
 #ifndef DATABASE_CONNECTION_INCLUDED
 #define DATABASE_CONNECTION_INCLUDED
 
-#include "SQLite/sqlite3.h"
+#include <sqlite3.h>
 #include <iostream>
 #include <vector>
 

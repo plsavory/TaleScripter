@@ -95,7 +95,7 @@ TextureManager* ResourceManager::getTextureManager() {
  */
 void ResourceManager::loadResourcesFromDatabase() {
   // Attempt to connect to the Resource database if it exists
-  if (!Utils::fileExists("db\\resource")) {
+  if (!Utils::fileExists("db/resource")) {
     return;
   }
 

@@ -1,4 +1,4 @@
-#include "SQLite/sqlite3.h"
+#include <sqlite3.h>
 #include "Database/DatabaseSchema.hpp"
 #include <cstring>
 #include <string>
@@ -32,7 +32,7 @@ bool DatabaseSchema::createDatabase() {
   char *zErrMsg = 0;
   int rc;
 
-  std::string filename = std::string("db\\");
+  std::string filename = std::string("db/");
   filename.append(name);
 
   // Convert the string to a char array TODO: Move this into its own function

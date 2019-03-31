@@ -2,6 +2,8 @@
 
 Changes from v0.3.1:
 
+Fixed some database-related non-portable file paths which was causing errors on macOS and Linux.
+Project has been converted to using CMAKE for the build process to allow for easy usage with IDEs and different build environments.
 Mouse input is now working.
 Character sprites can now be displayed during the novel, they are attached to a line and will be displayed when the line's text starts.
 Read character sprite state/display information on a line and save it into the database to be used within the game
