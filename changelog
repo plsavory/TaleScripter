@@ -2,7 +2,9 @@
 
 Changes from v0.3.1:
 
-Read character sprite state/display information on a line and save it into the database to be used within the game 
+Mouse input is now working.
+Character sprites can now be displayed during the novel, they are attached to a line and will be displayed when the line's text starts.
+Read character sprite state/display information on a line and save it into the database to be used within the game
 Database tables created to store Character States and Character State groups.
 Character sprite information is now read from Characters/Characters.json and saved into the databased linked to the correct characters.
 Textures information is now read from the database and texture files are loaded into memory.
