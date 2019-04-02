@@ -20,10 +20,11 @@ CharacterSpriteSlot::CharacterSpriteSlot(SpriteRenderer *sRenderer, ResourceMana
   }
 }
 
-CharacterSpriteSlot::~CharacterSpriteSlot() {
+CharacterSpriteSlot::~CharacterSpriteSlot() = default;
 
-}
-
+/**
+ * Once implemented, this function will handle sprite transitions and smooth positioning changes
+ */
 void CharacterSpriteSlot::update() {
 
 }

@@ -30,6 +30,7 @@ include_directories(Game/Include)
 include_directories(Game/Include/BackgroundRenderer)
 include_directories(Game/Include/Base)
 include_directories(Game/Include/Database)
+include_directories(Game/Include/Exceptions)
 include_directories(Game/Include/GameCompiler)
 include_directories(Game/Include/Input)
 include_directories(Game/Include/Misc)
@@ -60,6 +61,10 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/Base/Renderers.hpp
         Game/Include/Database/DatabaseConnection.hpp
         Game/Include/Database/DatabaseSchema.hpp
+        Game/Include/Exceptions/GeneralException.hpp
+        Game/Include/Exceptions/DatabaseException.hpp
+        Game/Include/Exceptions/DataSetException.hpp
+        Game/Include/Exceptions/MisuseException.hpp
         Game/Include/Input/GamepadHandler.hpp
         Game/Include/Input/InputManager.hpp
         Game/Include/Input/KeyboardHandler.hpp
@@ -133,6 +138,8 @@ add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/GameCompiler/GameCompilerChapterParser.hpp
         Game/Include/GameCompiler/ProjectBuilder.hpp
         Game/Include/GameCompiler/ResourceBuilder.hpp
+        Game/Include/Exceptions/GeneralException.hpp
+        Game/Include/Exceptions/ProjectBuilderException.hpp
         Game/Src/Database/DatabaseConnection.cpp
         Game/Src/Database/DatabaseSchema.cpp
         Game/Src/GameCompiler/ChapterBuilder.cpp

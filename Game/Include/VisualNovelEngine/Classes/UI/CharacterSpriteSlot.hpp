@@ -9,7 +9,7 @@ public:
   void push(CharacterSpriteDrawRequest *drawRequest);
   Sprite* getSprite();
 private:
-  Sprite *sprite[2]; // We need 2 of them for fade effects.
+  Sprite *sprite[2]{}; // We need 2 of them for fade effects.
   SpriteRenderer *spriteRenderer;
   int id;
 };

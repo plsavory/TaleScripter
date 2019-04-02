@@ -7,20 +7,30 @@
 #include <thread>
 #include "Base/Game.hpp"
 #include "Misc/ParameterHandler.hpp"
+#include "Exceptions/Exceptions.hpp"
 
 int main(int argc, char* argv[])
 {
   // Handle any command line parameters before starting the engine
-  ParameterHandler *parameterHandler = new ParameterHandler(argc, argv);
+  auto *parameterHandler = new ParameterHandler(argc, argv);
 
   if (parameterHandler->shouldExit()) {
     return 1;
   }
 
   // Entry point for the program
-  Game *game = new Game();
+  try {
+      Game *game = new Game();
+      game->run();
+  } catch (GeneralException &e) {
+      // Exceptions should be caught here as a last resort, as the visual error handler will later be added.
+      std::cout<<"Caught an exception: "<<e.what()<<std::endl;
+      exit(EXIT_FAILURE);
+  }
+  catch (std::exception &e) {
+      std::cout<<"Caught an exception: "<<e.what()<<" (Not very helpful, these exception types shouldn't be thrown...)"<<std::endl;
+      exit(EXIT_FAILURE);
+  }
 
-  game->run();
-
-  return 1;
+  return EXIT_SUCCESS;
 }
