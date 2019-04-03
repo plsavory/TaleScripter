@@ -2,9 +2,11 @@
 #include "Database/DatabaseConnection.hpp"
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+#include "GameCompiler/FileHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/ResourceBuilder.hpp"
 #include "GameCompiler/ChapterBuilder.hpp"
+#include "Exceptions/ProjectBuilderException.hpp"
 #include <fstream>
 #include <regex>
 #include "Misc/Utils.hpp"
@@ -15,13 +17,14 @@ using json = nlohmann::json;
  * [ProjectBuilder::ProjectBuilder Load the JSON file and report any errors]
  * @param fileName [File name to the project.json file]
  */
-ProjectBuilder::ProjectBuilder(std::string fileName, DatabaseConnection *novelDb, DatabaseConnection *resourceDb) {
+ProjectBuilder::ProjectBuilder(std::string fileName, DatabaseConnection *novelDb, DatabaseConnection *resourceDb, FileHandler *fileHandler) {
 
   // Handled previously, but check again in case this class is ever used anywhere else.
   if (!Utils::fileExists(fileName)) {
-    throw "ProjectBuilder: Unable to find project file.";
+    throw ProjectBuilderException("ProjectBuilder: Unable to find project file.");
   }
 
+  fHandler = fileHandler;
   projectFileName = fileName;
   novel = novelDb;
   resource = resourceDb;
@@ -45,15 +48,14 @@ void ProjectBuilder::process() {
 
 
   // Process the novel's resources
-  ResourceBuilder *resourceBuilder = new ResourceBuilder(resource, projectDirectory);
+  ResourceBuilder *resourceBuilder = new ResourceBuilder(resource, projectDirectory, fHandler);
   resourceBuilder->process();
 
-  std::ifstream stream(projectFileName);
-  json projectJson = json::parse(stream);
+  json projectJson = fHandler->parseJsonFile(projectFileName);
 
-  // Find the appropriate elements and store them 0 throwing errors where neccesary
+  // Find the appropriate elements and store them 0 throwing errors where needed
   if (projectJson.find("title") == projectJson.end()) {
-    throw "ProjectBuilder: No 'title' element found in project.json";
+    throw ProjectBuilderException("ProjectBuilder: No 'title' element found in project.json");
   }
 
   std::string projectTitle = projectJson["title"];
@@ -118,7 +120,7 @@ void ProjectBuilder::process() {
 
   // Process each chapter
   if (projectJson.find("chapters") == projectJson.end()) {
-    throw "No 'chapters' attribute found in project.json";
+    throw ProjectBuilderException("No 'chapters' attribute found in project.json");
   }
 
   // Process all of the characters
@@ -138,13 +140,13 @@ void ProjectBuilder::process() {
 
     std::string chapterFilePath = Utils::implodeString(explodedFilePath, "", 0);
 
-    ChapterBuilder *chapterBuilder = new ChapterBuilder(chapterFilePath, novel);
+    ChapterBuilder *chapterBuilder = new ChapterBuilder(chapterFilePath, novel, fHandler);
     chapterBuilder->process();
     delete(chapterBuilder);
   }
 
   if (numberOfChapters == 0) {
-    throw "No chapters were listed to be processed in the 'chapters' attribute of project.json.";
+    throw ProjectBuilderException("No chapters were listed to be processed in the 'chapters' attribute of project.json.");
   }
 }
 
@@ -154,14 +156,13 @@ void ProjectBuilder::processCharacters() {
   characterJsonFileName.append("Characters/Characters.json");
 
   if (!Utils::fileExists(characterJsonFileName)) {
-    std::cout<<"WARNING: No Characters.json file found in characters directory, certain features will not work."<<std::endl;
+    std::cout<<"No Characters.json file found in characters directory, certain features will not work."<<std::endl;
     return;
   }
 
   int numberOfCharacters = 0;
 
-  std::ifstream stream(characterJsonFileName);
-  json charactersJson = json::parse(stream);
+  json charactersJson = fHandler->parseJsonFile(characterJsonFileName);
 
   for (auto& datum : charactersJson.items()) {
     json character = datum.value();
@@ -176,11 +177,11 @@ void ProjectBuilder::processCharacters() {
     std::string showOnCharacterMenu = "TRUE";
 
     if (character.find("firstName") == character.end()) {
-      throw "A character must have a firstName.";
+      throw ProjectBuilderException("A character must have a firstName.");
     }
 
     if (character.find("characterId") == character.end()) {
-      throw "A character must have a characterId (It should be numeric)";
+      throw ProjectBuilderException("A character must have a characterId (It should be numeric)");
     }
 
     characterId = character["characterId"];
@@ -218,7 +219,7 @@ void ProjectBuilder::processCharacters() {
     if (dataSet->getRowCount() > 0) {
       std::string existingCharacterName = dataSet->getRow(0)->getColumn("first_name")->getData();
       std::vector<std::string> error = {"Character ID's must be unique, character '", firstName, "' conflicts with character '", existingCharacterName, "'"};
-      throw Utils::implodeString(error, "");
+      throw ProjectBuilderException(Utils::implodeString(error, ""));
     }
 
     std::vector<std::string> columns = {"id", "first_name", "surname", "bio", "age", "showOnCharacterMenu"};
@@ -244,7 +245,7 @@ void ProjectBuilder::processCharacters() {
             ": A character sprite must have a textureName attribute linked to it."
           };
 
-          throw Utils::implodeString(errorMessage, "");
+          throw ProjectBuilderException(Utils::implodeString(errorMessage, ""));
         }
 
         if (characterSprite.find("name") == characterSprite.end()) {
@@ -254,7 +255,7 @@ void ProjectBuilder::processCharacters() {
             ": A character sprite must have a name attribute linked to it."
           };
 
-          throw Utils::implodeString(errorMessage, "");
+          throw ProjectBuilderException(Utils::implodeString(errorMessage, ""));
         }
 
         name = characterSprite["name"];
@@ -266,7 +267,7 @@ void ProjectBuilder::processCharacters() {
             "';"
           };
 
-          DataSet *dataSet = new DataSet();
+          auto *dataSet = new DataSet();
           resource->executeQuery(Utils::implodeString(query, ""), dataSet);
 
           if (dataSet->getRowCount() == 0) {
@@ -278,10 +279,9 @@ void ProjectBuilder::processCharacters() {
               "exists."
             };
 
-            throw Utils::implodeString(errorMessage, "");
+            throw ProjectBuilderException(Utils::implodeString(errorMessage, ""));
           }
 
-          dataSet->debugOutputContents();
           textureId = dataSet->getRow(0)->getColumn("id")->getData();
 
           delete(dataSet);
@@ -297,7 +297,7 @@ void ProjectBuilder::processCharacters() {
             "';"
           };
 
-          DataSet *dataSet = new DataSet();
+          auto *dataSet = new DataSet();
           novel->executeQuery(Utils::implodeString(query, ""), dataSet);
 
           if (dataSet->getRowCount() > 0) {
@@ -309,7 +309,7 @@ void ProjectBuilder::processCharacters() {
               ") linked to this character."
             };
 
-            throw Utils::implodeString(errorMessage, "");
+            throw ProjectBuilderException(Utils::implodeString(errorMessage, ""));
           }
         }
 

@@ -4,6 +4,8 @@
 #include <vector>
 #include "Input/MouseHandler.hpp"
 #include <iostream>
+#include <Exceptions/InputHandlerException.hpp>
+#include <Exceptions/MisuseException.hpp>
 
 /**
  * @param windowPointer - Pointer to an SFML window
@@ -140,7 +142,7 @@ bool MouseEvent::conditionsMet() {
             mouseButton = sf::Mouse::Button::Right;
             break;
         default:
-            throw "Unknown mouse event type";
+            throw MisuseException("Unknown mouse event type");
     }
 
     if (sf::Mouse::isButtonPressed(mouseButton) && mouseInsideBounds) {
@@ -166,7 +168,7 @@ void MouseEvent::update() {
             mouseButton = sf::Mouse::Button::Right;
             break;
         default:
-            throw "Unknown mouse event type";
+            throw MisuseException("Unknown mouse event type");
     }
 
     if (hasFired) {

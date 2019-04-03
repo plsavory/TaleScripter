@@ -1,3 +1,6 @@
+#ifndef UTILS_INCLUDED
+#define UTILS_INCLUDED
+
 #include <vector>
 
 class Utils {
@@ -15,3 +18,5 @@ public:
   static std::string removeQuotationsFromString(std::string string);
 private:
 };
+
+#endif

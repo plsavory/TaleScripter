@@ -5,7 +5,8 @@
 
 // This exception is not needed within the main game engine, it will only be thrown in GameCompiler/ProjectBuilder.
 class ProjectBuilderException : public GeneralException {
-    explicit ProjectBuilderException(const std::string &message) : GeneralException(std::string("Misuse Exception"),
+public:
+    explicit ProjectBuilderException(const std::string &message) : GeneralException(std::string("Project Builder Exception"),
                                                                             message) {};
 };
 

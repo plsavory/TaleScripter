@@ -7,7 +7,7 @@
 #include <thread>
 #include "Base/Game.hpp"
 #include "Misc/ParameterHandler.hpp"
-#include "Exceptions/Exceptions.hpp"
+#include "Exceptions/GeneralException.hpp"
 
 int main(int argc, char* argv[])
 {

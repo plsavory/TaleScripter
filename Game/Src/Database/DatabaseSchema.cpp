@@ -105,7 +105,7 @@ DatabaseTable *DatabaseSchema::addTable(const std::string &tableName) {
     for (auto &potentialNewTable : table) {
 
         if (potentialNewTable == nullptr) {
-            potentialNewTable = new DatabaseTable(name);
+            potentialNewTable = new DatabaseTable(tableName);
             return potentialNewTable;
         }
 
@@ -271,7 +271,7 @@ std::string DatabaseColumn::getCreationQuery() {
             << name << " "
             << getTypeAsString()
             << (primaryKey ? " PRIMARY KEY" : "")
-            << (notNull ? " NOT nullptr" : "");
+            << (notNull ? " NOT NULL" : "");
 
     return ss.str();
 }

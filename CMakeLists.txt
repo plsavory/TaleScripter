@@ -65,6 +65,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/Exceptions/DatabaseException.hpp
         Game/Include/Exceptions/DataSetException.hpp
         Game/Include/Exceptions/MisuseException.hpp
+        Game/Include/Exceptions/InputHandlerException.hpp
         Game/Include/Input/GamepadHandler.hpp
         Game/Include/Input/InputManager.hpp
         Game/Include/Input/KeyboardHandler.hpp
@@ -138,8 +139,10 @@ add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/GameCompiler/GameCompilerChapterParser.hpp
         Game/Include/GameCompiler/ProjectBuilder.hpp
         Game/Include/GameCompiler/ResourceBuilder.hpp
+        Game/Include/GameCompiler/FileHandler.hpp
         Game/Include/Exceptions/GeneralException.hpp
         Game/Include/Exceptions/ProjectBuilderException.hpp
+        Game/Include/Exceptions/ProjectDataException.hpp
         Game/Src/Database/DatabaseConnection.cpp
         Game/Src/Database/DatabaseSchema.cpp
         Game/Src/GameCompiler/ChapterBuilder.cpp

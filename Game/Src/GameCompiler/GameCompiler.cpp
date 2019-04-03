@@ -2,15 +2,17 @@
 #include "Misc/Utils.hpp"
 #include "Database/DatabaseSchema.hpp"
 #include "Database/DatabaseConnection.hpp"
+#include "GameCompiler/FileHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
 
-GameCompiler::GameCompiler(GameCompilerOptions *gameCompilerOptions) {
+GameCompiler::GameCompiler(GameCompilerOptions *gameCompilerOptions, FileHandler *fileHandler) {
 
   compilerOptions = gameCompilerOptions;
+  fHandler = fileHandler;
 
   // If we have no project file path, set it as the default
-  if (compilerOptions->getProjectFilePath() == "") {
+  if (compilerOptions->getProjectFilePath().empty()) {
 
     if (!Utils::fileExists("projects/Default/project.json")) {
       throw "No project has been specified, and there is no project located at 'projects/Default/project.json'";
@@ -25,9 +27,7 @@ GameCompiler::GameCompiler(GameCompilerOptions *gameCompilerOptions) {
   createNovelDatabase();
 }
 
-GameCompiler::~GameCompiler() {
-
-}
+GameCompiler::~GameCompiler() = default;
 
 bool GameCompiler::process() {
 
@@ -45,7 +45,7 @@ bool GameCompiler::process() {
   }
 
   // Create an instance of ProjectBuilder to read the main project.json file
-  ProjectBuilder *projectBuilder = new ProjectBuilder(compilerOptions->getProjectFilePath(), novel, resource);
+  ProjectBuilder *projectBuilder = new ProjectBuilder(compilerOptions->getProjectFilePath(), novel, resource, fHandler);
   projectBuilder->process();
   return false;
 }

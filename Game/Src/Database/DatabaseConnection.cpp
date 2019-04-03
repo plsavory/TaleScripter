@@ -7,6 +7,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "Misc/Utils.hpp"
 #include <regex>
+#include <Exceptions/DatabaseException.hpp>
 
 DatabaseConnection::DatabaseConnection(const std::string& name) {
 
@@ -17,7 +18,7 @@ DatabaseConnection::DatabaseConnection(const std::string& name) {
     std::string filename = "db/";
     filename.append(name);
 
-    // Convert the string to a char array TODO: Move this into its own function
+    // Convert the string to a char array
     char *fName = new char[filename.length() + 1];
     std::strcpy(fName, filename.c_str());
 
@@ -113,7 +114,7 @@ void DatabaseConnection::executeQuery(const std::string& query, DataSet *destina
                 query
         };
 
-        throw Utils::implodeString(errorVector, "", 0);
+        throw DatabaseException(Utils::implodeString(errorVector));
     }
 }
 
@@ -132,7 +133,7 @@ int DatabaseConnection::executeQuery(const std::string& query) {
     char *queryString = new char[query.length() + 1];
     std::strcpy(queryString, query.c_str());
 
-    if (sqlite3_prepare_v2(db, queryString, -1, &statement, 0) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, queryString, -1, &statement, nullptr) == SQLITE_OK) {
         sqlite3_step(statement);
         sqlite3_finalize(statement);
         return this->getLastInsertId();
@@ -148,7 +149,7 @@ int DatabaseConnection::executeQuery(const std::string& query) {
                 query
         };
 
-        throw Utils::implodeString(errorVector, "", 0);
+        throw DatabaseException(Utils::implodeString(errorVector));
     }
 
     return 0;
@@ -161,7 +162,7 @@ int DatabaseConnection::getLastInsertId() {
     this->executeQuery("SELECT last_insert_rowid() as last_insert_id", dataSet);
 
     if (!dataSet->getRow(0)->doesColumnExist("last_insert_id")) {
-        throw "Failed to get the last insert ID";
+        throw DatabaseException("Failed to get the last insert ID");
     }
 
     int lastInsertId = std::stoi(dataSet->getRow(0)->getColumn("last_insert_id")->getData());
@@ -182,7 +183,7 @@ int DatabaseConnection::insert(const std::string &tableName, const std::vector<s
                                std::vector<std::string>& values, std::vector<int> types) {
 
     if (columns.size() != values.size() || types.size() != columns.size()) {
-        throw "The number of given columns and the number of given values does not match.";
+        throw DatabaseException("The number of given columns and the number of given values does not match.");
     }
 
     for (unsigned int i = 0; i < values.size(); i++) {
@@ -193,7 +194,7 @@ int DatabaseConnection::insert(const std::string &tableName, const std::vector<s
             case DATA_TYPE_STRING:
 
                 // If we actually want to set a string column to null...
-                if (values[i] == "nullptr") {
+                if (values[i] == "NULL") {
                     continue;
                 }
 
