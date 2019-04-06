@@ -1,10 +1,11 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "Exceptions/ResourceException.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "Resource/TextureManager.hpp"
 #include "SpriteRenderer/Sprite.hpp"
 
-Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::string sName, std::string stextureName, int sPriority, int myId) {
+Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, const std::string& sName, const std::string& stextureName, int sPriority, int myId) {
   mySprite = new sf::Sprite();
   displayWindow = window;
   name = sName;
@@ -17,7 +18,7 @@ Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, std::st
   id = myId;
 }
 
-Sprite::Sprite(TextureManager *sTextureManager, sf::RenderWindow *window, std::string sName, int myId) {
+Sprite::Sprite(TextureManager *sTextureManager, sf::RenderWindow *window, const std::string& sName, int myId) {
   mySprite = new sf::Sprite();
   textureManager = sTextureManager;
   displayWindow = window;
@@ -70,7 +71,11 @@ void Sprite::update() {
     int fetchedTextureId = textureManager->findTexture(textureName);
 
     if (fetchedTextureId == -1) {
-      return;
+        std::vector<std::string> errorMessage = {
+                "Could not assign texture to sprite '", name, "': a texture with name '", textureName, "' could not be loaded"
+        };
+
+        throw ResourceException(Utils::implodeString(errorMessage));
     }
 
     textureId = fetchedTextureId;
@@ -80,7 +85,11 @@ void Sprite::update() {
   Texture *texture = textureManager->getTexture(textureId);
 
   if (!texture) {
-    return;
+    std::vector<std::string> errorMessage = {
+        "Could not assign texture to sprite '", name, "': a texture with name '", textureName, "' could not be loaded"
+    };
+
+    throw ResourceException(Utils::implodeString(errorMessage));
   }
 
   if (texture->loaded) {

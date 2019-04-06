@@ -2,6 +2,7 @@
 #include "Misc/Utils.hpp"
 #include "Database/DatabaseSchema.hpp"
 #include "Database/DatabaseConnection.hpp"
+#include "Exceptions/ProjectBuilderException.hpp"
 #include "GameCompiler/FileHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
@@ -15,7 +16,7 @@ GameCompiler::GameCompiler(GameCompilerOptions *gameCompilerOptions, FileHandler
   if (compilerOptions->getProjectFilePath().empty()) {
 
     if (!Utils::fileExists("projects/Default/project.json")) {
-      throw "No project has been specified, and there is no project located at 'projects/Default/project.json'";
+      throw ProjectBuilderException("No project has been specified, and there is no project located at 'projects/Default/project.json'");
     }
 
     compilerOptions->setProjectFilePath("projects/default/project.json");
@@ -37,11 +38,11 @@ bool GameCompiler::process() {
   DatabaseConnection *resource = new DatabaseConnection("resource");
 
   if (!novel->isUsable()) {
-    throw "GameCompiler: Unable to continue - could not open Novel database.";
+    throw ProjectBuilderException("GameCompiler: Unable to continue - could not open Novel database.");
   }
 
   if (!resource->isUsable()) {
-    throw "GameCompiler: Unable to continue - could not open Resource database.";
+    throw ProjectBuilderException("GameCompiler: Unable to continue - could not open Resource database.");
   }
 
   // Create an instance of ProjectBuilder to read the main project.json file

@@ -105,7 +105,7 @@ void CharacterSpriteRenderer::initData(NovelData *novelData) {
 
       DataSet *dataSet = new DataSet();
 
-      resource->executeQuery(Utils::implodeString(textureNameQuery, ""), dataSet);
+      resource->executeQuery(Utils::implodeString(textureNameQuery), dataSet);
 
       if (dataSet->getRowCount() == 0) {
         std::vector<std::string> error = {
@@ -113,7 +113,7 @@ void CharacterSpriteRenderer::initData(NovelData *novelData) {
           std::to_string(sprite->getTextureId())
         };
 
-        throw Utils::implodeString(error, "");
+        throw Utils::implodeString(error);
       }
 
       sprite->setTextureName(dataSet->getRow(0)->getColumn("name")->getData());

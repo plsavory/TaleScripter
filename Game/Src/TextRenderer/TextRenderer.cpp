@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Database/DatabaseConnection.hpp"
+#include "Exceptions/ResourceException.hpp"
 #include "Resource/FontManager.hpp"
 #include "TextRenderer/TextRenderer.hpp"
 
@@ -8,8 +9,8 @@ TextRenderer::TextRenderer(sf::RenderWindow *windowPointer, FontManager *fontMan
   window = windowPointer;
   fontManager = fontManagerPointer;
 
-  for (int i = 0; i < MAX_TEXT_OBJECTS; i++) {
-    text[i] = nullptr;
+  for (auto & currentText : text) {
+    currentText = nullptr;
   }
 
   retryLoadClock = new sf::Clock();
@@ -18,24 +19,29 @@ TextRenderer::TextRenderer(sf::RenderWindow *windowPointer, FontManager *fontMan
 
 TextRenderer::~TextRenderer() {
 
-  for (int i = 0; i < MAX_TEXT_OBJECTS; i++) {
-    if (text[i]) {
-      delete(text[i]);
+  for (auto & currentText: text) {
+    if (currentText) {
+      delete(currentText);
     }
   }
 
 }
 
-Text* TextRenderer::addText(std::string name, std::string font) {
+Text* TextRenderer::addText(const std::string& name, const std::string& font) {
 
-  for (int i = 0; i < MAX_TEXT_OBJECTS; i++) {
-    if (!text[i]) {
-      text[i] = new Text(name, font, fontManager);
-      return text[i];
+  for (auto & currentText : text) {
+    if (!currentText) {
+      currentText = new Text(name, font, fontManager);
+      return currentText;
     }
   }
 
-  return nullptr;
+  // TODO: Store text objects in a vector so that this situation never happens.
+  std::vector<std::string> errorMessage = {
+          "Could not add text '", name, "' to the text renderer, the maximum number of text objects have already been added."
+  };
+
+  throw ResourceException(Utils::implodeString(errorMessage));
 }
 
 void TextRenderer::update() {
@@ -44,9 +50,9 @@ void TextRenderer::update() {
     return;
   }
 
-  for (int i = 0; i < MAX_TEXT_OBJECTS; i++) {
-    if (text[i]) {
-      text[i]->reAttemptLoad();
+  for (auto & currentText : text) {
+    if (currentText) {
+      currentText->reAttemptLoad();
     }
   }
 
@@ -55,14 +61,14 @@ void TextRenderer::update() {
 
 void TextRenderer::draw() {
 
-  for (int i = 0; i < MAX_TEXT_OBJECTS; i++) {
-    if (text[i]) {
+  for (auto & currentText : text) {
+    if (currentText) {
 
-      if (!text[i]->isVisible()) {
+      if (!currentText->isVisible()) {
         continue;
       }
 
-      window->draw(*text[i]->getTextObject());
+      window->draw(*currentText->getTextObject());
     }
   }
 

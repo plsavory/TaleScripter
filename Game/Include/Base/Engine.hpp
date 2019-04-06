@@ -43,6 +43,9 @@ public:
   sf::RenderWindow* getWindow() {
     return window;
   }
+  std::string getErrorMessage() {
+      return errorMessage;
+  }
 private:
   ResourceManager *resourceManager;
   SpriteRenderer *spriteRenderer;
@@ -52,6 +55,7 @@ private:
   BackgroundTransitionRenderer *backgroundTransitionRenderer;
   CharacterSpriteRenderer *characterSpriteRenderer;
   sf::RenderWindow *window;
+  std::string errorMessage;
 };
 
 #endif

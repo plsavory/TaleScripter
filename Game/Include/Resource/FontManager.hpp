@@ -28,9 +28,7 @@ public:
     state = FontState::fsUnloaded;
   }
   ~Font() {
-    if (myFont) {
       delete myFont;
-    }
   }
   std::string getName() {
     return name;
@@ -47,8 +45,10 @@ public:
 
     // Attempt to load the font file
     if (!myFont->loadFromFile(fontFilename)) {
-      state = FontState::fsError;
-      return;
+        std::vector<std::string> errorMessage = {
+                "Unable to load font ",name," (File: ",fontFilename," is missing, in the wrong format or corrupted)"
+        };
+        throw ResourceException(Utils::implodeString(errorMessage));
     }
 
     state = FontState::fsLoaded;
@@ -71,9 +71,9 @@ public:
   Font* addFont(std::string name, std::string filename);
   void loadAllFromDatabase(DatabaseConnection *database);
   void processQueue();
-  void loadFont(std::string name);
+  void loadFont(const std::string& name);
   void loadFont(int id);
-  Font* getFont(std::string name);
+  Font* getFont(const std::string& name);
   bool isQueueEmpty();
 private:
   Font *font[MAX_FONTS];

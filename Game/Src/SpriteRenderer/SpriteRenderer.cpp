@@ -31,9 +31,9 @@ SpriteRenderer::SpriteRenderer(sf::RenderWindow *window, TextureManager *tManage
 SpriteRenderer::~SpriteRenderer() {
 
   // Delete all sprites if SpriteRenderer is destroyed
-  for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
-    if (sprite[i]) {
-      delete sprite[i];
+  for (auto & currentSprite : sprite) {
+    if (currentSprite) {
+      delete currentSprite;
     }
   }
 
@@ -48,9 +48,9 @@ void SpriteRenderer::update() {
     updateClock->restart();
 
     // Make sprites refresh their images etc
-    for (int i = 0; i<MAX_SPRITE_COUNT; i++) {
-      if (sprite[i]) {
-        sprite[i]->update();
+    for (auto & currentSprite : sprite) {
+      if (currentSprite) {
+        currentSprite->update();
       }
     }
   }
@@ -150,7 +150,7 @@ Sprite* SpriteRenderer::getSprite(int id) {
   return sprite[id];
 }
 
-Sprite* SpriteRenderer::getSprite(std::string name) {
+Sprite* SpriteRenderer::getSprite(const std::string& name) {
 
   for (int i = 0; i<MAX_SPRITE_COUNT; i++) {
     if (sprite[i]) {
@@ -170,7 +170,7 @@ Sprite* SpriteRenderer::getSprite(std::string name) {
  * @param  name      [Accessible name of the sprite]
  * @return           [Sprite object, null on failure]
  */
-Sprite* SpriteRenderer::addSprite(std::string imageName, std::string name, int priority) {
+Sprite* SpriteRenderer::addSprite(const std::string& imageName, const std::string& name, int priority) {
 
   for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
     if (sprite[i] == nullptr) {
@@ -180,11 +180,14 @@ Sprite* SpriteRenderer::addSprite(std::string imageName, std::string name, int p
   }
 
   // TODO: Re-write the sprite renderer to use a vector so that this will never happen - should be done by v0.4.0 (Added to my to-to list)
-  throw "Maximum number of sprites have been assigned - Consider increasing in engine compile options. (This issue will be fixed in future)";
+  std::vector<std::string> errorMessage = {
+          "Could not add sprite '", name, "' as the maximum number of sprites have already been loaded Consider increasing in engine compile options. (This issue will be fixed in future)"
+  };
+  throw ResourceException(Utils::implodeString(errorMessage));
 
 }
 
-Sprite* SpriteRenderer::addSprite(std::string name) {
+Sprite* SpriteRenderer::addSprite(const std::string& name) {
 
   for (int i = 0; i < MAX_SPRITE_COUNT; i++) {
     if (!sprite[i]) {
@@ -193,7 +196,10 @@ Sprite* SpriteRenderer::addSprite(std::string name) {
     }
   }
 
-  return nullptr;
+    std::vector<std::string> errorMessage = {
+            "Could not add sprite '", name, "' as the maximum number of sprites have already been loaded Consider increasing in engine compile options. (This issue will be fixed in future)"
+    };
+    throw ResourceException(Utils::implodeString(errorMessage));
 }
 
 void SpriteRenderer::removeSprite(int id) {

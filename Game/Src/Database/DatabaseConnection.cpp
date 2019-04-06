@@ -101,6 +101,7 @@ void DatabaseConnection::executeQuery(const std::string& query, DataSet *destina
 #endif
 
         sqlite3_finalize(statement);
+        delete[](queryString);
         return;
     }
 

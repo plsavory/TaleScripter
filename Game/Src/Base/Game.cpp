@@ -17,82 +17,91 @@
 /**
  * [Game::Game Class constructor - Initialise variables here]
  */
-Game::Game() {
-
-}
+Game::Game() = default;
 
 /**
  * [Game Destructor - Do anything we need to do before the program ends]
  */
 Game::~Game() {
-  delete(gameManager);
-  delete(engine);
+    delete (gameManager);
+    delete (engine);
 }
 
 /**
  * [Game::run Initialise and run the game]
  */
 void Game::run() {
-  // TODO: Load from config file
+    // TODO: Load from config file
 
-  int frameRateLimit = 60;
+    int frameRateLimit = 60;
 
-  // Initialise SFML
-  window = new sf::RenderWindow(sf::VideoMode(1280,720), gameTitle, sf::Style::Default);
-  window->setFramerateLimit(frameRateLimit);
+    // Initialise SFML
+    window = new sf::RenderWindow(sf::VideoMode(1280, 720), gameTitle, sf::Style::Default);
+    window->setFramerateLimit(frameRateLimit);
 
-  // Create the main engine object(s)
-  engine = new Engine(window);
+    // Create the main engine object(s)
+    engine = new Engine(window);
+    std::string errorMessage = engine->getErrorMessage();
 
-  // Create ResourceManager to spin up the resource loading thread
-  inputManager = engine->getInputManager();
-  backgroundImageRenderer = engine->getBackgroundImageRenderer();
-  resourceManager = engine->getResourceManager();
-  spriteRenderer = engine->getSpriteRenderer();
-  textRenderer = engine->getTextRenderer();
-  characterSpriteRenderer = engine->getCharacterSpriteRenderer();
-  backgroundTransitionRenderer = engine->getBackgroundTransitionRenderer();
-  gameManager = new GameManager(engine);
-
-  sf::Clock updateClock;
-
-  #ifdef MULTITHREADED_RENDERING
-  // Launch the rendering thread if that compile option is enabled
-  window->setActive(false);
-  renderingThread = new std::thread(&Game::renderingThreadFunction, this);
-  renderingThread->detach(); // Launch the thread
-  #endif
-
-  // Enter the main loop
-  while (window->isOpen()) {
-
-    // Check for window events and handle them
-    sf::Event event;
-
-    while (window->pollEvent(event)) {
-
-      switch(event.type) {
-        case sf::Event::Closed:
-        window->close();
-        break;
-        default:
-        break;
-      }
-
+    // We throw exceptions when attempting to load resources, so store it so that we can get to the graphical error screen
+    try {
+        if (errorMessage.empty()) {
+            engine->getResourceManager()->loadResourcesFromDatabase();
+        }
+    } catch (GeneralException &e) {
+        errorMessage = e.what();
     }
 
-    // Update the game state 60 times a second
-    update(updateClock.getElapsedTime().asMilliseconds());
+    // Create ResourceManager to spin up the resource loading thread
+    inputManager = engine->getInputManager();
+    backgroundImageRenderer = engine->getBackgroundImageRenderer();
+    resourceManager = engine->getResourceManager();
+    spriteRenderer = engine->getSpriteRenderer();
+    textRenderer = engine->getTextRenderer();
+    characterSpriteRenderer = engine->getCharacterSpriteRenderer();
+    backgroundTransitionRenderer = engine->getBackgroundTransitionRenderer();
 
-    #ifndef MULTITHREADED_RENDERING
-    // Draw the game
-    draw();
-    window->display();
-    #else
-    // Sleep the main thread for the time that one frame should happen
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000/frameRateLimit));
-    #endif
-  }
+    gameManager = new GameManager(engine, errorMessage);
+
+    sf::Clock updateClock;
+
+#ifdef MULTITHREADED_RENDERING
+    // Launch the rendering thread if that compile option is enabled
+    window->setActive(false);
+    renderingThread = new std::thread(&Game::renderingThreadFunction, this);
+    renderingThread->detach(); // Launch the thread
+#endif
+
+    // Enter the main loop
+    while (window->isOpen()) {
+
+        // Check for window events and handle them
+        sf::Event event;
+
+        while (window->pollEvent(event)) {
+
+            switch (event.type) {
+                case sf::Event::Closed:
+                    window->close();
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        // Update the game state 60 times a second
+        update(updateClock.getElapsedTime().asMilliseconds());
+
+#ifndef MULTITHREADED_RENDERING
+        // Draw the game
+        draw();
+        window->display();
+#else
+        // Sleep the main thread for the time that one frame should happen
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000/frameRateLimit));
+#endif
+    }
 
 }
 
@@ -100,42 +109,55 @@ void Game::run() {
  * [Game::update Update loop]
  */
 void Game::update(int gameTime) {
-  inputManager->update();
-  resourceManager->update();
-  gameManager->update();
-  backgroundImageRenderer->update();
-  spriteRenderer->update();
-  textRenderer->update();
-  backgroundTransitionRenderer->update();
-  characterSpriteRenderer->update();
 
-  // Don't respond to input when the window isn't in focus
-  inputManager->setEnabled(window->hasFocus());
+    // If the engine didn't start properly, don't try to update anything
+    if (!engine->getErrorMessage().empty()) {
+        return;
+    }
+
+    inputManager->update();
+    resourceManager->update();
+    gameManager->update();
+    backgroundImageRenderer->update();
+    spriteRenderer->update();
+    textRenderer->update();
+    backgroundTransitionRenderer->update();
+    characterSpriteRenderer->update();
+
+    // Don't respond to input when the window isn't in focus
+    inputManager->setEnabled(window->hasFocus());
 }
 
 /**
  * [Game::draw Draw loop, handle display here]
  */
 void Game::draw() {
-  // TODO: Handle priorities for different types of rendering
-  // Clear the window
-  window->clear(*backgroundImageRenderer->getBackgroundColour());
+    // TODO: Handle priorities for different types of rendering
+    // Clear the window
+    window->clear(*backgroundImageRenderer->getBackgroundColour());
 
-  gameManager->draw();
-  backgroundImageRenderer->draw();
-  characterSpriteRenderer->draw(); // Probably not needed. TODO: Remove this when this is determined.
+    gameManager->draw();
 
-  if (!backgroundTransitionRenderer->isInForeground()) {
-    backgroundTransitionRenderer->draw();
-  }
+    // We don't want to update anything beyond here if the engine didn't start properly
+    if (!engine->getErrorMessage().empty()) {
+        return;
+    }
+
+    backgroundImageRenderer->draw();
+
+    characterSpriteRenderer->draw(); // Probably not needed. TODO: Remove this when this is determined.
+
+    if (!backgroundTransitionRenderer->isInForeground()) {
+        backgroundTransitionRenderer->draw();
+    }
 
 
-  spriteRenderer->draw();
-  textRenderer->draw();
+    spriteRenderer->draw();
+    textRenderer->draw();
 
-  if (backgroundTransitionRenderer->isInForeground()) {
-    backgroundTransitionRenderer->draw();
-  }
+    if (backgroundTransitionRenderer->isInForeground()) {
+        backgroundTransitionRenderer->draw();
+    }
 }
 
 #ifdef MULTITHREADED_RENDERING

@@ -30,9 +30,7 @@ ProjectBuilder::ProjectBuilder(std::string fileName, DatabaseConnection *novelDb
   resource = resourceDb;
 }
 
-ProjectBuilder::~ProjectBuilder() {
-
-}
+ProjectBuilder::~ProjectBuilder() = default;
 
 void ProjectBuilder::process() {
 
@@ -48,7 +46,7 @@ void ProjectBuilder::process() {
 
 
   // Process the novel's resources
-  ResourceBuilder *resourceBuilder = new ResourceBuilder(resource, projectDirectory, fHandler);
+  auto *resourceBuilder = new ResourceBuilder(resource, projectDirectory, fHandler);
   resourceBuilder->process();
 
   json projectJson = fHandler->parseJsonFile(projectFileName);
@@ -60,19 +58,17 @@ void ProjectBuilder::process() {
 
   std::string projectTitle = projectJson["title"];
 
-  bool storeCredits;
+  bool storeCredits = false;
 
   std::string* contributors[100];
 
-  if (projectJson.find("credits") == projectJson.end()) {
-    storeCredits = false;
-  } else {
+  if (projectJson.find("credits") != projectJson.end()) {
 
     json credits = projectJson["contributors"];
 
     // Store all of the names in the Credits array. TODO: Create a more comprehensive solution for game ending cvredits later
-    for (int i = 0; i < 100; i++) {
-      contributors[i] = nullptr;
+    for (auto & contributor : contributors) {
+      contributor = nullptr;
     }
 
     int contributorsCount = -1;
@@ -140,7 +136,7 @@ void ProjectBuilder::process() {
 
     std::string chapterFilePath = Utils::implodeString(explodedFilePath, "", 0);
 
-    ChapterBuilder *chapterBuilder = new ChapterBuilder(chapterFilePath, novel, fHandler);
+    auto *chapterBuilder = new ChapterBuilder(chapterFilePath, novel, fHandler);
     chapterBuilder->process();
     delete(chapterBuilder);
   }
@@ -171,8 +167,8 @@ void ProjectBuilder::processCharacters() {
 
     std::string characterId;
     std::string firstName;
-    std::string surname = "";
-    std::string bio = "";
+    std::string surname;
+    std::string bio;
     std::string age = "0";
     std::string showOnCharacterMenu = "TRUE";
 
@@ -212,7 +208,7 @@ void ProjectBuilder::processCharacters() {
 
     std::string queryString = Utils::implodeString(query, "");
 
-    DataSet *dataSet = new DataSet();
+    auto *dataSet = new DataSet();
 
     novel->executeQuery(queryString, dataSet);
 
@@ -232,8 +228,8 @@ void ProjectBuilder::processCharacters() {
     if (character.find("sprites") != character.end()) {
       json characterSprites = character["sprites"];
 
-      std::string textureId = "";
-      std::string name = "";
+      std::string textureId;
+      std::string name;
 
       for (auto& element : characterSprites.items()) {
         json characterSprite = element.value();

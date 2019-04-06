@@ -2,6 +2,10 @@
 
 Changes from v0.3.1:
 
+Added a lot more error messages. There were previously instances where a novel would run incorrectly due to errors not being handled
+Errors now write to an errors.log file in the same directory as the TaleScripter executable file
+Added a graphical error handler which displays an error message in the window, this will fall back to a console error message if it can't display
+Error messages now appear on the console if they are not caught by the graphical error handler
 Fixed some database-related non-portable file paths which was causing errors on macOS and Linux.
 Project has been converted to using CMAKE for the build process to allow for easy usage with IDEs and different build environments.
 Mouse input is now working.

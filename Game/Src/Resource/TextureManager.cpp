@@ -18,9 +18,9 @@ TextureManager::TextureManager() {
  */
 TextureManager::~TextureManager() {
 
-  for (int i = 0; i<MAX_TEXTURES; i++) {
-    if (texture[i]) {
-      delete texture[i];
+  for (auto & currentTexture : texture) {
+    if (currentTexture) {
+      delete currentTexture;
     }
   }
 
@@ -32,7 +32,7 @@ TextureManager::~TextureManager() {
  * @param  name      [Name of the texture]
  * @return           [ID of the texture, -1 on failure]
  */
-int TextureManager::loadTexture(std::string fname, std::string name) {
+int TextureManager::loadTexture(const std::string& fname, const std::string& name) {
 
   // Find a texture with the same name if it exists
   int existingTextureId = findTexture(name);
@@ -43,15 +43,19 @@ int TextureManager::loadTexture(std::string fname, std::string name) {
   }
 
   // Find an empty texture slot
-  for (int i = 0; i<MAX_TEXTURES; i++) {
+  for (auto i = 0; i<MAX_TEXTURES; i++) {
     if (!texture[i]) {
       assignTexture(fname, name, i);
       return i;
     }
   }
 
-  std::cout<<"Error loading texture: Max number of textures ("<<MAX_TEXTURES<<") already loaded."<<std::endl;
-  return -1;
+  // TODO: Store textures in a vector so that this never happens.
+  std::vector<std::string> errorMessage = {
+          "Error loading texture: Max number of textures (", std::to_string(MAX_TEXTURES),") are already loaded."
+  };
+
+  throw ResourceException(Utils::implodeString(errorMessage));
 
 }
 
@@ -61,7 +65,7 @@ int TextureManager::loadTexture(std::string fname, std::string name) {
  * @param name  [accessible name]
  * @param id    [ID slot to use]
  */
-void TextureManager::assignTexture(std::string fname, std::string name, int id) {
+void TextureManager::assignTexture(const std::string& fname, const std::string& name, int id) {
 
   if (texture[id]) {
     // Texture already exists
@@ -80,7 +84,7 @@ void TextureManager::assignTexture(std::string fname, std::string name, int id) 
  * @param  name [Name of the texture]
  * @return      [Texture ID if found, -1 if not found]
  */
-int TextureManager::findTexture(std::string name) {
+int TextureManager::findTexture(const std::string& name) {
 
   for (int i = 0; i<MAX_TEXTURES; i++) {
     if (texture[i]) {
@@ -97,14 +101,12 @@ int TextureManager::findTexture(std::string name) {
  */
 void TextureManager::processQueue() {
 
-  if (textureLoadQueue.size() == 0) {
+  if (textureLoadQueue.empty()) {
     return;
   }
 
   // Load the texture into memory
-  texture[textureLoadQueue.front().getId()]->texture
-    ->loadFromFile(textureLoadQueue.front().getFilename());
-
+  texture[textureLoadQueue.front().getId()]->loadFromFile(textureLoadQueue.front().getFilename());
   texture[textureLoadQueue.front().getId()]->loaded = true;
 
   // Remove the texture load request from memory
@@ -117,7 +119,7 @@ void TextureManager::processQueue() {
  * @return [True if queue is empty, otherwise false]
  */
 bool TextureManager::isQueueEmpty() {
-  return (textureLoadQueue.size() == 0);
+  return (textureLoadQueue.empty());
 }
 
 /**
@@ -137,14 +139,13 @@ Texture* TextureManager::getTexture(int id) {
  * @return      [Success: Texture object pointer
  *               Failure: nullptr]
  */
-Texture* TextureManager::getTexture(std::string name) {
+Texture* TextureManager::getTexture(const std::string& name) {
   int textureId = findTexture(name);
 
   if (textureId >= 0) {
     return texture[textureId];
   }
 
-  std::cout<<"Texture with name (" << name << ") not found."<<std::endl;
   return nullptr;
 }
 
@@ -159,7 +160,7 @@ void TextureManager::loadAllFromDatabase(DatabaseConnection *resource) {
   For instance, for every chapter or scene, we can load or unload textures for character sprites as required if they appear in that scene/chapter or not.
   */
 
- DataSet *dataSet = new DataSet();
+ auto *dataSet = new DataSet();
  resource->executeQuery("SELECT * FROM textures;", dataSet);
 
  int numberOfTextures = dataSet->getRowCount();

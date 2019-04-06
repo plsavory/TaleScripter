@@ -13,25 +13,32 @@
  */
 Engine::Engine(sf::RenderWindow *windowPointer) {
 
-  window = windowPointer;
+    window = windowPointer;
+    errorMessage = "";
 
-  inputManager = new InputManager(window);
-  backgroundImageRenderer = new BackgroundImageRenderer(window);
-  resourceManager = new ResourceManager(backgroundImageRenderer);
-  spriteRenderer = new SpriteRenderer(window,resourceManager->getTextureManager());
-  textRenderer = new TextRenderer(window, resourceManager->getFontManager());
-  backgroundTransitionRenderer = new BackgroundTransitionRenderer(window, backgroundImageRenderer);
-  characterSpriteRenderer = new CharacterSpriteRenderer(resourceManager, spriteRenderer);
+    try {
+
+        inputManager = new InputManager(window);
+        backgroundImageRenderer = new BackgroundImageRenderer(window);
+        resourceManager = new ResourceManager(backgroundImageRenderer);
+        spriteRenderer = new SpriteRenderer(window, resourceManager->getTextureManager());
+        textRenderer = new TextRenderer(window, resourceManager->getFontManager());
+        backgroundTransitionRenderer = new BackgroundTransitionRenderer(window, backgroundImageRenderer);
+        characterSpriteRenderer = new CharacterSpriteRenderer(resourceManager, spriteRenderer);
+
+    } catch (GeneralException &e) {
+        errorMessage = e.what();
+    }
 }
 
 /**
  * [Engine Delete everything when this class is deleted]
  */
 Engine::~Engine() {
-  delete(resourceManager);
-  delete(spriteRenderer);
-  delete(textRenderer);
-  delete(inputManager);
-  delete(backgroundImageRenderer);
-  delete(backgroundTransitionRenderer);
+    delete (resourceManager);
+    delete (spriteRenderer);
+    delete (textRenderer);
+    delete (inputManager);
+    delete (backgroundImageRenderer);
+    delete (backgroundTransitionRenderer);
 }

@@ -7,9 +7,11 @@
 #ifndef GENERAL_EXCEPTION_INCLUDED
 #define GENERAL_EXCEPTION_INCLUDED
 
+#include <fstream>
 #include <exception>
 #include <stdexcept>
 #include <vector>
+#include <sstream>
 #include "Misc/Utils.hpp"
 
 class GeneralException : public std::exception {
@@ -20,14 +22,17 @@ public:
      */
     GeneralException() {
         fullMessage = "No information provided (This is not helpful.)";
+        writeToFile();
     };
+
     /**
      * Simple constructor - To be used when we don't care about displaying the type of error.
      *
      * @param message
      */
-    GeneralException(const std::string &message) {
+    explicit GeneralException(const std::string &message) {
         fullMessage = message;
+        writeToFile();
     };
 
     /**
@@ -45,12 +50,37 @@ public:
         };
 
         fullMessage = Utils::implodeString(errorStrings);
+        writeToFile();
     }
-    const char* what() {
+
+    const char *what() {
         return fullMessage.c_str();
     }
+
 private:
     std::string fullMessage;
+
+    /**
+     * Writes information about the exception to the error log
+     */
+    void writeToFile() {
+        std::ofstream file("errors.log", std::ios::app);
+
+        if (!file) {
+            fullMessage.append(" - was not able to write to error log");
+            return;
+        }
+
+        // TODO: Make the date format customisable
+        std::string dateTime = Utils::getSystemDateTime(DateFormat::FORMAT_DATETIME_UK);
+        std::stringstream ss;
+        ss<<"------------"<<std::endl<<
+        "Occurred at: "<<dateTime<<std::endl<<std::endl<<
+        fullMessage<<std::endl<<std::endl;
+
+        file<<ss.str();
+        file.close();
+    }
 };
 
 

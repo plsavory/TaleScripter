@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Database/DatabaseConnection.hpp"
+#include "Exceptions/ResourceException.hpp"
 #include "Resource/MusicManager.hpp"
 
 MusicManager::MusicManager() {

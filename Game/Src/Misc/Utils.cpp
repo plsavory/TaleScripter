@@ -204,3 +204,41 @@ std::string Utils::removeQuotationsFromString(std::string string) {
 
   return std::regex_replace(std::regex_replace(string, end, ""), start, "");
 }
+
+/**
+ * Returns the current date & time as a string
+ */
+std::string Utils::getSystemDateTime(DateFormat dateFormat) {
+    auto time = std::time(nullptr);
+    auto local = *std::localtime(&time);
+
+    std::ostringstream oss;
+
+    std::string formatToUse;
+
+    switch (dateFormat) {
+        case DateFormat::FORMAT_ISO:
+            formatToUse = "%Y-%m-%d";
+            break;
+        case DateFormat::FORMAT_UK:
+            formatToUse = "%d/%m/%Y";
+            break;
+        case DateFormat::FORMAT_DATETIME_UK:
+            formatToUse = "%d/%m/%Y %H:%M:%S";
+            break;
+        case DateFormat::FORMAT_US:
+            formatToUse = "%m/%d/%Y";
+            break;
+        case DateFormat::FORMAT_DATETIME_US:
+            formatToUse = "%m/%d/%Y %H:%M:%S";
+            break;
+        case DateFormat::FORMAT_DATETIME_ISO:
+        default:
+            formatToUse = "%Y-%m-%d %H:%M:%S";
+            break;
+    }
+
+    oss << std::put_time(&local, formatToUse.c_str());
+
+    return oss.str();
+}

@@ -59,12 +59,14 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/Base/GameManager.hpp
         Game/Include/Base/GameScreen.hpp
         Game/Include/Base/Renderers.hpp
+        Game/Include/Base/ErrorScreen.hpp
         Game/Include/Database/DatabaseConnection.hpp
         Game/Include/Database/DatabaseSchema.hpp
         Game/Include/Exceptions/GeneralException.hpp
         Game/Include/Exceptions/DatabaseException.hpp
         Game/Include/Exceptions/DataSetException.hpp
         Game/Include/Exceptions/MisuseException.hpp
+        Game/Include/Exceptions/ResourceException.hpp
         Game/Include/Exceptions/InputHandlerException.hpp
         Game/Include/Input/GamepadHandler.hpp
         Game/Include/Input/InputManager.hpp
@@ -100,6 +102,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Src/Base/Game.cpp
         Game/Src/Base/GameManager.cpp
         Game/Src/Base/GameScreen.cpp
+        Game/Src/Base/ErrorScreen.cpp
         Game/Src/Database/DatabaseConnection.cpp
         Game/Src/Database/DatabaseSchema.cpp
         Game/Src/Input/GamepadHandler.cpp

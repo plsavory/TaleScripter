@@ -16,13 +16,13 @@ ResourceManager::ResourceManager(BackgroundImageRenderer *backgroundImageRendere
   fontManager = new FontManager();
   backgroundImageRenderer = backgroundImageRendererPointer;
 
-  loadResourcesFromDatabase();
-
   #ifdef MULTITHREADED_RESOURCE_LOADING
   // Putting resource loading into a separate thread to prevent stuttering in-game as things are loaded.
   resourceLoadThread = new std::thread(&ResourceManager::threadFunction, this);
   resourceLoadThread->detach();
   #endif
+
+  openDatabase();
 
 }
 
@@ -94,17 +94,21 @@ TextureManager* ResourceManager::getTextureManager() {
  * [loadResourcesFromDatabase Attempts to load all resource files which are linked in the database]
  */
 void ResourceManager::loadResourcesFromDatabase() {
-  // Attempt to connect to the Resource database if it exists
-  if (!Utils::fileExists("db/resource")) {
-    return;
-  }
-
-  // Connect to the resource database
-  resourceDatabase = new DatabaseConnection("resource");
 
   // Load all resources from the database
   textureManager->loadAllFromDatabase(resourceDatabase);
   musicManager->loadAllFromDatabase(resourceDatabase);
   fontManager->loadAllFromDatabase(resourceDatabase);
   backgroundImageRenderer->addAllFromDatabase(resourceDatabase);
+}
+
+void ResourceManager::openDatabase() {
+
+    // Attempt to connect to the Resource database if it exists
+    if (!Utils::fileExists("db/resource")) {
+        throw ResourceException("The db/resource file does not exist");
+    }
+
+    // Connect to the resource database
+    resourceDatabase = new DatabaseConnection("resource");
 }

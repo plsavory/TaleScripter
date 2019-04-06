@@ -6,7 +6,7 @@
 
 struct Text {
 public:
-  Text(std::string name, std::string fontName, FontManager *fManager) {
+  Text(const std::string& name, const std::string& fontName, FontManager *fManager) {
     fontManager = fManager;
     textObj = new sf::Text();
     fontSet = false;
@@ -21,16 +21,19 @@ public:
   std::string getName() {
     return name;
   }
-  void setFont(std::string fName) {
+  void setFont(const std::string& fName) {
     fontName = fName;
-
     setFont();
   }
   void setFont() {
     Font *fontFindAttempt = fontManager->getFont(fontName);
 
     if (!fontFindAttempt) {
-      return;
+        // A font needs to be added to the FontManager before we attempt to use it.
+        std::vector<std::string> errorMessage = {
+                "No font with the name '", fontName,"' has been loaded"
+        };
+      throw ResourceException(Utils::implodeString(errorMessage));
     }
 
     font = fontFindAttempt;
@@ -51,7 +54,7 @@ public:
   }
 
   bool hasFontLoaded() {
-    return !(font == nullptr);
+    return font != nullptr;
   }
   sf::Text* getTextObject() {
     return textObj;
@@ -100,7 +103,7 @@ public:
   ~TextRenderer();
   void update();
   void draw();
-  Text* addText(std::string name, std::string font);
+  Text* addText(const std::string& name, const std::string& font);
   FontManager* getFontManager();
 private:
   sf::RenderWindow *window;

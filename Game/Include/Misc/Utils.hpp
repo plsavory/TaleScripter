@@ -2,6 +2,17 @@
 #define UTILS_INCLUDED
 
 #include <vector>
+#include <iomanip>
+#include <ctime>
+
+enum class DateFormat {
+    FORMAT_ISO, // Y-m-d
+    FORMAT_DATETIME_ISO, // Y-m-d H:M:S
+    FORMAT_UK, // d/m/Y
+    FORMAT_DATETIME_UK, // d/m/Y H:M:S
+    FORMAT_US, // m/d/Y
+    FORMAT_DATETIME_US // m/d/Y H:M:S
+};
 
 class Utils {
 public:
@@ -16,6 +27,7 @@ public:
   static std::string implodeString(std::vector<std::string> explodedString, std::string glue);
   static std::string implodeString(std::vector<std::string> explodedString);
   static std::string removeQuotationsFromString(std::string string);
+  static std::string getSystemDateTime(DateFormat dateFormat);
 private:
 };
 

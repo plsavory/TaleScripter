@@ -4,22 +4,33 @@
 #include <iostream>
 #include <queue>
 #include <SFML/Graphics.hpp>
+#include "Exceptions/ResourceException.hpp"
 
 #define MAX_TEXTURES 0xFF
 
 struct Texture {
 public:
-  Texture(std::string assignableName) {
+  explicit Texture(const std::string& assignableName) {
     texture = new sf::Texture();
+    loaded = false;
 
     assign(assignableName);
   };
   ~Texture() {
     delete texture;
   };
-  void assign(std::string assignableName) {
+  void assign(const std::string& assignableName) {
     name = assignableName;
     loaded = false;
+  }
+  void loadFromFile(const std::string& fileName) {
+      if (!texture->loadFromFile(fileName)) {
+          std::vector<std::string> errorMessage = {
+                  "Unable to load texture 'name' (File: '", fileName, "' is either missing, in the wrong format or corrupted)"
+          };
+
+          throw ResourceException(Utils::implodeString(errorMessage));
+      };
   }
   std::string name;
   sf::Texture *texture;
@@ -28,7 +39,7 @@ public:
 
 struct TextureLoadRequest {
 public:
-  TextureLoadRequest(std::string fname, int textureId) {
+  TextureLoadRequest(const std::string& fname, int textureId) {
     filename = fname;
     id = textureId;
   }
@@ -48,17 +59,17 @@ class TextureManager {
 public:
   TextureManager();
   ~TextureManager();
-  int loadTexture(std::string fname, std::string name);
-  int findTexture(std::string name);
+  int loadTexture(const std::string& fname, const std::string& name);
+  int findTexture(const std::string& name);
   Texture* getTexture(int id);
-  Texture* getTexture(std::string name);
+  Texture* getTexture(const std::string& name);
   bool isQueueEmpty();
   void processQueue();
   void loadAllFromDatabase(DatabaseConnection *resource);
 private:
   std::queue<TextureLoadRequest> textureLoadQueue;
   Texture *texture[MAX_TEXTURES];
-  void assignTexture(std::string fname, std::string name, int id);
+  void assignTexture(const std::string& fname, const std::string& name, int id);
   DatabaseConnection *resource;
 };
 

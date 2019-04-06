@@ -19,9 +19,9 @@ public:
   void update();
   void draw();
   Sprite* getSprite(int id);
-  Sprite* getSprite(std::string name);
-  Sprite* addSprite(std::string imageName, std::string name, int priority);
-  Sprite* addSprite(std::string name);
+  Sprite* getSprite(const std::string& name);
+  Sprite* addSprite(const std::string& imageName, const std::string& name, int priority);
+  Sprite* addSprite(const std::string& name);
   void removeSprite(int id);
   void setCameraPosition(int x, int y);
   sf::Vector2u getRenderArea();
