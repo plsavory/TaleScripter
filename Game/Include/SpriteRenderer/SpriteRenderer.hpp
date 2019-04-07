@@ -1,10 +1,9 @@
 #ifndef SPRITE_RENDERER_INCLUDED
 #define SPRITE_RENDERER_INCLUDED
 
-#define MAX_SPRITE_COUNT 512
 #define SPRITE_RENDERER_UPDATE_DELAY 250
 #define SPRITE_RENDERER_PRIORITISE_DELAY 500
-#define SPRITE_RENDERER_MAX_PRIORITIES 5
+#define SPRITE_RENDERER_MAX_PRIORITIES 10
 
 #include "SpriteRenderer/Sprite.hpp"
 
@@ -18,7 +17,6 @@ public:
   ~SpriteRenderer();
   void update();
   void draw();
-  Sprite* getSprite(int id);
   Sprite* getSprite(const std::string& name);
   Sprite* addSprite(const std::string& imageName, const std::string& name, int priority);
   Sprite* addSprite(const std::string& name);
@@ -30,9 +28,8 @@ private:
   void renderSprites();
   void renderPrioritisedSprites();
   sf::RenderWindow *displayWindow;
-  Sprite* sprite[MAX_SPRITE_COUNT];
-  int priorityMatrix[MAX_SPRITE_COUNT]; // TODO: Experiment with a linked list rather than a priority matrix
-  int priorityMatrixIndex;
+  std::vector<Sprite*> sprites;
+  std::vector<Sprite*> priorityMatrix;
   SpriteRenderMode renderMode;
   sf::Clock *updateClock;
   TextureManager *textureManager;
