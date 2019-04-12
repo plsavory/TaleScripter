@@ -5,8 +5,9 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include "Database/DatabaseConnection.hpp"
+#include "BackgroundRenderer/BackgroundOverlay.hpp"
 #include "BackgroundRenderer/BackgroundImageRenderer.hpp"
-#include "BackgroundRenderer/BackgroundTransitionRenderer.hpp"
+#include "BackgroundRenderer/BackgroundTransitionHandler.hpp"
 #include "Resource/ResourceManager.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
 #include "TextRenderer/TextRenderer.hpp"
@@ -34,7 +35,7 @@ public:
   BackgroundImageRenderer* getBackgroundImageRenderer() {
     return backgroundImageRenderer;
   }
-  BackgroundTransitionRenderer* getBackgroundTransitionRenderer() {
+  BackgroundTransitionHandler* getBackgroundTransitionRenderer() {
     return backgroundTransitionRenderer;
   }
   CharacterSpriteRenderer* getCharacterSpriteRenderer() {
@@ -42,6 +43,9 @@ public:
   }
   sf::RenderWindow* getWindow() {
     return window;
+  }
+  BackgroundOverlay* getBackgroundOverlay() {
+      return backgroundOverlay;
   }
   std::string getErrorMessage() {
       return errorMessage;
@@ -51,8 +55,9 @@ private:
   SpriteRenderer *spriteRenderer;
   TextRenderer *textRenderer;
   InputManager *inputManager;
+  BackgroundOverlay *backgroundOverlay;
   BackgroundImageRenderer *backgroundImageRenderer;
-  BackgroundTransitionRenderer *backgroundTransitionRenderer;
+  BackgroundTransitionHandler *backgroundTransitionRenderer;
   CharacterSpriteRenderer *characterSpriteRenderer;
   sf::RenderWindow *window;
   std::string errorMessage;

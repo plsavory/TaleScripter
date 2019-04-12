@@ -19,11 +19,12 @@ Engine::Engine(sf::RenderWindow *windowPointer) {
     try {
 
         inputManager = new InputManager(window);
+        backgroundOverlay = new BackgroundOverlay(window);
         backgroundImageRenderer = new BackgroundImageRenderer(window);
         resourceManager = new ResourceManager(backgroundImageRenderer);
         spriteRenderer = new SpriteRenderer(window, resourceManager->getTextureManager());
         textRenderer = new TextRenderer(window, resourceManager->getFontManager());
-        backgroundTransitionRenderer = new BackgroundTransitionRenderer(window, backgroundImageRenderer);
+        backgroundTransitionRenderer = new BackgroundTransitionHandler(window, backgroundImageRenderer, backgroundOverlay);
         characterSpriteRenderer = new CharacterSpriteRenderer(resourceManager, spriteRenderer);
 
     } catch (GeneralException &e) {

@@ -54,6 +54,7 @@ void Game::run() {
 
     // Create ResourceManager to spin up the resource loading thread
     inputManager = engine->getInputManager();
+    backgroundOverlay = engine->getBackgroundOverlay();
     backgroundImageRenderer = engine->getBackgroundImageRenderer();
     resourceManager = engine->getResourceManager();
     spriteRenderer = engine->getSpriteRenderer();
@@ -123,6 +124,7 @@ void Game::update(int gameTime) {
     textRenderer->update();
     backgroundTransitionRenderer->update();
     characterSpriteRenderer->update();
+    backgroundOverlay->update();
 
     // Don't respond to input when the window isn't in focus
     inputManager->setEnabled(window->hasFocus());
@@ -145,18 +147,15 @@ void Game::draw() {
 
     backgroundImageRenderer->draw();
 
-    characterSpriteRenderer->draw(); // Probably not needed. TODO: Remove this when this is determined.
-
-    if (!backgroundTransitionRenderer->isInForeground()) {
-        backgroundTransitionRenderer->draw();
+    if (!backgroundOverlay->isInForeground()) {
+        backgroundOverlay->draw();
     }
-
-
+    characterSpriteRenderer->draw(); // Probably not needed. TODO: Remove this when this is determined.
     spriteRenderer->draw();
     textRenderer->draw();
 
-    if (backgroundTransitionRenderer->isInForeground()) {
-        backgroundTransitionRenderer->draw();
+    if (backgroundOverlay->isInForeground()) {
+        backgroundOverlay->draw();
     }
 }
 

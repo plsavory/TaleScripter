@@ -53,7 +53,8 @@ link_directories(Libs/SQLite)
 add_executable(${EXECUTABLE_NAME}
         Game/Include/BackgroundRenderer/BackgroundImageRenderer.hpp
         Game/Include/BackgroundRenderer/BackgroundTransition.hpp
-        Game/Include/BackgroundRenderer/BackgroundTransitionRenderer.hpp
+        Game/Include/BackgroundRenderer/BackgroundTransitionHandler.hpp
+        Game/Include/BackgroundRenderer/BackgroundOverlay.hpp
         Game/Include/Base/Engine.hpp
         Game/Include/Base/Game.hpp
         Game/Include/Base/GameManager.hpp
@@ -97,7 +98,8 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/VisualNovelEngine/NovelScreenClasses.hpp
         Game/Src/BackgroundRenderer/BackgroundImageRenderer.cpp
         Game/Src/BackgroundRenderer/BackgroundTransition.cpp
-        Game/Src/BackgroundRenderer/BackgroundTransitionRenderer.cpp
+        Game/Src/BackgroundRenderer/BackgroundTransitionHandler.cpp
+        Game/Src/BackgroundRenderer/BackgroundOverlay.cpp
         Game/Src/Base/Engine.cpp
         Game/Src/Base/Game.cpp
         Game/Src/Base/GameManager.cpp
@@ -130,7 +132,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Src/VisualNovelEngine/Classes/UI/CharacterSpriteSlot.cpp
         Game/Src/VisualNovelEngine/Classes/UI/NovelTextDisplay.cpp
         Game/Src/VisualNovelEngine/Screens/NovelScreen.cpp
-        Game/Src/EntryPoint.cpp)
+        Game/Src/EntryPoint.cpp Game/Src/BackgroundRenderer/BackgroundOverlay.cpp)
 
 add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp

@@ -25,8 +25,9 @@ private:
     SpriteRenderer *spriteRenderer;
     TextRenderer *textRenderer;
     InputManager *inputManager;
+    BackgroundOverlay *backgroundOverlay;
     BackgroundImageRenderer *backgroundImageRenderer;
-    BackgroundTransitionRenderer *backgroundTransitionRenderer;
+    BackgroundTransitionHandler *backgroundTransitionRenderer;
     CharacterSpriteRenderer *characterSpriteRenderer;
 #ifdef MULTITHREADED_RENDERING
     std::thread *renderingThread;

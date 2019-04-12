@@ -20,7 +20,7 @@ private:
   InputManager *inputManager;
   MusicManager *musicManager;
   BackgroundImageRenderer *backgroundImageRenderer;
-  BackgroundTransitionRenderer *backgroundTransitionRenderer;
+  BackgroundTransitionHandler *backgroundTransitionRenderer;
   CharacterSpriteRenderer *characterSpriteRenderer;
   MouseEvent* advanceMouseEvent;
   NovelData *novel;

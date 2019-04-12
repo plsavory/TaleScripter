@@ -3,54 +3,62 @@
 
 class BackgroundTransition {
 public:
-  BackgroundTransition(sf::RenderWindow *windowPointer, int delayBeforeStart, int transitionType, int screenWidth, int screenHeight, int delayAfterFinish, int animationLength, BackgroundImageRenderer *bgRenderer);
-  ~BackgroundTransition();
-  bool update();
-  void draw();
-  void setPrimaryColour(sf::Color colour);
-  void setToForeground() {
-    foregroundTransition = true;
-  }
-  void setToBackground() {
-    foregroundTransition = false;
-  }
-  bool isForegroundTransition() {
-    return foregroundTransition;
-  }
+    BackgroundTransition(sf::RenderWindow *windowPointer, int delayBeforeStart, int transitionType, int screenWidth,
+                         int screenHeight, int delayAfterFinish, int animationLength,
+                         BackgroundImageRenderer *bgRenderer, BackgroundOverlay *bgOverlay);
 
-  // Static types
-  static const int FADE_IN;
-  static const int FADE_OUT;
+    ~BackgroundTransition();
+
+    bool update();
+
+    void draw();
+
+    void setPrimaryColour(sf::Color colour);
+
+    void setToForeground() {
+        foregroundTransition = true;
+    }
+
+    void setToBackground() {
+        foregroundTransition = false;
+    }
+
+    bool isForegroundTransition() {
+        return foregroundTransition;
+    }
+
+    // Static types
+    static const int FADE_IN;
+    static const int FADE_OUT;
 private:
-  sf::RenderWindow *window;
-  int width;
-  int height;
-  sf::Color primaryColour;
-  sf::Color renderColour;
-  int delay;
-  int startDelay;
-  int alpha;
-  int type;
-  double length;
-  sf::Clock *delayClock;
-  sf::Clock *startDelayClock;
-  bool drawBeforeStartDelay;
-  bool transitionCompleted;
-  bool foregroundTransition;
-  sf::RectangleShape *rectangleShape;
-  BackgroundImageRenderer *backgroundImageRenderer;
+    sf::RenderWindow *window;
+    int width;
+    int height;
+    sf::Color primaryColour;
+    sf::Color renderColour;
+    int delay;
+    int startDelay;
+    int alpha;
+    int type;
+    double length;
+    sf::Clock *delayClock;
+    sf::Clock *startDelayClock;
+    bool drawBeforeStartDelay;
+    bool transitionCompleted;
+    bool foregroundTransition;
+    sf::RectangleShape *rectangleShape;
+    BackgroundImageRenderer *backgroundImageRenderer;
+    BackgroundOverlay *backgroundOverlay;
 
-  // Transition-specific init functions
-  void FadeInInit();
-  void FadeOutInit();
+    // Transition-specific init functions
+    void FadeInInit();
 
-  // Transition-specific update functions
-  void FadeInUpdate();
-  void FadeOutUpdate();
+    void FadeOutInit();
 
-  // Transition-specific draw functions
-  void FadeInDraw();
-  void FadeOutDraw();
+    // Transition-specific update functions
+    void FadeInUpdate();
+
+    void FadeOutUpdate();
 };
 
 #endif
