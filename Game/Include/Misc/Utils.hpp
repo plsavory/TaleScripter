@@ -27,7 +27,10 @@ public:
   static std::string implodeString(std::vector<std::string> explodedString, std::string glue);
   static std::string implodeString(std::vector<std::string> explodedString);
   static std::string removeQuotationsFromString(std::string string);
+  static std::string formatDate(const std::string& date, DateFormat dateFormat);
   static std::string getSystemDateTime(DateFormat dateFormat);
+  static std::vector<int> getMonthLengthMatrix(bool leapYear);
+  static bool isAcceptedValue(std::vector<std::string> acceptedValues, std::string subject, bool caseInsensitive);
 private:
 };
 

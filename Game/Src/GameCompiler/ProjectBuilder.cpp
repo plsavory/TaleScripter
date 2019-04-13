@@ -213,7 +213,7 @@ void ProjectBuilder::processCharacters() {
     novel->executeQuery(queryString, dataSet);
 
     if (dataSet->getRowCount() > 0) {
-      std::string existingCharacterName = dataSet->getRow(0)->getColumn("first_name")->getData();
+      std::string existingCharacterName = dataSet->getRow(0)->getColumn("first_name")->getRawData();
       std::vector<std::string> error = {"Character ID's must be unique, character '", firstName, "' conflicts with character '", existingCharacterName, "'"};
       throw ProjectBuilderException(Utils::implodeString(error, ""));
     }
@@ -278,7 +278,7 @@ void ProjectBuilder::processCharacters() {
             throw ProjectBuilderException(Utils::implodeString(errorMessage, ""));
           }
 
-          textureId = dataSet->getRow(0)->getColumn("id")->getData();
+          textureId = dataSet->getRow(0)->getColumn("id")->getRawData();
 
           delete(dataSet);
         }

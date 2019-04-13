@@ -107,9 +107,9 @@ void BackgroundImageRenderer::addAllFromDatabase(DatabaseConnection *db) {
       continue;
     }
 
-    std::string name = result->getRow(i)->getColumn("name")->getData();
-    std::string fname = result->getRow(i)->getColumn("filename")->getData();
-    std::string id = result->getRow(i)->getColumn("id")->getData();
+    std::string name = result->getRow(i)->getColumn("name")->getRawData();
+    std::string fname = result->getRow(i)->getColumn("filename")->getRawData();
+    std::string id = result->getRow(i)->getColumn("id")->getRawData();
 
     std::string fullFileName = "resource/backgrounds/";
     fullFileName.append(fname);
@@ -134,19 +134,19 @@ void BackgroundImageRenderer::addAllFromDatabase(DatabaseConnection *db) {
       float offsetTop = 0;
 
       if (attributeResult->getRow(0)->doesColumnExist("max_width")) {
-        maxWidth = std::atof(attributeResult->getRow(0)->getColumn("max_width")->getData().c_str());
+        maxWidth = std::atof(attributeResult->getRow(0)->getColumn("max_width")->getRawData().c_str());
       }
 
       if (attributeResult->getRow(0)->doesColumnExist("max_height")) {
-        maxHeight = std::atof(attributeResult->getRow(0)->getColumn("max_height")->getData().c_str());
+        maxHeight = std::atof(attributeResult->getRow(0)->getColumn("max_height")->getRawData().c_str());
       }
 
       if (attributeResult->getRow(0)->doesColumnExist("offset_left")) {
-        offsetLeft = std::atof(attributeResult->getRow(0)->getColumn("offset_left")->getData().c_str());
+        offsetLeft = std::atof(attributeResult->getRow(0)->getColumn("offset_left")->getRawData().c_str());
       }
 
       if (attributeResult->getRow(0)->doesColumnExist("offset_top")) {
-        offsetTop = std::atof(attributeResult->getRow(0)->getColumn("offset_top")->getData().c_str());
+        offsetTop = std::atof(attributeResult->getRow(0)->getColumn("offset_top")->getRawData().c_str());
       }
 
       addedBackground->setAttributes(new BackgroundImageAttributes(maxWidth, maxHeight, offsetLeft, offsetTop));

@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include <regex>
+#include "Exceptions/MisuseException.hpp"
 
 /**
  * [Utils::setBit Sets or unsets a bit on the provided 8-bit variable]
@@ -205,6 +206,48 @@ std::string Utils::removeQuotationsFromString(std::string string) {
   return std::regex_replace(std::regex_replace(string, end, ""), start, "");
 }
 
+std::string Utils::formatDate(const std::string& date, DateFormat dateFormat) {
+
+    std::string formatToUse;
+
+    switch (dateFormat) {
+        case DateFormat::FORMAT_ISO:
+            formatToUse = "%Y-%m-%d";
+            break;
+        case DateFormat::FORMAT_UK:
+            formatToUse = "%d/%m/%Y";
+            break;
+        case DateFormat::FORMAT_DATETIME_UK:
+            formatToUse = "%d/%m/%Y %H:%M:%S";
+            break;
+        case DateFormat::FORMAT_US:
+            formatToUse = "%m/%d/%Y";
+            break;
+        case DateFormat::FORMAT_DATETIME_US:
+            formatToUse = "%m/%d/%Y %H:%M:%S";
+            break;
+        case DateFormat::FORMAT_DATETIME_ISO:
+        default:
+            formatToUse = "%Y-%m-%d %H:%M:%S";
+            break;
+    }
+
+    std::tm *tm = {};
+    std::istringstream ss(date);
+    ss >> std::get_time(tm, formatToUse.c_str());
+
+    if (ss.fail()) {
+
+        std::vector<std::string> error = {
+                "Date parse failed with value '", date, "'"
+        };
+
+        throw MisuseException(implodeString(error));
+    } else {
+        return ss.str();
+    }
+
+}
 /**
  * Returns the current date & time as a string
  */
@@ -241,4 +284,43 @@ std::string Utils::getSystemDateTime(DateFormat dateFormat) {
     oss << std::put_time(&local, formatToUse.c_str());
 
     return oss.str();
+}
+
+/**
+ * Returns an array containing the number of days in each month
+ * @param leapYear - Is this a leap year or not?
+ * @return
+ */
+std::vector<int> Utils::getMonthLengthMatrix(bool leapYear) {
+
+    int februaryLength = leapYear ? 29 : 28;
+    std::vector<int> resultSet = {31,februaryLength,31,30,31,30,31,31,30,31,30,31};
+    return resultSet;
+
+}
+
+/**
+ * Returns whether the subject is in the list of accepted values or not
+ * @param acceptedValues - The list of accepted values
+ * @param subject - The subject string
+ * @return
+ */
+bool Utils::isAcceptedValue(std::vector<std::string> acceptedValues, std::string subject, bool caseInsensitive) {
+
+    if (caseInsensitive) {
+        std::transform(subject.begin(), subject.end(), subject.begin(), ::tolower);
+    }
+
+    for (auto &acceptedValue : acceptedValues) {
+
+        if (caseInsensitive) {
+            std::transform(acceptedValue.begin(), acceptedValue.end(), acceptedValue.begin(), ::tolower);
+        }
+
+        if (subject == acceptedValue) {
+            return true;
+        }
+    }
+
+    return false;
 }

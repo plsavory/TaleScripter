@@ -19,6 +19,7 @@ BackgroundOverlay::BackgroundOverlay(sf::RenderWindow *targetWindow) {
 
     overlay->setPosition(0,0);
     overlay->setSize(sf::Vector2f(1280,720));
+    overlay->setFillColor(*colour);
 
     foreground = true;
 

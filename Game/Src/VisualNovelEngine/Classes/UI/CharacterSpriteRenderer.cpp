@@ -116,7 +116,7 @@ void CharacterSpriteRenderer::initData(NovelData *novelData) {
         throw Utils::implodeString(error);
       }
 
-      sprite->setTextureName(dataSet->getRow(0)->getColumn("name")->getData());
+      sprite->setTextureName(dataSet->getRow(0)->getColumn("name")->getRawData());
 
       delete(dataSet);
 

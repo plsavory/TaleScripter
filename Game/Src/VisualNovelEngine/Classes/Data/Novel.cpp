@@ -3,6 +3,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include <sstream>
+#include <Exceptions/ResourceException.hpp>
 
 NovelData::NovelData() {
 
@@ -105,27 +106,27 @@ void NovelData::loadFromDatabase() {
             bool showOnCharacterMenu = false;
 
             if (characterData->getRow(i)->doesColumnExist("id")) {
-                id = std::stoi(characterData->getRow(i)->getColumn("id")->getData());
+                id = characterData->getRow(i)->getColumn("id")->getData()->asInteger();
             }
 
             if (characterData->getRow(i)->doesColumnExist("first_name")) {
-                firstName = characterData->getRow(i)->getColumn("first_name")->getData();
+                firstName = characterData->getRow(i)->getColumn("first_name")->getRawData();
             }
 
             if (characterData->getRow(i)->doesColumnExist("surname")) {
-                surname = characterData->getRow(i)->getColumn("surname")->getData();
+                surname = characterData->getRow(i)->getColumn("surname")->getRawData();
             }
 
             if (characterData->getRow(i)->doesColumnExist("bio")) {
-                bio = characterData->getRow(i)->getColumn("bio")->getData();
+                bio = characterData->getRow(i)->getColumn("bio")->getRawData();
             }
 
             if (characterData->getRow(i)->doesColumnExist("age")) {
-                age = characterData->getRow(i)->getColumn("age")->getData();
+                age = characterData->getRow(i)->getColumn("age")->getRawData();
             }
 
             if (characterData->getRow(i)->doesColumnExist("showOnCharacterMenu")) {
-                std::string comparison = characterData->getRow(i)->getColumn("showOnCharacterMenu")->getData();
+                std::string comparison = characterData->getRow(i)->getColumn("showOnCharacterMenu")->getRawData();
                 showOnCharacterMenu = (comparison == "TRUE" || comparison == "true");
             }
 
@@ -155,8 +156,8 @@ void NovelData::loadFromDatabase() {
         }
 
         chapter[i] = new NovelChapter(novelDb,
-                                      chapterData->getRow(i)->getColumn("title")->getData(),
-                                      std::stoi(chapterData->getRow(i)->getColumn("id")->getData()),
+                                      chapterData->getRow(i)->getColumn("title")->getData()->getRawData(),
+                                      chapterData->getRow(i)->getColumn("id")->getData()->asInteger(),
                                       character);
 
         chapterCount++;
@@ -220,7 +221,7 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
     }
 
     // Get all of the scenes within the chapter
-    DataSet *sceneData = new DataSet();
+    auto *sceneData = new DataSet();
 
     std::ostringstream ss;
 
@@ -237,7 +238,7 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
         std::string backgroundImageName("");
 
         if (sceneData->getRow(i)->doesColumnExist("background_image_name")) {
-            backgroundImageName = sceneData->getRow(i)->getColumn("background_image_name")->getData();
+            backgroundImageName = sceneData->getRow(i)->getColumn("background_image_name")->getRawData();
         }
 
         int backgroundColourId = 0;
@@ -245,20 +246,19 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
         int endTransitionColourId = 0;
 
         if (sceneData->getRow(i)->doesColumnExist("background_colour_id")) {
-            backgroundColourId = std::stoi(sceneData->getRow(i)->getColumn("background_colour_id")->getData());
+            backgroundColourId = sceneData->getRow(i)->getColumn("background_colour_id")->getData()->asInteger();
         }
 
         if (sceneData->getRow(i)->doesColumnExist("start_transition_colour_id")) {
-            startTransitionColourId = std::stoi(
-                    sceneData->getRow(i)->getColumn("start_transition_colour_id")->getData());
+            startTransitionColourId = sceneData->getRow(i)->getColumn("start_transition_colour_id")->getData()->asInteger();
         }
 
         if (sceneData->getRow(i)->doesColumnExist("end_transition_colour_id")) {
-            endTransitionColourId = std::stoi(sceneData->getRow(i)->getColumn("end_transition_colour_id")->getData());
+            endTransitionColourId = sceneData->getRow(i)->getColumn("end_transition_colour_id")->getData()->asInteger();
         }
 
         scene[i] = new NovelScene(db,
-                                  std::stoi(sceneData->getRow(i)->getColumn("id")->getData()),
+                                  sceneData->getRow(i)->getColumn("id")->getData()->asInteger(),
                                   backgroundImageName,
                                   backgroundColourId,
                                   startTransitionColourId,
@@ -328,16 +328,14 @@ NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int
         }
 
         std::string visualEffectName = sceneSegmentData->getRow(i)->doesColumnExist("visual_effect_name")
-                                       ? sceneSegmentData->getRow(i)->getColumn("visual_effect_name")->getData() : "";
-        std::string backgroundMusicName = sceneSegmentData->getRow(i)->doesColumnExist("background_music_name")
-                                          ? sceneSegmentData->getRow(i)->getColumn("background_music_name")->getData()
-                                          : "";
+                                       ? sceneSegmentData->getRow(i)->getColumn("visual_effect_name")->getRawData() : "";
 
         segment[i] = new NovelSceneSegment(db,
-                                           std::stoi(sceneSegmentData->getRow(i)->getColumn("id")->getData()),
-                                           backgroundMusicName,
+                                           sceneSegmentData->getRow(i)->getColumn("id")->getData()->asInteger(),
                                            visualEffectName,
-                                           character);
+                                           character,
+                                           sceneSegmentData->getRow(i)->getColumn(
+                                                   "music_playback_request_id")->getData()->asInteger());
 
         segmentCount++;
     }
@@ -391,20 +389,43 @@ int NovelScene::getEndTransitionColourId() {
 }
 
 // Segment-specific stuff
-NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId, std::string ssBackgroundMusicName,
-                                     std::string ssVisualEffectName, Character *character[]) {
+NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId,
+                                     std::string ssVisualEffectName, Character *character[], int musicPlaybackRequestId) {
     id = ssId;
-    backgroundMusicName = ssBackgroundMusicName;
     visualEffectName = ssVisualEffectName;
     lineCount = 0;
+    musicPlaybackRequest = nullptr;
 
-    for (int i = 0; i < MAX_LINES; i++) {
-        line[i] = nullptr;
+    for (auto & currentLine : line) {
+        currentLine = nullptr;
     }
 
 #ifdef DEBUG_NOVEL_DATA
     std::cout<<"Added scene segment "<<id<<std::endl;
 #endif
+
+    // Get the music playback request if there is one
+    auto *musicPlaybackRequestData = new DataSet();
+
+    if (musicPlaybackRequestId) {
+        std::vector<std::string> query = {
+                "SELECT * FROM music_playback_requests WHERE id = ",
+                std::to_string(musicPlaybackRequestId), ";"
+        };
+
+        db->executeQuery(Utils::implodeString(query), musicPlaybackRequestData);
+    }
+
+    if (musicPlaybackRequestData->getRowCount() == 1) {
+
+        // We have a music playback request, so let's add it
+        int playbackRequestId = musicPlaybackRequestData->getRow(0)->getColumn("id")->getData()->asInteger();
+        std::string musicName = musicPlaybackRequestData->getRow(0)->getColumn("music_name")->getRawData();
+        int musicPlaybackRequestMetadataId = musicPlaybackRequestData->getRow(0)->getColumn("music_playback_request_metadata_id")->getData()->asInteger();
+        musicPlaybackRequest = new MusicPlaybackRequest(db, playbackRequestId, musicName, musicPlaybackRequestMetadataId);
+    }
+
+    delete(musicPlaybackRequestData);
 
     // Get all of the lines for this scene segment
     DataSet *lineData = new DataSet();
@@ -428,21 +449,20 @@ NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId, std::stri
         }
 
         if (lineData->getRow(i)->doesColumnExist("character_state_group_id")) {
-            characterStateGroupId = std::stoi(lineData->getRow(i)->getColumn("character_state_group_id")->getData());
+            characterStateGroupId = lineData->getRow(i)->getColumn("character_state_group_id")->getData()->asInteger();
         }
 
-        std::string characterId = lineData->getRow(i)->doesColumnExist("character_id") ? lineData->getRow(i)->getColumn(
-                "character_id")->getData() : "0";
+        int characterId = lineData->getRow(i)->getColumn("character_id")->getData()->asInteger();
         std::string overrideCharacterName = "";
 
         if (lineData->getRow(i)->doesColumnExist("override_character_name")) {
-            overrideCharacterName = lineData->getRow(i)->getColumn("override_character_name")->getData();
+            overrideCharacterName = lineData->getRow(i)->getColumn("override_character_name")->getRawData();
         }
 
         line[i] = new NovelSceneSegmentLine(db,
-                                            std::stoi(lineData->getRow(i)->getColumn("id")->getData()),
-                                            std::stoi(characterId),
-                                            lineData->getRow(i)->getColumn("text")->getData(),
+                                            lineData->getRow(i)->getColumn("id")->getData()->asInteger(),
+                                            characterId,
+                                            lineData->getRow(i)->getColumn("text")->getRawData(),
                                             characterStateGroupId,
                                             overrideCharacterName,
                                             character
@@ -505,7 +525,7 @@ NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, 
     db->executeQuery(Utils::implodeString(characterStateGroupQuery), dataSet);
 
     if (dataSet->getRowCount() > 0) {
-        characterStateGroup = new CharacterStateGroup(std::stoi(dataSet->getRow(0)->getColumn("id")->getData()), db,
+        characterStateGroup = new CharacterStateGroup(dataSet->getRow(0)->getColumn("id")->getData()->asInteger(), db,
                                                       character);
     }
 
@@ -557,15 +577,15 @@ ProjectInformation::ProjectInformation(DatabaseConnection *db) {
     }
 
     if (projectInformationDataSet->getRow(0)->doesColumnExist("game_title")) {
-        gameTitle = projectInformationDataSet->getRow(0)->getColumn("game_title")->getData();
+        gameTitle = projectInformationDataSet->getRow(0)->getColumn("game_title")->getRawData();
     }
 
     if (projectInformationDataSet->getRow(0)->doesColumnExist("author_name")) {
-        authorName = projectInformationDataSet->getRow(0)->getColumn("author_name")->getData();
+        authorName = projectInformationDataSet->getRow(0)->getColumn("author_name")->getRawData();
     }
 
     if (projectInformationDataSet->getRow(0)->doesColumnExist("version_number")) {
-        versionNumber = projectInformationDataSet->getRow(0)->getColumn("version_number")->getData();
+        versionNumber = projectInformationDataSet->getRow(0)->getColumn("version_number")->getRawData();
     }
 
     delete projectInformationDataSet;
@@ -592,7 +612,7 @@ CharacterStateGroup::CharacterStateGroup(int myId, DatabaseConnection *db, Chara
 
         for (int i = 0; i < numberOfStates; i++) {
             characterState.push_back(
-                    new CharacterState(std::stoi(dataSet->getRow(i)->getColumn("id")->getData()), db, character));
+                    new CharacterState(dataSet->getRow(i)->getColumn("id")->getData()->asInteger(), db, character));
         }
 
     }
@@ -622,7 +642,7 @@ CharacterState::CharacterState(int myId, DatabaseConnection *db, Character *char
 
     db->executeQuery(Utils::implodeString(query), dataSet);
 
-    std::string characterSpriteId = dataSet->getRow(0)->getColumn("character_sprite_id")->getData();
+    std::string characterSpriteId = dataSet->getRow(0)->getColumn("character_sprite_id")->getRawData();
 
     if (dataSet->getRowCount() > 0) {
 
@@ -632,7 +652,7 @@ CharacterState::CharacterState(int myId, DatabaseConnection *db, Character *char
                 ";"
         };
 
-        DataSet *dataSet = new DataSet();
+        auto *dataSet = new DataSet();
 
         db->executeQuery(Utils::implodeString(query), dataSet);
 
@@ -642,23 +662,23 @@ CharacterState::CharacterState(int myId, DatabaseConnection *db, Character *char
                     characterSpriteId
             };
 
-            throw Utils::implodeString(error);
+            throw ResourceException(Utils::implodeString(error));
         }
 
-        std::string characterId = dataSet->getRow(0)->getColumn("character_id")->getData();
-        std::string characterSpriteName = dataSet->getRow(0)->getColumn("name")->getData();
+        int characterId = dataSet->getRow(0)->getColumn("character_id")->getData()->asInteger();
+        std::string characterSpriteName = dataSet->getRow(0)->getColumn("name")->getRawData();
 
-        characterSprite = character[std::stoi(characterId) - 1]->getSprite(characterSpriteName);
+        characterSprite = character[characterId - 1]->getSprite(characterSpriteName);
 
         if (!characterSprite) {
             std::vector<std::string> error = {
                     "Could not find sprite for character ",
-                    characterId,
+                    std::to_string(characterId),
                     " with name: ",
                     characterSpriteName
             };
 
-            throw Utils::implodeString(error);
+            throw ResourceException(Utils::implodeString(error));
         }
 
         delete (dataSet);
@@ -670,12 +690,78 @@ CharacterState::CharacterState(int myId, DatabaseConnection *db, Character *char
                 " could be found."
         };
 
-        throw Utils::implodeString(error);
+        throw DataSetException(Utils::implodeString(error));
     }
 
     delete (dataSet);
 }
 
 CharacterState::~CharacterState() {
+
+}
+
+// Music playback request stuff
+MusicPlaybackRequest::MusicPlaybackRequest(DatabaseConnection *db, int myId, std::string myMusicName, int musicPlaybackRequestMetadataId) {
+    id = myId;
+    musicName = myMusicName;
+    metadata = nullptr;
+
+    auto *musicPlaybackRequestMetadataSet = new DataSet();
+
+    std::vector<std::string> query = {
+            "SELECT * FROM music_playback_request_metadata WHERE id = ",
+            std::to_string(musicPlaybackRequestMetadataId), ";"
+    };
+
+    db->executeQuery(Utils::implodeString(query), musicPlaybackRequestMetadataSet);
+
+    if (musicPlaybackRequestMetadataSet->getRowCount() == 1) {
+        metadata = new MusicPlaybackRequestMetadata(musicPlaybackRequestMetadataSet);
+    }
+
+    delete(musicPlaybackRequestMetadataSet);
+
+
+}
+
+/**
+ * Saves all of the data required for the metadata object
+ * @param data
+ */
+MusicPlaybackRequestMetadata::MusicPlaybackRequestMetadata(DataSet *data) {
+    // I have taken a different approach this time by simply passing the dataset into here
+    // Might be nicer to do this everywhere
+
+    // TODO: Throw errors when values are out of range
+    id = data->getRow(0)->getColumn("id")->getData()->asInteger();
+    pitch = data->getRow(0)->getColumn("pitch")->getData()->asFloat();
+    volume = data->getRow(0)->getColumn("volume")->getData()->asInteger();
+    loop = data->getRow(0)->getColumn("loop")->getData()->asBoolean();
+    startInMilliseconds = data->getRow(0)->getColumn("startTime")->getData()->asInteger();
+    endInMilliseconds = data->getRow(0)->getColumn("endTime")->getData()->asInteger();
+    bool mute = data->getRow(0)->getColumn("muted")->getData()->asBoolean();
+
+    // 1-10 are valid values, 5 is normal speed.
+    if (pitch == 0) {
+        pitch = 1;
+    }
+
+    if (volume > 100) {
+        volume = 100;
+    }
+
+    if (volume <= 0) {
+        volume = 100;
+    }
+
+    // Why anybody would want to do this though, I don't know...
+    if (mute) {
+        volume = 0;
+    }
+
+    // TODO: Throw error if end time is out of range
+    if (endInMilliseconds < 0) {
+        throw ResourceException("startInMilliseconds must be greater than 0");
+    }
 
 }

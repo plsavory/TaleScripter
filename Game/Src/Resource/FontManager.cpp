@@ -98,8 +98,8 @@ void FontManager::loadAllFromDatabase(DatabaseConnection *database) {
             continue;
         }
 
-        std::string name = result->getRow(i)->getColumn("name")->getData();
-        std::string fname = result->getRow(i)->getColumn("filename")->getData();
+        std::string name = result->getRow(i)->getColumn("name")->getRawData();
+        std::string fname = result->getRow(i)->getColumn("filename")->getRawData();
 
         std::string fullFileName = "resource/fonts/";
         fullFileName.append(fname);

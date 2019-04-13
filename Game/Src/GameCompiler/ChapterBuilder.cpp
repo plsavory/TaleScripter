@@ -15,6 +15,7 @@ using json = nlohmann::json;
 #include <vector>
 #include <regex>
 #include <fstream>
+#include "Database/DatabaseDataSanitiser.hpp"
 
 ChapterBuilder::ChapterBuilder(const std::string &fileName, DatabaseConnection *novelDb, FileHandler *fileHandler) {
 
@@ -220,7 +221,7 @@ void ChapterBuilder::processScene(json sceneJson, int chapterId) {
 
 void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
 
-    std::string backgroundMusicName;
+    std::string musicPlaybackRequestId = "NULL";
     std::string visualEffectName;
 
     if (sceneSegmentJson.find("music") != sceneSegmentJson.end()) {
@@ -228,12 +229,95 @@ void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
         // TODO: Deal with music effects/transformations
         json musicJson = sceneSegmentJson["music"];
 
-        backgroundMusicName = "NULL";
+        // Process a music playback request as well as its metadata
+        {
+            std::string backgroundMusicName = "NULL";
 
-        if (musicJson.find("name") != musicJson.end()) {
-            // TODO: Validate that the music actually exists im the resource database when it is working
-            backgroundMusicName = musicJson["name"];
+            if (musicJson.find("name") != musicJson.end()) {
+                // TODO: Validate that the music actually exists in the resource database when it is working
+                backgroundMusicName = musicJson["name"];
+            }
+
+            // We only want to bother adding the rest to the database if there's any music to actually play
+            std::string musicPlaybackRequestMetadataId = "NULL";
+
+            if (backgroundMusicName != "NULL") {
+                // Create the metadata entry
+                {
+                    std::string pitch = "NULL";
+                    std::string speed = "NULL";
+                    std::string loop = "NULL";
+                    std::string volume = "NULL";
+                    std::string startTime = "NULL";
+                    std::string endTime = "NULL";
+                    std::string muted = "NULL";
+
+                    if (musicJson.find("pitch") != musicJson.end()) {
+                        pitch = DatabaseDataSanitiser::sanitiseDouble(musicJson["pitch"]);
+
+                        // 0 causes problems and higher than 5 is speaker-busting. Higher than 5 can work, but it is appalling so I am stopping it here.
+                        if (std::stof(pitch) < 0.1 || std::stof(pitch) > 5) {
+                            std::vector<std::string> error = {
+                                    "Value '", pitch , "' for pitch is out of range (Must be between 0.1 and 5)"
+                            };
+
+                            throw ProjectBuilderException(Utils::implodeString(error));
+                        }
+
+                    }
+
+                    // TODO: Validate that these values are in range
+
+                    if (musicJson.find("loop") != musicJson.end()) {
+                        loop = DatabaseDataSanitiser::sanitiseBoolean(musicJson["loop"]);
+                    }
+
+                    if (musicJson.find("muted") != musicJson.end()) {
+                        muted = DatabaseDataSanitiser::sanitiseBoolean(musicJson["muted"]);
+                    }
+
+                    if (musicJson.find("volume") != musicJson.end()) {
+                        volume = DatabaseDataSanitiser::sanitiseInteger(musicJson["volume"]);
+
+                        if (std::stoi(volume) < 0 || std::stoi(volume) > 100) {
+                            std::vector<std::string> error = {
+                                    "Value '", volume , "' for volume is out of range (Must be between 1 and 100) - To mute the audio, use the 'mute' attribute instead (it's a boolean)"
+                            };
+
+                            throw ProjectBuilderException(Utils::implodeString(error));
+                        }
+                    }
+
+                    if (musicJson.find("startTime") != musicJson.end()) {
+                        startTime = DatabaseDataSanitiser::sanitiseInteger(musicJson["startTime"]);
+
+                        throw ProjectBuilderException("Music startTime is currently unimplemented");
+                    }
+
+                    if (musicJson.find("endTime") != musicJson.end()) {
+                        endTime = DatabaseDataSanitiser::sanitiseInteger(musicJson["endTime"]);
+
+                        throw ProjectBuilderException("Music endTime is currently unimplemented");
+                    }
+
+                    std::vector<std::string> values = {pitch, speed, loop, volume, startTime, endTime, muted};
+                    std::vector<std::string> columns = {"pitch", "speed", "loop", "volume", "startTime", "endTime", "muted"};
+                    std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_BOOLEAN, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_BOOLEAN};
+                    int newId = novel->insert("music_playback_request_metadata", columns, values,
+                                                                   types);
+
+                    musicPlaybackRequestMetadataId = std::to_string(newId);
+                }
+            }
+
+            // Create the background music request
+            std::vector<std::string> columns = {"music_name", "music_playback_request_metadata_id"};
+            std::vector<std::string> values = {backgroundMusicName, musicPlaybackRequestMetadataId};
+            std::vector<int> types = {DATA_TYPE_STRING, DATA_TYPE_NUMBER};
+            int newId = novel->insert("music_playback_requests", columns, values, types);
+            musicPlaybackRequestId = std::to_string(newId);
         }
+
     }
 
     if (sceneSegmentJson.find("visualEffectName") != sceneSegmentJson.end()) {
@@ -242,8 +326,8 @@ void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
         visualEffectName = "NULL";
     }
 
-    std::vector<std::string> columns = {"scene_id", "background_music_name", "visual_effect_name"};
-    std::vector<std::string> values = {std::to_string(sceneId), backgroundMusicName, visualEffectName};
+    std::vector<std::string> columns = {"scene_id", "music_playback_request_id", "visual_effect_name"};
+    std::vector<std::string> values = {std::to_string(sceneId), musicPlaybackRequestId, visualEffectName};
     std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_STRING, DATA_TYPE_STRING};
 
     int sceneSegmentId = novel->insert("scene_segments", columns, values, types);
@@ -378,7 +462,7 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
                         throw ProjectBuilderException(Utils::implodeString(error));
                     }
 
-                    characterId = dataSet->getRow(0)->getColumn("id")->getData();
+                    characterId = dataSet->getRow(0)->getColumn("id")->getRawData();
 
                 } else {
                     throw ProjectBuilderException(
@@ -421,7 +505,7 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
                 throw ProjectBuilderException(Utils::implodeString(error));
             }
 
-            characterSpriteId = dataSet->getRow(0)->getColumn("id")->getData();
+            characterSpriteId = dataSet->getRow(0)->getColumn("id")->getRawData();
 
             std::vector<std::string> columns = {"character_sprite_id", "character_state_group_id"};
             std::vector<std::string> values = {characterSpriteId, characterStateGroupId};

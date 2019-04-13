@@ -79,6 +79,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp
         Game/Include/Misc/Utils.hpp
         Game/Include/Resource/FontManager.hpp
+        Game/Include/Resource/MusicPlayRequest.hpp
         Game/Include/Resource/MusicManager.hpp
         Game/Include/Resource/ResourceManager.hpp
         Game/Include/Resource/TextureManager.hpp
@@ -88,6 +89,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/TileRenderer/Tile.hpp
         Game/Include/TileRenderer/Tilemap.hpp
         Game/Include/TileRenderer/TileRenderer.hpp
+        Game/Include/VisualNovelEngine/Classes/Data/DataModels/MusicPlaybackRequestMetadata.hpp
         Game/Include/VisualNovelEngine/Classes/Data/Character.hpp
         Game/Include/VisualNovelEngine/Classes/Data/CharacterSprite.hpp
         Game/Include/VisualNovelEngine/Classes/Data/Novel.hpp
@@ -137,6 +139,7 @@ add_executable(${EXECUTABLE_NAME}
 add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp
         Game/Include/Misc/Utils.hpp
+        Game/Include/Database/DatabaseDataSanitiser.hpp
         Game/Include/Database/DatabaseConnection.hpp
         Game/Include/Database/DatabaseSchema.hpp
         Game/Include/GameCompiler/ChapterBuilder.hpp

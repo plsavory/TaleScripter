@@ -30,9 +30,9 @@ Character::Character(int cId, std::string cFirstName, std::string cSurname, std:
   int spriteCount = dataSet->getRowCount();
 
   for (int i = 0; i < spriteCount; i++) {
-    std::string name = dataSet->getRow(i)->getColumn("name")->getData();
-    int textureId = std::stoi(dataSet->getRow(i)->getColumn("texture_id")->getData());
-    int id = std::stoi(dataSet->getRow(i)->getColumn("id")->getData());
+    std::string name = dataSet->getRow(i)->getColumn("name")->getRawData();
+    int textureId = std::stoi(dataSet->getRow(i)->getColumn("texture_id")->getRawData());
+    int id = std::stoi(dataSet->getRow(i)->getColumn("id")->getRawData());
     characterSprite[i] = new CharacterSprite(name, id, textureId);
   }
 

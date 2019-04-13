@@ -140,7 +140,17 @@ void NovelScreen::nextSegment() {
   NovelSceneSegment *nextSegment = novel->advanceToNextSegment();
 
   // Play the music file related to the scene segment
-  musicManager->playAudioStream(nextSegment->getBackgroundMusicName());
+  MusicPlaybackRequest* musicPlaybackRequest = nextSegment->getMusicPlaybackRequest();
+  if (musicPlaybackRequest) {
+      // TODO: Handle metadata
+      MusicPlaybackRequestMetadata* metadata = musicPlaybackRequest->getMetadata();
+
+      if (metadata) {
+          musicManager->playAudioStream(musicPlaybackRequest->getMusicName(), metadata);
+      } else {
+          musicManager->playAudioStream(musicPlaybackRequest->getMusicName());
+      }
+  }
 
   nextLine();
 

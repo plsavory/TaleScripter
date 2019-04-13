@@ -32,6 +32,23 @@ private:
   std::string versionNumber;
 };
 
+#include "VisualNovelEngine/Classes/Data/DataModels/MusicPlaybackRequestMetadata.hpp"
+class MusicPlaybackRequest {
+public:
+    MusicPlaybackRequest(DatabaseConnection *db, int myId, std::string myMusicName, int musicPlaybackRequestMetadataId);
+    MusicPlaybackRequestMetadata* getMetadata() {
+        return metadata;
+    }
+
+    std::string getMusicName() {
+        return musicName;
+    }
+private:
+    MusicPlaybackRequestMetadata *metadata;
+    int id;
+    std::string musicName;
+};
+
 class CharacterState {
 public:
   CharacterState(int myId, DatabaseConnection *db, Character *character[]);
@@ -75,17 +92,21 @@ private:
 
 class NovelSceneSegment {
 public:
-  NovelSceneSegment(DatabaseConnection *db, int ssId, std::string ssBackgroundMusicName, std::string ssVisualEffectName, Character *character[]);
+  NovelSceneSegment(DatabaseConnection *db, int ssId, std::string ssVisualEffectName, Character *character[], int musicPlaybackRequestId);
   ~NovelSceneSegment();
   int getLineCount();
   NovelSceneSegmentLine* getLine(int id);
   std::string getBackgroundMusicName();
+  MusicPlaybackRequest* getMusicPlaybackRequest() {
+      return musicPlaybackRequest;
+  }
 private:
   int id;
   std::string backgroundMusicName;
   std::string visualEffectName;
   NovelSceneSegmentLine *line[MAX_LINES];
   int lineCount;
+  MusicPlaybackRequest *musicPlaybackRequest;
 };
 
 class NovelScene {

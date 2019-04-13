@@ -9,24 +9,13 @@
 
 #include <SFML/Audio.hpp>
 #include <queue>
+#include "VisualNovelEngine/Classes/Data/DataModels/MusicPlaybackRequestMetadata.hpp"
+#include "Resource/MusicPlayRequest.hpp"
 
 #define MAX_AUDIO_STREAMS 50
 
 enum AudioStreamState {
     Unloaded, Stopped, Playing, Paused, Error
-};
-
-struct PlayRequest {
-public:
-    PlayRequest(int id) {
-        streamId = id;
-    };
-
-    int getId() {
-        return streamId;
-    };
-private:
-    int streamId;
 };
 
 struct AudioStream {
@@ -67,6 +56,10 @@ public:
     };
 
     void play() {
+        play(nullptr);
+    }
+
+    void play(MusicPlayRequest *musicPlayRequest) {
 
         // File hasn't been loaded
         if (!music) {
@@ -77,6 +70,18 @@ public:
                 };
 
                 throw ResourceException(Utils::implodeString(errorMessage));
+            }
+        }
+
+        // Set values from the music play request if we need to
+        if (musicPlayRequest) {
+            MusicPlaybackRequestMetadata *metadata = musicPlayRequest->getMetadata();
+
+            if (metadata) {
+                // We have values to set on to the music
+                music->setLoop(metadata->shouldLoop());
+                music->setPitch(metadata->getPitch());
+                music->setVolume(metadata->getVolume());
             }
         }
 
@@ -141,13 +146,15 @@ public:
 
     void playAudioStream(std::string name);
 
+    void playAudioStream(std::string name, MusicPlaybackRequestMetadata* metadata);
+
     int findAudioStream(std::string name);
 
     void loadAllFromDatabase(DatabaseConnection *database);
 
 private:
     AudioStream *audioStream[MAX_AUDIO_STREAMS];
-    std::queue<PlayRequest> playRequestQueue;
+    std::queue<MusicPlayRequest> playRequestQueue;
 };
 
 #endif

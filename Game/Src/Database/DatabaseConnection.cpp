@@ -75,6 +75,8 @@ void DatabaseConnection::executeQuery(const std::string& query, DataSet *destina
 
                 for (int col = 0; col < columns; col++) {
 
+                    bool isNull = sqlite3_column_type(statement, col) == SQLITE_NULL;
+
                     if (sqlite3_column_text(statement, col)) {
                         // Add a column to the row
 
@@ -82,9 +84,14 @@ void DatabaseConnection::executeQuery(const std::string& query, DataSet *destina
                         const char *cData = reinterpret_cast<const char *>(sqlite3_column_text(statement, col));
 
                         std::string columnName((cName ? cName : ""));
-                        std::string data((cData ? cData : ""));
+                        std::string data(cData ? cData : "");
 
-                        row->addColumn(columnName, data);
+                        row->addColumn(columnName, data, false);
+                    } else if (isNull) {
+                        const char *cName = sqlite3_column_name(statement, col);
+                        std::string columnName = (cName ? cName : "");
+                        std::string data;
+                        row->addColumn(columnName, data, true);
                     }
                 }
 
@@ -166,7 +173,7 @@ int DatabaseConnection::getLastInsertId() {
         throw DatabaseException("Failed to get the last insert ID");
     }
 
-    int lastInsertId = std::stoi(dataSet->getRow(0)->getColumn("last_insert_id")->getData());
+    int lastInsertId = std::stoi(dataSet->getRow(0)->getColumn("last_insert_id")->getRawData());
     delete (dataSet);
     return lastInsertId;
 

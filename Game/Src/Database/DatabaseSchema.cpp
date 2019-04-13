@@ -271,7 +271,8 @@ std::string DatabaseColumn::getCreationQuery() {
             << name << " "
             << getTypeAsString()
             << (primaryKey ? " PRIMARY KEY" : "")
-            << (notNull ? " NOT NULL" : "");
+            << (notNull ? " NOT NULL " : "")
+            << "DEFAULT NULL";
 
     return ss.str();
 }

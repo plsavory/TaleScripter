@@ -38,14 +38,20 @@ AudioStream* MusicManager::addStream(std::string name, std::string fname) {
  * @param name [description]
  */
 void MusicManager::playAudioStream(std::string name) {
+    playAudioStream(name, nullptr);
+}
 
-  int id = findAudioStream(name);
+void MusicManager::playAudioStream(std::string name, MusicPlaybackRequestMetadata* metadata) {
 
-  if (id < 0) {
-    return;
-  }
+    int id = findAudioStream(name);
 
-  playRequestQueue.push(PlayRequest(id));
+    if (id < 0) {
+        return;
+    }
+
+    MusicPlayRequest playRequest(id);
+    playRequest.setMetadata(metadata);
+    playRequestQueue.push(playRequest);
 }
 
 void MusicManager::playAudioStream(int id) {
@@ -60,7 +66,7 @@ void MusicManager::addAllStreamsFromDatabase() {
  * [update Process any load requests]
  */
 void MusicManager::processQueue() {
-  if (playRequestQueue.size() == 0) {
+  if (playRequestQueue.empty()) {
     return;
   }
 
@@ -88,14 +94,15 @@ void MusicManager::processQueue() {
     return;
   }
 
-  audioStream[playRequestQueue.front().getId()]->play();
+  MusicPlayRequest playRequest = playRequestQueue.front();
+  audioStream[playRequest.getId()]->play(&playRequest);
 
   // Remove the audio load request from memory
   playRequestQueue.pop();
 }
 
 bool MusicManager::isQueueEmpty() {
-  return (playRequestQueue.size() == 0);
+  return (playRequestQueue.empty());
 }
 
 
@@ -152,8 +159,8 @@ void MusicManager::loadAllFromDatabase(DatabaseConnection *database) {
       continue;
     }
 
-    std::string name = result->getRow(i)->getColumn("name")->getData();
-    std::string fname = result->getRow(i)->getColumn("filename")->getData();
+    std::string name = result->getRow(i)->getColumn("name")->getRawData();
+    std::string fname = result->getRow(i)->getColumn("filename")->getRawData();
 
     std::string fullFileName = "resource/music/";
     fullFileName.append(fname);

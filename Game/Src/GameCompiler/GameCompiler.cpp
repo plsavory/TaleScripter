@@ -61,15 +61,6 @@ void GameCompiler::createResourceDatabase() {
     musicTable->addColumn("name", ColumnType::tText, false, "");
     musicTable->addColumn("filename", ColumnType::tText, false, "");
     musicTable->addColumn("enabled", ColumnType::tBoolean, false, "");
-    musicTable->addColumn("audio_effect_id", ColumnType::tInteger, false, "");
-
-    // Create audio effect table
-    DatabaseTable *audioEffectTable = resourceDb->addTable("audio_effects");
-    audioEffectTable->addPrimaryKey();
-    audioEffectTable->addColumn("name", ColumnType::tText, false, "");
-    audioEffectTable->addColumn("enabled", ColumnType::tBoolean, false, "");
-    audioEffectTable->addColumn("pitch", ColumnType::tInteger, false, "");
-    audioEffectTable->addColumn("speed", ColumnType::tInteger, false, ""); // Speed 5 should be normal, music plays backwards if lower
 
     // Create font and text transform tables
     DatabaseTable *fontTable = resourceDb->addTable("fonts");
@@ -190,7 +181,7 @@ void GameCompiler::createNovelDatabase() {
   DatabaseTable *sceneSegmentsTable = novelDb->addTable("scene_segments");
   sceneSegmentsTable->addPrimaryKey();
   sceneSegmentsTable->addColumn("scene_id", ColumnType::tInteger, false, "");
-  sceneSegmentsTable->addColumn("background_music_name", ColumnType::tText, false, "");
+  sceneSegmentsTable->addColumn("music_playback_request_id", ColumnType::tInteger, false, "");
   sceneSegmentsTable->addColumn("visual_effect_name", ColumnType::tText, false, "");
 
   /*
@@ -274,6 +265,23 @@ void GameCompiler::createNovelDatabase() {
    */
   DatabaseTable *characterStateGroupsTable = novelDb->addTable("character_state_groups");
   characterStateGroupsTable->addPrimaryKey();
+
+    // Create music play request table
+    DatabaseTable *musicPlaybackRequestTable = novelDb->addTable("music_playback_requests");
+    musicPlaybackRequestTable->addPrimaryKey();
+    musicPlaybackRequestTable->addColumn("music_name", ColumnType::tText, false, "");
+    musicPlaybackRequestTable->addColumn("music_playback_request_metadata_id", ColumnType::tInteger, false, "");
+
+    // Create audio effect table
+    DatabaseTable *musicPlaybackRequestMetadataTable = novelDb->addTable("music_playback_request_metadata");
+    musicPlaybackRequestMetadataTable->addPrimaryKey();
+    musicPlaybackRequestMetadataTable->addColumn("pitch", ColumnType::tDouble, false, "");
+    musicPlaybackRequestMetadataTable->addColumn("speed", ColumnType::tDouble, false, ""); // Speed 5 should be normal, music plays backwards if lower
+    musicPlaybackRequestMetadataTable->addColumn("loop", ColumnType::tBoolean, false, "");
+    musicPlaybackRequestMetadataTable->addColumn("volume", ColumnType::tInteger, false, "");
+    musicPlaybackRequestMetadataTable->addColumn("startTime", ColumnType::tInteger, false, "");
+    musicPlaybackRequestMetadataTable->addColumn("endTime", ColumnType::tInteger, false, "");
+    musicPlaybackRequestMetadataTable->addColumn("muted", ColumnType::tBoolean, false, "");
 
   novelDb->createDatabase();
 

@@ -166,9 +166,9 @@ void TextureManager::loadAllFromDatabase(DatabaseConnection *resource) {
  int numberOfTextures = dataSet->getRowCount();
 
  for (int i = 0; i < numberOfTextures; i++) {
-   std::string name = dataSet->getRow(i)->getColumn("name")->getData();
+   std::string name = dataSet->getRow(i)->getColumn("name")->getRawData();
    std::string fileName = "resource/textures/";
-   fileName.append(dataSet->getRow(i)->getColumn("filename")->getData());
+   fileName.append(dataSet->getRow(i)->getColumn("filename")->getRawData());
    loadTexture(fileName, name);
  }
 }

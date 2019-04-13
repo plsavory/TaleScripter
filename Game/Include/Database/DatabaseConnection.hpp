@@ -6,6 +6,7 @@
 #include <vector>
 #include <Exceptions/DatabaseException.hpp>
 #include <Exceptions/DataSetException.hpp>
+#include <regex>
 
 #define DATA_SET_MAX_ROWS 1000
 #define DATA_SET_MAX_COLUMNS 50
@@ -20,27 +21,191 @@ enum FetchMode {
     None, All, One
 };
 
+struct DataContainer {
+    DataContainer(const std::string &value, const std::string &parentColumnName, bool isNull) {
+        data = isNull ? "" : value;
+        columnName = parentColumnName;
+    }
+    /**
+     * Returns the raw data contained within this object as a string
+     * @return unformatted data
+     */
+    std::string getRawData() {
+        return data;
+    }
+
+    /**
+     * Formats the data contained within this object as an integer and returns it
+     * @return
+     */
+    int asInteger() {
+
+        if (data.empty()) {
+            return 0;
+        }
+
+        try {
+            return std::stoi(data);
+        } catch (std::exception &e) {
+            std::vector<std::string> error = {
+                    "DataContainer.asInteger() called on a datum which does not contain an integer.\n\n",
+                    "Column name: '", columnName, "' \n",
+                    "Value: '", data, "'"
+            };
+            throw DataSetException(Utils::implodeString(error));
+        }
+    }
+
+    float asFloat() {
+
+        if (data.empty()) {
+            return 0;
+        }
+
+        try {
+            return std::stof(data);
+        } catch (std::exception &e) {
+            std::vector<std::string> error = {
+                    "DataContainer.asInteger() called on a datum which does not contain a float value.\n\n",
+                    "Column name: '", columnName, "' \n",
+                    "Value: '", data, "'"
+            };
+            throw DataSetException(Utils::implodeString(error));
+        }
+
+    }
+
+    /**
+     * Formats the data as a boolean and returns it, as long as it is one of the appropriate values
+     * @return
+     */
+    bool asBoolean() {
+
+        if (data.empty()) {
+            return false;
+        }
+
+        // Validate that we are actually dealing with a boolean in a string...
+        std::vector<std::string> acceptedValues = {"1", "0"};
+
+        if (!Utils::isAcceptedValue(acceptedValues, data, false)) {
+            std::vector<std::string> error {
+                    "DataContainer.asBoolean called on a datum which does not contain a boolean. \n\n",
+                    "Column name: '", columnName, "' \n",
+                    "Value: '", data, "'"
+            };
+            throw DataSetException(Utils::implodeString(error));
+        }
+
+        return data == "1";
+
+    }
+
+    // TODO: Test this function... I got side tracked from something else and wrote it.
+    std::string asDate(DateFormat format) {
+
+        std::string date;
+
+        if (data.empty()) {
+            date = "1970-01-01";
+        } else {
+            date = data;
+        }
+
+        std::regex isoDateRegex = std::regex("^([0-9]{4})-([0-9][0-9])-([0-9][0-9])$");
+
+        // Ensure that the string at least looks like a date
+        if (!std::regex_match(date, isoDateRegex)) {
+            std::vector<std::string> error = {
+                    "DataContainer.asDate() called on a column which does not contain a date\n\n",
+                    "Column name: '", columnName, "' \n",
+                    "Data: ", date, "'\n"
+            };
+
+            throw DataSetException(Utils::implodeString(error));
+        }
+
+        // Ensure that the values of each part of the date are in range
+        std::vector<std::string> datePortions = Utils::explodeString(date, '-');
+
+        int year = std::stoi(datePortions[0]);
+        int month = std::stoi(datePortions[1]);
+        int day = std::stoi(datePortions[2]);
+
+        // Initial range validation
+        bool validDate = (month > 0 && month <=12) && (day > 0 && day <= 31);
+
+        if (!validDate) {
+            std::vector<std::string> error = {
+                    "DataContainer.asDate() called on a date which is out of range (Month or day out of range) \n\n",
+                    "Column name: '", columnName, "'\n",
+                    "Data: ", date, "'\n"
+            };
+            throw DataSetException(Utils::implodeString(error));
+        }
+
+        // Figure out if we are dealing with a leap year or not
+        bool isLeapYear = (year % 100 == 0) ? (year % 400 == 0) : (year % 4 == 0);
+
+        // Check to see if the days are within the length of the month
+        int monthLength = Utils::getMonthLengthMatrix(isLeapYear)[month-1];
+
+        if (day > monthLength) {
+            std::vector<std::string> error = {
+                    "DataContainer.asDate() called on a date which is out of range (More days than the length of the month) \n\n",
+                    "Column name: '", columnName,"'",
+                    "Data: '", date, "'\n"
+            };
+        }
+
+        // Format the date and return it
+        if (format != DateFormat::FORMAT_ISO && format != DateFormat::FORMAT_DATETIME_ISO) {
+            return Utils::formatDate(date, format);
+        } else {
+            return date;
+        }
+    }
+private:
+    std::string data;
+    std::string columnName; // Used for printing errors
+};
+
 // Data set related stuff
 struct DataSetColumn {
 public:
-    DataSetColumn(std::string cName, std::string cData) {
+    DataSetColumn(std::string cName, std::string cData, bool isNull) {
         name = std::move(cName);
-        data = std::move(cData);
+        dataContainer = new DataContainer(cData, name, isNull);
     };
 
-    ~DataSetColumn() = default;
+    ~DataSetColumn() {
+        delete(dataContainer);
+    };
 
     std::string getName() {
         return name;
     }
 
-    std::string getData() {
-        return data;
+    /**
+     * Returns the DataContainer object containing the data in this column
+     * @return - DataContainer object
+     */
+    DataContainer* getData() {
+        return dataContainer;
+    }
+
+    /**
+     * @deprecated - Functions on the DataContainer should be used instead, I have left this here for now as removing it would break everything.
+     * @return
+     */
+    std::string getRawData() {
+        // TODO: Remove this function when all usages have been changed
+        return dataContainer->getRawData();
     }
 
 private:
     std::string name;
-    std::string data;
+    DataContainer *dataContainer;
 };
 
 struct DataSetRow {
@@ -64,7 +229,7 @@ public:
      * @param data
      * @return
      */
-    DataSetColumn *addColumn(const std::string &name, const std::string &data) {
+    DataSetColumn *addColumn(const std::string &name, const std::string &data, bool isNull) {
 
         if (name.empty()) {
             return nullptr;
@@ -72,7 +237,7 @@ public:
 
         for (auto &potentialNewColumn : column) {
             if (!potentialNewColumn) {
-                potentialNewColumn = new DataSetColumn(name, data);
+                potentialNewColumn = new DataSetColumn(name, data, isNull);
                 return potentialNewColumn;
             }
         }
@@ -150,7 +315,7 @@ public:
 
         for (auto &currentColumn : column) {
             if (currentColumn) {
-                std::cout << "Column: " << currentColumn->getName() << " | " << currentColumn->getData();
+                std::cout << "Column: " << currentColumn->getName() << " | " << currentColumn->getRawData();
                 std::cout << std::endl;
             }
         }
