@@ -8,16 +8,17 @@
 using json = nlohmann::json;
 
 #include "Database/DatabaseConnection.hpp"
-#include "GameCompiler/FileHandler.hpp"
+#include "GameCompiler/JsonHandler.hpp"
 #include "GameCompiler/ChapterBuilder.hpp"
 #include "Exceptions/ProjectBuilderException.hpp"
+#include "Exceptions/JsonParserException.hpp"
 #include "Misc/Utils.hpp"
 #include <vector>
 #include <regex>
 #include <fstream>
-#include "Database/DatabaseDataSanitiser.hpp"
+#include "Database/TypeCaster.hpp"
 
-ChapterBuilder::ChapterBuilder(const std::string &fileName, DatabaseConnection *novelDb, FileHandler *fileHandler) {
+ChapterBuilder::ChapterBuilder(const std::string &fileName, DatabaseConnection *novelDb, JsonHandler *fileHandler) {
 
     if (!Utils::fileExists(fileName)) {
 
@@ -52,7 +53,7 @@ void ChapterBuilder::process() {
     if (chapterJson.find("title") == chapterJson.end()) {
         title = "Unnamed Chapter";
     } else {
-        title = chapterJson["title"];
+        title = JsonHandler::getString(chapterJson,"title");
     }
 
     std::cout << "Processing chapter " << title << "..." << std::endl;
@@ -60,25 +61,25 @@ void ChapterBuilder::process() {
     if (chapterJson.find("accessibleName") == chapterJson.end()) {
         accessibleName = title;
     } else {
-        accessibleName = chapterJson["accessibleName"];
+        accessibleName = JsonHandler::getString(chapterJson,"accessibleName");
     }
 
     if (chapterJson.find("requirementId") == chapterJson.end()) {
         requirementId = "0";
     } else {
-        requirementId = chapterJson["requirementId"];
+        requirementId = TypeCaster::cast(JsonHandler::getInteger(chapterJson, "requirementId"));
     }
 
     if (chapterJson.find("hidden") == chapterJson.end()) {
         hidden = "FALSE";
     } else {
-        hidden = chapterJson["hidden"];
+        hidden = TypeCaster::cast(JsonHandler::getBoolean(chapterJson,"hidden"));
     }
 
     if (chapterJson.find("description") == chapterJson.end()) {
         description = "";
     } else {
-        description = chapterJson["description"];
+        description = JsonHandler::getString(chapterJson,"description");
     }
 
     std::vector<std::string> columns = {"title", "accessible_name", "description", "hidden", "requirement_id"};
@@ -119,37 +120,37 @@ void ChapterBuilder::processScene(json sceneJson, int chapterId) {
 
     // Could use ternaries for this, but this is easier to follow I suppose.
     if (sceneJson.find("backgroundImageName") != sceneJson.end()) {
-        backgroundImageName = sceneJson["backgroundImageName"];
+        backgroundImageName = JsonHandler::getString(sceneJson,"backgroundImageName");
     } else {
         backgroundImageName = "NULL";
     }
 
     if (sceneJson.find("backgroundColourId") != sceneJson.end()) {
-        backgroundColourId = sceneJson["backgroundColourId"];
+        backgroundColourId = TypeCaster::cast(JsonHandler::getInteger(sceneJson, "backgroundColourId"));
     } else {
         backgroundColourId = "NULL";
     }
 
     if (sceneJson.find("startTransitionColourId") != sceneJson.end()) {
-        startTransitionColourId = sceneJson["startTransitionColourId"];
+        startTransitionColourId = TypeCaster::cast(JsonHandler::getInteger(sceneJson, "startTransitionColourId"));
     } else {
         startTransitionColourId = "NULL";
     }
 
     if (sceneJson.find("endTransitionColourId") != sceneJson.end()) {
-        endTransitionColourId = sceneJson["endTransitionColourId"];
+        endTransitionColourId = TypeCaster::cast(JsonHandler::getInteger(sceneJson, "endTransitionColourId"));
     } else {
         endTransitionColourId = "NULL";
     }
 
     if (sceneJson.find("startTransitionTypeId") != sceneJson.end()) {
-        startTransitionTypeId = sceneJson["startTransitionTypeId"];
+        startTransitionTypeId = TypeCaster::cast(JsonHandler::getInteger(sceneJson, "startTransitionTypeId"));
     } else {
         startTransitionTypeId = "NULL";
     }
 
     if (sceneJson.find("endTransition") != sceneJson.end()) {
-        std::string endTransitionType = sceneJson["endTransition"];
+        std::string endTransitionType = JsonHandler::getString(sceneJson,"endTransition");
 
         std::vector<std::string> acceptedValues = {
                 "none", "morph", "fade"
@@ -174,15 +175,6 @@ void ChapterBuilder::processScene(json sceneJson, int chapterId) {
         }
     } else {
         endTransitionTypeId = "NULL";
-    }
-
-    if (sceneJson.find("morphToNextBackground") != sceneJson.end()) {
-        std::string type = sceneJson["morphToNextBackground"];
-        type = DatabaseDataSanitiser::sanitiseBoolean(type);
-
-        if (type == "TRUE") {
-            endTransitionTypeId = "3"; // 3 = morph
-        }
     }
 
     // Insert the data into the database...
@@ -266,7 +258,7 @@ void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
 
             if (musicJson.find("name") != musicJson.end()) {
                 // TODO: Validate that the music actually exists in the resource database when it is working
-                backgroundMusicName = musicJson["name"];
+                backgroundMusicName = JsonHandler::getString(musicJson,"name");
             }
 
             // We only want to bother adding the rest to the database if there's any music to actually play
@@ -284,7 +276,7 @@ void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
                     std::string muted = "NULL";
 
                     if (musicJson.find("pitch") != musicJson.end()) {
-                        pitch = DatabaseDataSanitiser::sanitiseDouble(musicJson["pitch"]);
+                        pitch = TypeCaster::cast(JsonHandler::getDouble(musicJson, "pitch"));
 
                         // 0 causes problems and higher than 5 is speaker-busting. Higher than 5 can work, but it is appalling so I am stopping it here.
                         if (std::stof(pitch) < 0.1 || std::stof(pitch) > 5) {
@@ -300,15 +292,15 @@ void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
                     // TODO: Validate that these values are in range
 
                     if (musicJson.find("loop") != musicJson.end()) {
-                        loop = DatabaseDataSanitiser::sanitiseBoolean(musicJson["loop"]);
+                        loop = TypeCaster::cast(JsonHandler::getBoolean(musicJson, "loop"));
                     }
 
                     if (musicJson.find("muted") != musicJson.end()) {
-                        muted = DatabaseDataSanitiser::sanitiseBoolean(musicJson["muted"]);
+                        muted = TypeCaster::cast(JsonHandler::getBoolean(musicJson,"muted"));
                     }
 
                     if (musicJson.find("volume") != musicJson.end()) {
-                        volume = DatabaseDataSanitiser::sanitiseInteger(musicJson["volume"]);
+                        volume = TypeCaster::cast(JsonHandler::getInteger(musicJson,"volume"));
 
                         if (std::stoi(volume) < 0 || std::stoi(volume) > 100) {
                             std::vector<std::string> error = {
@@ -320,14 +312,14 @@ void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
                     }
 
                     if (musicJson.find("startTime") != musicJson.end()) {
-                        startTime = DatabaseDataSanitiser::sanitiseInteger(musicJson["startTime"]);
-
+                        startTime = TypeCaster::cast(JsonHandler::getInteger(musicJson,"startTime"));
+                        // TODO: Implement this
                         throw ProjectBuilderException("Music startTime is currently unimplemented");
                     }
 
                     if (musicJson.find("endTime") != musicJson.end()) {
-                        endTime = DatabaseDataSanitiser::sanitiseInteger(musicJson["endTime"]);
-
+                        endTime = TypeCaster::cast(JsonHandler::getInteger(musicJson,"endTime"));
+                        // TODO: Implement this
                         throw ProjectBuilderException("Music endTime is currently unimplemented");
                     }
 
@@ -352,7 +344,7 @@ void ChapterBuilder::processSceneSegment(json sceneSegmentJson, int sceneId) {
     }
 
     if (sceneSegmentJson.find("visualEffectName") != sceneSegmentJson.end()) {
-        visualEffectName = sceneSegmentJson["visualEffectName"];
+        visualEffectName = JsonHandler::getString(sceneSegmentJson,"visualEffectName");
     } else {
         visualEffectName = "NULL";
     }
@@ -405,14 +397,15 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
 
     if (lineJson.find("characterName") != lineJson.end()) {
         // TODO: Validate that the character exists in the database
-        overrideCharacterName = lineJson["characterName"];
+        overrideCharacterName = JsonHandler::getString(lineJson,"characterName");
     }
 
     if (lineJson.find("text") == lineJson.end()) {
+        // TODO: Make this work - it could be used for chaining together character sprites
         std::cout << "Warning: a line in this chapter does not have any text associated with it." << std::endl;
         text = "";
     } else {
-        text = lineJson["text"];
+        text = JsonHandler::getString(lineJson,"text");
 
         // TODO: Figure out how large the text will be, and warn the user if it is too long based on length and font size.
     }
@@ -424,18 +417,16 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
                     << "Warning: both characterId and characterName are present on the same line - characterName will override characterId."
                     << std::endl;
         } else {
-            characterId = lineJson["characterId"];
+            characterId = TypeCaster::cast(JsonHandler::getInteger(lineJson, "characterId"));
         }
 
     }
 
     if (lineJson.find("spoken") != lineJson.end()) {
-        if (lineJson["spoken"] == "TRUE" || lineJson["spoken"] == "true") {
-            // There is probably a better way of doing this...
-            std::string tempText = "\"";
-            tempText.append(text);
-            tempText.append("\"");
-            text = tempText;
+        if (JsonHandler::getBoolean(lineJson, "spoken")) {
+            text = Utils::implodeString(std::vector<std::string> {
+               "\"",text,"\""
+            });
         }
     }
 
@@ -460,7 +451,7 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
 
                 if (characterState.find("characterFirstName") != characterState.end()) {
 
-                    std::string characterFirstName = characterState["characterFirstName"];
+                    std::string characterFirstName = JsonHandler::getString(characterState,"characterFirstName");
 
                     auto *dataSet = new DataSet();
 
@@ -501,14 +492,14 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
                 }
 
             } else {
-                characterId = characterState["characterId"];
+                characterId = TypeCaster::cast(JsonHandler::getInteger(characterState,"characterId"));
             }
 
             if (characterState.find("spriteName") == characterState.end()) {
                 throw ProjectBuilderException("Each character state item must have a spriteName");
             }
 
-            spriteName = characterState["spriteName"];
+            spriteName = JsonHandler::getString(characterState,"spriteName");
 
             // TODO: Validate that a character exists with this ID (if it wasn't selected by name)
 

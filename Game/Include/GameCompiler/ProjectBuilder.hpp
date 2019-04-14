@@ -17,7 +17,7 @@ private:
 
 class ProjectBuilder {
   public:
-    ProjectBuilder(std::string fileName, DatabaseConnection *novelDb, DatabaseConnection *resourceDb, FileHandler *fileHandler);
+    ProjectBuilder(std::string fileName, DatabaseConnection *novelDb, DatabaseConnection *resourceDb, JsonHandler *fileHandler);
     ~ProjectBuilder();
     void process();
   private:
@@ -26,5 +26,5 @@ class ProjectBuilder {
     DatabaseConnection *novel;
     DatabaseConnection *resource;
     void processCharacters();
-    FileHandler *fHandler;
+    JsonHandler *fHandler;
 };

@@ -2,6 +2,7 @@
 
 Changes from v0.3.1:
 
+- Appropriate data types are now used for project files: JSON elements should now be their actual data types instead of always strings
 - Background transitions can now be set in the project by using the 'endTransition' property on a scene. The options for this are:
     none: Instantly switches to the next scene
     fade: Fades this scene out and causes the next scene to fade in

@@ -1,8 +1,9 @@
 #include <iostream>
 #include "Database/DatabaseConnection.hpp"
+#include "Database/TypeCaster.hpp"
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
-#include "GameCompiler/FileHandler.hpp"
+
+#include "GameCompiler/JsonHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/ResourceBuilder.hpp"
 #include "GameCompiler/ChapterBuilder.hpp"
@@ -17,7 +18,7 @@ using json = nlohmann::json;
  * [ProjectBuilder::ProjectBuilder Load the JSON file and report any errors]
  * @param fileName [File name to the project.json file]
  */
-ProjectBuilder::ProjectBuilder(std::string fileName, DatabaseConnection *novelDb, DatabaseConnection *resourceDb, FileHandler *fileHandler) {
+ProjectBuilder::ProjectBuilder(std::string fileName, DatabaseConnection *novelDb, DatabaseConnection *resourceDb, JsonHandler *fileHandler) {
 
   // Handled previously, but check again in case this class is ever used anywhere else.
   if (!Utils::fileExists(fileName)) {
@@ -81,7 +82,7 @@ void ProjectBuilder::process() {
   if (projectJson.find("version_number") == projectJson.end()) {
     versionNumber = "1.0";
   } else {
-    versionNumber = projectJson["version_number"];
+    versionNumber = JsonHandler::getString(projectJson,"version_number");
   }
 
   // TODO: Store the contributors in the database when we have an appropriate location for it
@@ -89,7 +90,7 @@ void ProjectBuilder::process() {
   std::string buildDate;
 
   if (projectJson.find("date") == projectJson.end()) {
-    buildDate = projectJson["date"];
+    buildDate = JsonHandler::getString(projectJson,"date");
   } else {
     buildDate = "NOW()";
   }
@@ -169,7 +170,7 @@ void ProjectBuilder::processCharacters() {
     std::string firstName;
     std::string surname;
     std::string bio;
-    std::string age = "0";
+    std::string age = "Unknown";
     std::string showOnCharacterMenu = "TRUE";
 
     if (character.find("firstName") == character.end()) {
@@ -180,23 +181,23 @@ void ProjectBuilder::processCharacters() {
       throw ProjectBuilderException("A character must have a characterId (It should be numeric)");
     }
 
-    characterId = character["characterId"];
-    firstName = character["firstName"];
+    characterId = TypeCaster::cast(JsonHandler::getInteger(character,"characterId"));
+    firstName = JsonHandler::getString(character,"firstName");
 
     if (character.find("surname") != character.end()) {
-      surname = character["surname"];
+      surname = JsonHandler::getString(character,"surname");
     }
 
     if (character.find("bio") != character.end()) {
-      bio = character["bio"];
+      bio = JsonHandler::getString(character,"bio");
     }
 
     if (character.find("age") != character.end()) {
-      age = character["age"];
+      age = TypeCaster::cast(JsonHandler::getInteger(character,"age"));
     }
 
     if (character.find("showOnCharacterMenu") != character.end()) {
-      showOnCharacterMenu = character["showOnCharacterMenu"];
+      showOnCharacterMenu = TypeCaster::cast(JsonHandler::getBoolean(character,"showOnCharacterMenu"));
     }
 
     // Check if a character with this ID already exists
@@ -220,7 +221,7 @@ void ProjectBuilder::processCharacters() {
 
     std::vector<std::string> columns = {"id", "first_name", "surname", "bio", "age", "showOnCharacterMenu"};
     std::vector<std::string> values = {characterId, firstName, surname, bio, age, showOnCharacterMenu};
-    std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_STRING, DATA_TYPE_STRING, DATA_TYPE_STRING, DATA_TYPE_NUMBER, DATA_TYPE_BOOLEAN};
+    std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_STRING, DATA_TYPE_STRING, DATA_TYPE_STRING, DATA_TYPE_STRING, DATA_TYPE_BOOLEAN};
 
     novel->insert("characters", columns, values, types);
 
@@ -254,7 +255,7 @@ void ProjectBuilder::processCharacters() {
           throw ProjectBuilderException(Utils::implodeString(errorMessage, ""));
         }
 
-        name = characterSprite["name"];
+        name = JsonHandler::getString(characterSprite,"name");
 
         {
           std::vector<std::string> query = {

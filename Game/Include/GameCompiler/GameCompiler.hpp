@@ -3,14 +3,14 @@
 
 class GameCompiler {
 public:
-  GameCompiler(GameCompilerOptions *gameCompilerOptions, FileHandler *fileHandler);
+  GameCompiler(GameCompilerOptions *gameCompilerOptions, JsonHandler *fileHandler);
   ~GameCompiler();
   bool process();
 private:
   void createResourceDatabase();
   void createNovelDatabase();
   GameCompilerOptions *compilerOptions;
-  FileHandler *fHandler;
+  JsonHandler *fHandler;
 };
 
 #endif

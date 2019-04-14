@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include "Database/DatabaseConnection.hpp"
-#include "GameCompiler/FileHandler.hpp"
+#include "GameCompiler/JsonHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
 #include "Misc/ParameterHandler.hpp"
@@ -12,6 +12,8 @@
 #include <Exceptions/MisuseException.hpp>
 
 int main(int argc, char *argv[]) {
+
+    auto fileHandler = new JsonHandler();
 
     try {
 
@@ -94,8 +96,6 @@ int main(int argc, char *argv[]) {
 
         }
 
-        auto fileHandler = new FileHandler();
-
         try {
             auto *compiler = new GameCompiler(compilerOptions, fileHandler);
             compiler->process();
@@ -124,6 +124,9 @@ int main(int argc, char *argv[]) {
         }
 
     } catch (GeneralException &e) {
-        std::cout << "An error occurred while building your project: " << e.what() << std::endl;
+        std::cout <<
+                  "A JSON error occurred while building your project." << std::endl <<
+                  std::endl << "File: " << fileHandler->getLastReadFileName() <<
+                  std::endl << "Message: " << e.what() << std::endl;
     }
 }

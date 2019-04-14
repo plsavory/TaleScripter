@@ -3,7 +3,7 @@
 
 class ChapterBuilder {
 public:
-    ChapterBuilder(const std::string &fileName, DatabaseConnection *novelDb, FileHandler *fileHandler);
+    ChapterBuilder(const std::string &fileName, DatabaseConnection *novelDb, JsonHandler *fileHandler);
 
     ~ChapterBuilder();
 
@@ -19,7 +19,7 @@ private:
 
     void processLine(json lineJson, int sceneSegmentId);
 
-    FileHandler *fHandler;
+    JsonHandler *fHandler;
 };
 
 #endif

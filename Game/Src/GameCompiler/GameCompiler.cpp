@@ -3,11 +3,11 @@
 #include "Database/DatabaseSchema.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "Exceptions/ProjectBuilderException.hpp"
-#include "GameCompiler/FileHandler.hpp"
+#include "GameCompiler/JsonHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
 
-GameCompiler::GameCompiler(GameCompilerOptions *gameCompilerOptions, FileHandler *fileHandler) {
+GameCompiler::GameCompiler(GameCompilerOptions *gameCompilerOptions, JsonHandler *fileHandler) {
 
   compilerOptions = gameCompilerOptions;
   fHandler = fileHandler;

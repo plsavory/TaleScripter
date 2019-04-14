@@ -5,7 +5,8 @@
 #include <string>
 #include "Misc/Utils.hpp"
 #include "Database/DatabaseConnection.hpp"
-#include "GameCompiler/FileHandler.hpp"
+#include "Database/TypeCaster.hpp"
+#include "GameCompiler/JsonHandler.hpp"
 #include "GameCompiler/ResourceBuilder.hpp"
 #include "Exceptions/ProjectBuilderException.hpp"
 
@@ -19,7 +20,7 @@ using json = nlohmann::json;
  * @param projectDirectory [The working directory of the project]
  */
 ResourceBuilder::ResourceBuilder(DatabaseConnection *resourceDb, const std::string& projectDirectory,
-                                 FileHandler *fileHandler) {
+                                 JsonHandler *fileHandler) {
     resource = resourceDb;
 
     resourceDirectory = projectDirectory;
@@ -78,13 +79,13 @@ void ResourceBuilder::processBackgroundImages() {
         }
 
         if (backgroundImage.find("enabled") != backgroundImage.end()) {
-            enabled = backgroundImage["enabled"];
+            enabled = TypeCaster::cast(JsonHandler::getBoolean(backgroundImage,"enabled"));
         } else {
             enabled = "TRUE"; // If not stated otherwise, assume that it is enabled
         }
 
-        name = backgroundImage["name"];
-        fileName = backgroundImage["fileName"];
+        name = JsonHandler::getString(backgroundImage,"name");
+        fileName = JsonHandler::getString(backgroundImage,"fileName");
 
         std::vector<std::string> columns = {"name", "filename", "enabled"};
         std::vector<std::string> values = {name, fileName, enabled};
@@ -110,23 +111,23 @@ void ResourceBuilder::processBackgroundImages() {
             std::string offsetTop = "0";
 
             if (attributeJson.find("enabled") != attributeJson.end()) {
-                enabled = attributeJson["enabled"];
+                enabled = TypeCaster::cast(JsonHandler::getBoolean(attributeJson,"enabled"));
             }
 
             if (attributeJson.find("maxHeight") != attributeJson.end()) {
-                maxHeight = attributeJson["maxHeight"];
+                maxHeight = TypeCaster::cast(JsonHandler::getInteger(attributeJson,"maxHeight"));
             }
 
             if (attributeJson.find("maxWidth") != attributeJson.end()) {
-                maxWidth = attributeJson["maxWidth"];
+                maxWidth = TypeCaster::cast(JsonHandler::getInteger(attributeJson,"maxWidth"));
             }
 
             if (attributeJson.find("offsetLeft") != attributeJson.end()) {
-                offsetLeft = attributeJson["offsetLeft"];
+                offsetLeft = TypeCaster::cast(JsonHandler::getInteger(attributeJson,"offsetLeft"));
             }
 
             if (attributeJson.find("offsetTop") != attributeJson.end()) {
-                offsetTop = attributeJson["offsetTop"];
+                offsetTop = TypeCaster::cast(JsonHandler::getInteger(attributeJson,"offsetTop"));
             }
 
             std::vector<std::string> columns = {"background_image_id", "enabled", "max_height", "max_width",
@@ -179,13 +180,13 @@ void ResourceBuilder::processTextures() {
         }
 
         if (texture.find("enabled") != texture.end()) {
-            enabled = texture["enabled"];
+            enabled = TypeCaster::cast(JsonHandler::getBoolean(texture,"enabled"));
         } else {
             enabled = "TRUE"; // If not stated otherwise, assume that it is enabled
         }
 
-        name = texture["name"];
-        fileName = texture["fileName"];
+        name = JsonHandler::getString(texture,"name");
+        fileName = JsonHandler::getString(texture,"fileName");
 
         std::vector<std::string> columns = {"name", "filename", "enabled"};
         std::vector<std::string> values = {name, fileName, enabled};
@@ -234,13 +235,13 @@ void ResourceBuilder::processFonts() {
         }
 
         if (font.find("enabled") != font.end()) {
-            enabled = font["enabled"];
+            enabled = TypeCaster::cast(JsonHandler::getBoolean(font,"enabled"));
         } else {
             enabled = "TRUE"; // If not stated otherwise, assume that it is enabled
         }
 
-        name = font["name"];
-        fileName = font["fileName"];
+        name = JsonHandler::getString(font,"name");
+        fileName = JsonHandler::getString(font,"fileName");
 
         std::vector<std::string> columns = {"name", "filename", "enabled"};
         std::vector<std::string> values = {name, fileName, enabled};
@@ -289,13 +290,13 @@ void ResourceBuilder::processMusic() {
         }
 
         if (music.find("enabled") != music.end()) {
-            enabled = music["enabled"];
+            enabled = TypeCaster::cast(JsonHandler::getBoolean(music,"enabled"));
         } else {
             enabled = "TRUE"; // If not stated otherwise, assume that it is enabled
         }
 
-        name = music["name"];
-        fileName = music["fileName"];
+        name = JsonHandler::getString(music,"name");
+        fileName = JsonHandler::getString(music,"fileName");
 
         std::vector<std::string> columns = {"name", "filename", "enabled"};
         std::vector<std::string> values = {name, fileName, enabled};

@@ -141,17 +141,18 @@ add_executable(${EXECUTABLE_NAME}
 add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp
         Game/Include/Misc/Utils.hpp
-        Game/Include/Database/DatabaseDataSanitiser.hpp
         Game/Include/Database/DatabaseConnection.hpp
         Game/Include/Database/DatabaseSchema.hpp
+        Game/Include/Database/TypeCaster.hpp
         Game/Include/GameCompiler/ChapterBuilder.hpp
         Game/Include/GameCompiler/GameCompiler.hpp
         Game/Include/GameCompiler/GameCompilerChapterParser.hpp
         Game/Include/GameCompiler/ProjectBuilder.hpp
         Game/Include/GameCompiler/ResourceBuilder.hpp
-        Game/Include/GameCompiler/FileHandler.hpp
+        Game/Include/GameCompiler/JsonHandler.hpp
         Game/Include/Exceptions/GeneralException.hpp
         Game/Include/Exceptions/ProjectBuilderException.hpp
+        Game/Include/Exceptions/JsonParserException.hpp
         Game/Include/Exceptions/ProjectDataException.hpp
         Game/Src/Database/DatabaseConnection.cpp
         Game/Src/Database/DatabaseSchema.cpp
