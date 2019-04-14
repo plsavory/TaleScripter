@@ -16,6 +16,7 @@ BackgroundImageRenderer::BackgroundImageRenderer(sf::RenderWindow *windowPointer
   upcomingBackground = nullptr;
   backgroundColour = nullptr;
   drawingEnabled = true;
+  backgroundAlpha = 255;
 
 }
 
@@ -66,12 +67,10 @@ void BackgroundImageRenderer::processQueue() {
 }
 
 bool BackgroundImageRenderer::isQueueEmpty() {
-  return (backgroundLoadQueue.size() == 0);
+  return (backgroundLoadQueue.empty());
 }
 
 void BackgroundImageRenderer::draw() {
-  // Possible error that may occur here: currentBackground or upcomingBackground may be null and cause a crash
-  // TODO: Do something about this.
 
   if (!drawingEnabled) {
     return;
@@ -179,9 +178,19 @@ void BackgroundImageRenderer::setBackground(std::string name) {
     return;
   }
 
-  // TODO: Handle background fade transitions
   currentBackground = background[bgId];
   enableImageDrawing();
+}
+
+void BackgroundImageRenderer::setUpcomingBackground(std::string name) {
+    int bgId = findBackground(name);
+
+    if (bgId < 0) {
+        return;
+    }
+
+    upcomingBackground = background[bgId];
+    enableImageDrawing();
 }
 
 void BackgroundImageRenderer::setBackgroundColour(sf::Color *colour) {
@@ -215,3 +224,25 @@ void BackgroundImageRenderer::enableImageDrawing() {
 bool BackgroundImageRenderer::isDrawingEnabled() {
   return drawingEnabled;
 }
+
+/**
+ * Fades-out the current background by the given amount on every call
+ * Removes the upcoming background and makes that one the current background when alpha of current background becomes 0
+ */
+void BackgroundImageRenderer::setBackgroundAlpha(int alpha) {
+
+    if (alpha <= 0) {
+        drawingEnabled = false;
+        currentBackground = upcomingBackground;
+        upcomingBackground = nullptr; // Don't delete it as the resource manager can do this
+        backgroundAlpha = 255;
+        drawingEnabled = true;
+    } else {
+        backgroundAlpha = alpha;
+    }
+
+    if (currentBackground) {
+        currentBackground->setAlpha(backgroundAlpha);
+    }
+
+};

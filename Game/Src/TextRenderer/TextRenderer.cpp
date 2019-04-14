@@ -6,74 +6,72 @@
 #include "TextRenderer/TextRenderer.hpp"
 
 TextRenderer::TextRenderer(sf::RenderWindow *windowPointer, FontManager *fontManagerPointer) {
-  window = windowPointer;
-  fontManager = fontManagerPointer;
-
-  for (auto & currentText : text) {
-    currentText = nullptr;
-  }
-
-  retryLoadClock = new sf::Clock();
-
+    window = windowPointer;
+    fontManager = fontManagerPointer;
+    retryLoadClock = new sf::Clock();
 }
 
 TextRenderer::~TextRenderer() {
 
-  for (auto & currentText: text) {
-    if (currentText) {
-      delete(currentText);
+    for (auto &currentText: text) {
+        if (currentText) {
+            delete (currentText);
+        }
     }
-  }
 
 }
 
-Text* TextRenderer::addText(const std::string& name, const std::string& font) {
+/**
+ * Adds a piece of text to the text renderer
+ * @param name - Name of the new piece of text, can be used to retrieve or delete it later
+ * @param font - The name of the font, must be a font already loaded in FontManager
+ * @return - Pointer to the new text object, can be manually drawn from another object if the automatic draw flag is unset
+ */
+Text *TextRenderer::addText(const std::string &name, const std::string &font) {
+    text.push_back(new Text(name, font, fontManager));
+    return text.back();
+}
 
-  for (auto & currentText : text) {
-    if (!currentText) {
-      currentText = new Text(name, font, fontManager);
-      return currentText;
+/**
+ * Removes a piece of text from the renderer
+ * @param name
+ */
+void TextRenderer::removeText(const std::string &name) {
+    // TODO: Test that this actually works...
+    for (int i = 0; i < text.size(); i++) {
+        if (text[i]->getName() == name) {
+            delete (text[i]);
+            text.erase(text.begin() + i);
+        }
     }
-  }
-
-  // TODO: Store text objects in a vector so that this situation never happens.
-  std::vector<std::string> errorMessage = {
-          "Could not add text '", name, "' to the text renderer, the maximum number of text objects have already been added."
-  };
-
-  throw ResourceException(Utils::implodeString(errorMessage));
 }
 
 void TextRenderer::update() {
-  // Retry any font setting where the font wasn't loaded before
-  if (retryLoadClock->getElapsedTime().asMilliseconds() < RETRY_LOADING_TIME) {
-    return;
-  }
-
-  for (auto & currentText : text) {
-    if (currentText) {
-      currentText->reAttemptLoad();
+    // Retry any font setting where the font wasn't loaded before
+    if (retryLoadClock->getElapsedTime().asMilliseconds() < RETRY_LOADING_TIME) {
+        return;
     }
-  }
 
-  retryLoadClock->restart();
+    for (auto &currentText : text) {
+        currentText->reAttemptLoad();
+    }
+
+    retryLoadClock->restart();
 }
 
 void TextRenderer::draw() {
 
-  for (auto & currentText : text) {
-    if (currentText) {
+    for (auto &currentText : text) {
 
-      if (!currentText->isVisible()) {
-        continue;
-      }
+        if (!currentText->isVisible() || !currentText->automaticDrawEnabled()) {
+            continue;
+        }
 
-      window->draw(*currentText->getTextObject());
+        window->draw(*currentText->getTextObject());
     }
-  }
 
 }
 
-FontManager* TextRenderer::getFontManager() {
-  return fontManager;
+FontManager *TextRenderer::getFontManager() {
+    return fontManager;
 }

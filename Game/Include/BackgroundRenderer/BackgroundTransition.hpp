@@ -30,6 +30,7 @@ public:
     // Static types
     static const int FADE_IN;
     static const int FADE_OUT;
+    static const int MORPH;
 private:
     sf::RenderWindow *window;
     int width;
@@ -55,10 +56,15 @@ private:
 
     void FadeOutInit();
 
+    void FadeMorphInit();
+
     // Transition-specific update functions
     void FadeInUpdate();
 
     void FadeOutUpdate();
+
+    void FadeMorphUpdate();
+
 };
 
 #endif

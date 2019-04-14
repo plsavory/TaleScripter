@@ -111,16 +111,18 @@ private:
 
 class NovelScene {
 public:
-  NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int strColourId, int etrColourId, Character *character[]);
+  NovelScene(DatabaseConnection *db, DataSetRow *data, Character *character[]);
   ~NovelScene();
   NovelSceneSegment* getSceneSegment(int id);
   int getSegmentCount();
   int getId();
   std::string getBackgroundImageName();
   int getBackgroundColourId();
-  int getTransitionColourId();
   int getStartTransitionColourId();
   int getEndTransitionColourId();
+  int getEndTransitionTypeId() {
+      return endTransitionTypeId;
+  }
 private:
   int id;
   std::string backgroundImage;
@@ -129,6 +131,8 @@ private:
   int backgroundColourId;
   int startTransitionColourId;
   int endTransitionColourId;
+  int startTransitionTypeId;
+  int endTransitionTypeId;
 };
 
 class NovelChapter {
@@ -163,6 +167,17 @@ public:
   NovelChapter* getCurrentChapter();
   ProjectInformation* getProjectInformation();
   Character* getCharacter(int id);
+  NovelScene* getPreviousScene() {
+      return previousScene;
+  };
+
+  /**
+   * Gets the current scene index within the chapter
+   * @return the scene index
+   */
+  int getCurrentSceneIndex() {
+      return currentScene;
+  };
 private:
   void loadFromDatabase();
   DatabaseConnection *novelDb;
@@ -174,6 +189,7 @@ private:
   int currentSceneSegment;
   int currentSceneSegmentLine;
   ProjectInformation *projectInformation;
+  NovelScene *previousScene;
 };
 
 #endif

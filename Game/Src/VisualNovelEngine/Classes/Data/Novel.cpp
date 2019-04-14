@@ -194,6 +194,13 @@ NovelSceneSegment *NovelData::advanceToNextSegment() {
 
 NovelScene *NovelData::advanceToNextScene() {
     currentSceneSegment = -1;
+
+    if (currentScene >= 0) {
+        // We won't be always be jumping between them in a linear fashion
+        previousScene = getCurrentScene(); // Keep a reference to it as sometimes we need to use it during transitions
+    } else {
+        previousScene = nullptr;
+    }
     currentScene++;
     return getCurrentScene();
 }
@@ -257,13 +264,7 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
             endTransitionColourId = sceneData->getRow(i)->getColumn("end_transition_colour_id")->getData()->asInteger();
         }
 
-        scene[i] = new NovelScene(db,
-                                  sceneData->getRow(i)->getColumn("id")->getData()->asInteger(),
-                                  backgroundImageName,
-                                  backgroundColourId,
-                                  startTransitionColourId,
-                                  endTransitionColourId,
-                                  character);
+        scene[i] = new NovelScene(db, sceneData->getRow(i), character);
         sceneCount++;
     }
 
@@ -295,13 +296,14 @@ int NovelChapter::getSceneCount() {
 }
 
 // Scene-specific stuff
-NovelScene::NovelScene(DatabaseConnection *db, int sId, std::string bgImage, int bgColourId, int strColourId,
-                       int etrColourId, Character *character[]) {
-    id = sId;
-    backgroundImage = bgImage;
-    backgroundColourId = bgColourId;
-    startTransitionColourId = strColourId;
-    endTransitionColourId = etrColourId;
+NovelScene::NovelScene(DatabaseConnection *db, DataSetRow *data, Character *character[]) {
+    id = data->getColumn("id")->getData()->asInteger();
+    backgroundImage = data->getColumn("background_image_name")->getData()->asString();
+    backgroundColourId = data->getColumn("background_colour_id")->getData()->asInteger();
+    startTransitionColourId = data->getColumn("start_transition_colour_id")->getData()->asInteger();
+    endTransitionColourId = data->getColumn("end_transition_colour_id")->getData()->asInteger();
+    startTransitionTypeId = data->getColumn("start_transition_type_id")->getData()->asInteger();
+    endTransitionTypeId = data->getColumn("end_transition_type_id")->getData()->asInteger();
 
     segmentCount = 0;
 

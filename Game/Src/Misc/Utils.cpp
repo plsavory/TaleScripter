@@ -324,3 +324,8 @@ bool Utils::isAcceptedValue(std::vector<std::string> acceptedValues, std::string
 
     return false;
 }
+
+std::string Utils::strToLower(std::string subject) {
+    std::transform(subject.begin(), subject.end(), subject.begin(), ::tolower);
+    return subject;
+}

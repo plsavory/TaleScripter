@@ -80,6 +80,12 @@ public:
   std::string getName() {
     return name;
   }
+  void setAlpha(int alpha) {
+      if (myStatus == BackgroundStatus::bgLoaded) {
+          sf::Color color = mySprite->getColor();
+          mySprite->setColor(sf::Color(color.r, color.g, color.b, alpha));
+      }
+  }
   void setAttributes(BackgroundImageAttributes *a) {
     if (a) {
       attributes = a;
@@ -121,12 +127,14 @@ public:
   void update();
   void draw();
   void setBackground(std::string name);
+  void setUpcomingBackground(std::string name);
   int findBackground(std::string name);
   void setBackgroundColour(sf::Color *colour);
   void disableImageDrawing();
   void enableImageDrawing();
   bool isDrawingEnabled();
   sf::Color* getBackgroundColour();
+  void setBackgroundAlpha(int alpha);
 private:
   sf::RenderWindow *window;
   Background* addBackground(std::string name, std::string filename);
@@ -137,6 +145,7 @@ private:
   void loadBackground(int id);
   sf::Color *backgroundColour;
   bool drawingEnabled;
+  int backgroundAlpha;
 };
 
 #endif

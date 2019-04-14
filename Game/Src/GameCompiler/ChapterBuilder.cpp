@@ -148,10 +148,41 @@ void ChapterBuilder::processScene(json sceneJson, int chapterId) {
         startTransitionTypeId = "NULL";
     }
 
-    if (sceneJson.find("endTransitionTypeId") != sceneJson.end()) {
-        endTransitionTypeId = sceneJson["endTransitionTypeId"];
+    if (sceneJson.find("endTransition") != sceneJson.end()) {
+        std::string endTransitionType = sceneJson["endTransition"];
+
+        std::vector<std::string> acceptedValues = {
+                "none", "morph", "fade"
+        };
+
+        if (!Utils::isAcceptedValue(acceptedValues, endTransitionType, true)) {
+            std::vector<std::string> error = {
+                "Unknown endTransition type '", endTransitionType, "' \n",
+                "Accepted values: 'fade', 'morph'"
+            };
+            throw ProjectBuilderException(Utils::implodeString(error));
+        }
+
+        endTransitionType = Utils::strToLower(endTransitionType);
+
+        if (endTransitionType == "fade") {
+            endTransitionTypeId = "2";
+        } else if (endTransitionType == "morph") {
+            endTransitionTypeId = "3";
+        } else {
+            endTransitionTypeId = "NULL";
+        }
     } else {
         endTransitionTypeId = "NULL";
+    }
+
+    if (sceneJson.find("morphToNextBackground") != sceneJson.end()) {
+        std::string type = sceneJson["morphToNextBackground"];
+        type = DatabaseDataSanitiser::sanitiseBoolean(type);
+
+        if (type == "TRUE") {
+            endTransitionTypeId = "3"; // 3 = morph
+        }
     }
 
     // Insert the data into the database...

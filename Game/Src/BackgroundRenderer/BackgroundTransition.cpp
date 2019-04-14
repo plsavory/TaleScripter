@@ -9,6 +9,7 @@
 
 const int BackgroundTransition::FADE_IN = 0;
 const int BackgroundTransition::FADE_OUT = 1;
+const int BackgroundTransition::MORPH = 2;
 
 BackgroundTransition::BackgroundTransition(sf::RenderWindow *windowPointer, int transitionType, int delayBeforeStart,
                                            int screenWidth, int screenHeight, int delayAfterFinish, int animationLength,
@@ -41,6 +42,9 @@ BackgroundTransition::BackgroundTransition(sf::RenderWindow *windowPointer, int 
             break;
         case FADE_OUT:
             FadeOutInit();
+            break;
+        case MORPH:
+            FadeMorphInit();
             break;
         default:
             delete (this);
@@ -86,6 +90,8 @@ bool BackgroundTransition::update() {
         case FADE_OUT:
             FadeOutUpdate();
             break;
+        case MORPH:
+            FadeMorphUpdate();
         default:
             break;
     }
@@ -165,4 +171,27 @@ void BackgroundTransition::FadeOutUpdate() {
     backgroundOverlay->setAlpha(alpha);
     transitionCompleted = true;
 
+}
+
+void BackgroundTransition::FadeMorphInit() {
+    alpha = 255;
+}
+
+void BackgroundTransition::FadeMorphUpdate() {
+
+    if (transitionCompleted) {
+        return;
+    }
+
+    if (alpha > 0) {
+        alpha -= (255/60*length);
+        backgroundImageRenderer->setBackgroundAlpha(alpha);
+        return;
+    }
+
+    if (delay > 0) {
+        delayClock = new sf::Clock();
+    }
+
+    transitionCompleted = true;
 }

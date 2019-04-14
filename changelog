@@ -2,6 +2,11 @@
 
 Changes from v0.3.1:
 
+- Background transitions can now be set in the project by using the 'endTransition' property on a scene. The options for this are:
+    none: Instantly switches to the next scene
+    fade: Fades this scene out and causes the next scene to fade in
+    morph: Causes this scene to morph into the next one, the current background fades out while the new one fades in at the same time
+
 - When playing music, the following options are now available:
     loop (true or false)
     pitch (0.1-5)

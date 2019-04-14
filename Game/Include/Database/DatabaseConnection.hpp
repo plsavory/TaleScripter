@@ -35,6 +35,14 @@ struct DataContainer {
     }
 
     /**
+     * Does the same as getRawData for now, in its own function in case any extra processing is needed in future
+     * @return
+     */
+    std::string asString() {
+        return getRawData();
+    }
+
+    /**
      * Formats the data contained within this object as an integer and returns it
      * @return
      */

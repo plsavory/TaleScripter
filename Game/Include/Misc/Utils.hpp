@@ -31,6 +31,7 @@ public:
   static std::string getSystemDateTime(DateFormat dateFormat);
   static std::vector<int> getMonthLengthMatrix(bool leapYear);
   static bool isAcceptedValue(std::vector<std::string> acceptedValues, std::string subject, bool caseInsensitive);
+  static std::string strToLower(std::string subject);
 private:
 };
 
