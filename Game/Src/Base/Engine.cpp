@@ -42,4 +42,5 @@ Engine::~Engine() {
     delete (inputManager);
     delete (backgroundImageRenderer);
     delete (backgroundTransitionRenderer);
+    delete (characterSpriteRenderer);
 }

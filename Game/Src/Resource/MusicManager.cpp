@@ -4,33 +4,24 @@
 #include "Resource/MusicManager.hpp"
 
 MusicManager::MusicManager() {
-  // Null-out the audio audio streams
-  for (int i = 0; i < MAX_AUDIO_STREAMS; i++) {
-    audioStream[i] = nullptr;
-  }
+
 }
 
 MusicManager::~MusicManager() {
 
-  for (int i = 0; i < MAX_AUDIO_STREAMS; i++) {
-    if (audioStream[i]) {
-      delete audioStream[i];
-    }
+  for (auto & currentAudioStream : audioStream) {
+    currentAudioStream->stop(true);
+    delete currentAudioStream;
   }
 
 }
 
 AudioStream* MusicManager::addStream(std::string name, std::string fname) {
 
-  for (int i = 0; i < MAX_AUDIO_STREAMS; i++) {
-    if (!audioStream[i]) {
-      // Empty slot found, add a stream
-      audioStream[i] = new AudioStream(name, fname);
-      return audioStream[i];
-    }
-  }
-
-  return nullptr;
+  // Add a stream
+  auto *stream = new AudioStream(name, fname);
+  audioStream.push_back(stream);
+  return stream;
 }
 
 /**
@@ -58,10 +49,6 @@ void MusicManager::playAudioStream(int id) {
   // TODO (I don't think this is needed, decide later when it isn't 2am.)
 }
 
-void MusicManager::addAllStreamsFromDatabase() {
-  // TODO
-}
-
 /**
  * [update Process any load requests]
  */
@@ -71,8 +58,7 @@ void MusicManager::processQueue() {
   }
 
   // Stop all other audio streams, do nothing if we're trying to re-play the already-playing stream
-  for (int i = 0; i < MAX_AUDIO_STREAMS; i++) {
-    if (audioStream[i]) {
+  for (int i = 0; i < audioStream.size(); i++) {
       if (audioStream[i]->isPlaying()) {
 
         // Do nothing if we're trying to re-play the stream which is already playing
@@ -83,7 +69,6 @@ void MusicManager::processQueue() {
 
         audioStream[i]->stop(true);
       }
-    }
   }
 
   // Play the stream
@@ -108,7 +93,7 @@ bool MusicManager::isQueueEmpty() {
 
 AudioStream* MusicManager::getAudioStream(int id) {
 
-  if (audioStream[id]) {
+  if (id < audioStream.size()) {
     return audioStream[id];
   }
 
@@ -130,12 +115,10 @@ AudioStream* MusicManager::getAudioStream(std::string name) {
 
 int MusicManager::findAudioStream(std::string name) {
 
-  for (int i = 0; i < MAX_AUDIO_STREAMS; i++) {
-    if (audioStream[i]) {
+  for (int i = 0; i < audioStream.size(); i++) {
       if (audioStream[i]->getName() == name) {
         return i;
       }
-    }
   }
 
   return -1;

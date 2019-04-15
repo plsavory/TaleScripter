@@ -12,8 +12,6 @@
 #include "VisualNovelEngine/Classes/Data/DataModels/MusicPlaybackRequestMetadata.hpp"
 #include "Resource/MusicPlayRequest.hpp"
 
-#define MAX_AUDIO_STREAMS 50
-
 enum AudioStreamState {
     Unloaded, Stopped, Playing, Paused, Error
 };
@@ -153,7 +151,7 @@ public:
     void loadAllFromDatabase(DatabaseConnection *database);
 
 private:
-    AudioStream *audioStream[MAX_AUDIO_STREAMS];
+    std::vector<AudioStream*> audioStream;
     std::queue<MusicPlayRequest> playRequestQueue;
 };
 

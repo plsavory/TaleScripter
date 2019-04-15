@@ -29,7 +29,9 @@ ResourceManager::ResourceManager(BackgroundImageRenderer *backgroundImageRendere
 ResourceManager::~ResourceManager() {
   terminateLoadingThread = true;
 
-  delete textureManager;
+  delete(textureManager);
+  delete(musicManager);
+  delete(fontManager);
 }
 
 void ResourceManager::update() {

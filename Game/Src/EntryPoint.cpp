@@ -22,6 +22,8 @@ int main(int argc, char* argv[])
   try {
       Game *game = new Game();
       game->run();
+      delete(game);
+      return 0;
   } catch (GeneralException &e) {
       // Exceptions should be caught here as a last resort, as the visual error handler will later be added.
       std::cout<<"Caught an exception: "<<e.what()<<std::endl;
