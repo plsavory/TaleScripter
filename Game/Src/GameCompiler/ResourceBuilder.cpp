@@ -6,7 +6,7 @@
 #include "Misc/Utils.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "Database/TypeCaster.hpp"
-#include "GameCompiler/JsonHandler.hpp"
+#include "Misc/JsonHandler.hpp"
 #include "GameCompiler/ResourceBuilder.hpp"
 #include "Exceptions/ProjectBuilderException.hpp"
 

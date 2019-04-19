@@ -3,7 +3,7 @@
 #include "Database/DatabaseSchema.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "Exceptions/ProjectBuilderException.hpp"
-#include "GameCompiler/JsonHandler.hpp"
+#include "Misc/JsonHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
 

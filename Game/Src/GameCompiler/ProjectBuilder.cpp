@@ -3,7 +3,7 @@
 #include "Database/TypeCaster.hpp"
 #include <nlohmann/json.hpp>
 
-#include "GameCompiler/JsonHandler.hpp"
+#include "Misc/JsonHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/ResourceBuilder.hpp"
 #include "GameCompiler/ChapterBuilder.hpp"

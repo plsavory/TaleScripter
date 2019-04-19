@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include "Database/DatabaseConnection.hpp"
-#include "GameCompiler/JsonHandler.hpp"
+#include "Misc/JsonHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
 #include "Misc/ParameterHandler.hpp"

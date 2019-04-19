@@ -8,7 +8,7 @@
 using json = nlohmann::json;
 
 #include "Database/DatabaseConnection.hpp"
-#include "GameCompiler/JsonHandler.hpp"
+#include "Misc/JsonHandler.hpp"
 #include "GameCompiler/ChapterBuilder.hpp"
 #include "Exceptions/ProjectBuilderException.hpp"
 #include "Exceptions/JsonParserException.hpp"

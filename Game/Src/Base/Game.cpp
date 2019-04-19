@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include "Config/ConfigHandler.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/Engine.hpp"
@@ -31,13 +32,26 @@ Game::~Game() {
  * [Game::run Initialise and run the game]
  */
 void Game::run() {
-    // TODO: Load from config file
-
-    int frameRateLimit = 60;
+    // Load from config file
+    auto configHandler = new ConfigHandler();
 
     // Initialise SFML
-    window = new sf::RenderWindow(sf::VideoMode(1280, 720), gameTitle, sf::Style::Default);
-    window->setFramerateLimit(frameRateLimit);
+    int style;
+
+    switch (configHandler->getConfig()->getDisplayMode()) {
+        case ConfigConstants::DISPLAY_MODE_WINDOWED:
+            style = sf::Style::Default;
+            break;
+        case ConfigConstants::DISPLAY_MODE_FULLSCREEN:
+            style = sf::Style::Fullscreen;
+            break;
+        default:
+            throw GeneralException("Display mode not supported.");
+    }
+
+    // TODO: Allow screen resolution to be set via. config file
+    window = new sf::RenderWindow(sf::VideoMode(1280, 720), gameTitle, style);
+    window->setFramerateLimit(configHandler->getConfig()->getFrameRate());
 
     // Create the main engine object(s)
     engine = new Engine(window);

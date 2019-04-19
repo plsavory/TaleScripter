@@ -61,6 +61,8 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/Base/GameScreen.hpp
         Game/Include/Base/Renderers.hpp
         Game/Include/Base/ErrorScreen.hpp
+        Game/Include/Config/Config.hpp
+        Game/Include/Config/ConfigHandler.hpp
         Game/Include/Database/DatabaseConnection.hpp
         Game/Include/Database/DatabaseSchema.hpp
         Game/Include/Exceptions/GeneralException.hpp
@@ -69,6 +71,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/Exceptions/MisuseException.hpp
         Game/Include/Exceptions/ResourceException.hpp
         Game/Include/Exceptions/InputHandlerException.hpp
+        Game/Include/Exceptions/JsonParserException.hpp
         Game/Include/Input/GamepadHandler.hpp
         Game/Include/Input/InputManager.hpp
         Game/Include/Input/KeyboardHandler.hpp
@@ -78,6 +81,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/Misc/ParameterHandler.hpp
         Game/Include/Misc/ProjectInfo.hpp
         Game/Include/Misc/Utils.hpp
+        Game/Include/Misc/JsonHandler.hpp
         Game/Include/Resource/FontManager.hpp
         Game/Include/Resource/MusicPlayRequest.hpp
         Game/Include/Resource/MusicManager.hpp
@@ -108,6 +112,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Src/Base/GameManager.cpp
         Game/Src/Base/GameScreen.cpp
         Game/Src/Base/ErrorScreen.cpp
+        Game/Src/Config/ConfigHandler.cpp
         Game/Src/Database/DatabaseConnection.cpp
         Game/Src/Database/DatabaseSchema.cpp
         Game/Src/Input/GamepadHandler.cpp
@@ -149,7 +154,7 @@ add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/GameCompiler/GameCompilerChapterParser.hpp
         Game/Include/GameCompiler/ProjectBuilder.hpp
         Game/Include/GameCompiler/ResourceBuilder.hpp
-        Game/Include/GameCompiler/JsonHandler.hpp
+        Game/Include/Misc/JsonHandler.hpp
         Game/Include/Exceptions/GeneralException.hpp
         Game/Include/Exceptions/ProjectBuilderException.hpp
         Game/Include/Exceptions/JsonParserException.hpp
