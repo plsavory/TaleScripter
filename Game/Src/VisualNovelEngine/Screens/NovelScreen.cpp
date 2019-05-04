@@ -52,6 +52,10 @@ void NovelScreen::update() {
         return;
     }
 
+    if (!characterSpriteRenderer->isDoingNothing()) {
+        return;
+    }
+
     textDisplay->update();
 
     // TODO: Allow for an auto mode which doesn't need user input

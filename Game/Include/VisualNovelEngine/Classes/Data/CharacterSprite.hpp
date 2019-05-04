@@ -3,7 +3,7 @@
 
 class CharacterSprite {
 public:
-  CharacterSprite(std::string cName, int tId, int characterId);
+  CharacterSprite(std::string cName, int tId, int pCharacterId);
   ~CharacterSprite();
   void setSprite(int id);
   std::string getName();
@@ -15,8 +15,11 @@ public:
   std::string getTextureName() {
     return textureName;
   }
+  int getCharacterId() {
+      return characterId;
+  }
 private:
-  int id;
+  int characterId;
   int textureId;
   std::string name;
   std::string textureName;

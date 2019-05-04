@@ -1,7 +1,6 @@
 #ifndef BASE_GAME_INCLUDED
 
 #define BASE_GAME_INCLUDED
-
 class Game {
 public:
     Game();
@@ -29,6 +28,7 @@ private:
     BackgroundImageRenderer *backgroundImageRenderer;
     BackgroundTransitionHandler *backgroundTransitionRenderer;
     CharacterSpriteRenderer *characterSpriteRenderer;
+    int frameRateLimit;
 #ifdef MULTITHREADED_RENDERING
     std::thread *renderingThread;
     void renderingThreadFunction();

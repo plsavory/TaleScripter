@@ -80,7 +80,7 @@ public:
   std::string getName() {
     return name;
   }
-  void setAlpha(int alpha) {
+  void setAlpha(float alpha) {
       if (myStatus == BackgroundStatus::bgLoaded) {
           sf::Color color = mySprite->getColor();
           mySprite->setColor(sf::Color(color.r, color.g, color.b, alpha));

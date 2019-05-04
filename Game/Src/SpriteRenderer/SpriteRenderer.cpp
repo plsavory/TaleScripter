@@ -6,10 +6,8 @@
 
 SpriteRenderer::SpriteRenderer(sf::RenderWindow *window, TextureManager *tManager) {
     displayWindow = window;
-    renderMode = SpriteRenderMode::Standard;
-    textureManager = tManager;
-
     renderMode = SpriteRenderMode::Prioritised;
+    textureManager = tManager;
 
     updateClock = new sf::Clock();
 

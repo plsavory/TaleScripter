@@ -29,6 +29,15 @@ public:
   bool hasProcessedPositioning() {
     return processedPositioning;
   };
+  bool isDoingNothing() {
+      for(int i = 0; i<activeSpriteCount; i++) {
+          if (!spriteSlot[i]->isDoingNothing()) {
+              return false;
+          }
+      }
+
+      return true;
+  }
 private:
   ResourceManager *resourceManager;
   SpriteRenderer *spriteRenderer;

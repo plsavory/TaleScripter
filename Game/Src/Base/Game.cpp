@@ -52,6 +52,7 @@ void Game::run() {
     // TODO: Allow screen resolution to be set via. config file
     window = new sf::RenderWindow(sf::VideoMode(1280, 720), gameTitle, style);
     window->setFramerateLimit(configHandler->getConfig()->getFrameRate());
+    frameRateLimit = configHandler->getConfig()->getFrameRate();
 
     // Create the main engine object(s)
     engine = new Engine(window);

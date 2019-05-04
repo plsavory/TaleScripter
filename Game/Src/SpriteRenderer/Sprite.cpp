@@ -40,18 +40,25 @@ bool Sprite::setImage(sf::Texture *image) {
   mySprite->setTexture(*myImage);
   sf::IntRect rect = sf::IntRect(0,0,myImage->getSize().x, myImage->getSize().y);
   mySprite->setTextureRect(rect);
+  mySprite->setPosition(myPosition);
+  mySprite->setColor(myColour);
   textureSet = true;
   return true;
 }
 
-void Sprite::setTextureName(std::string name) {
+void Sprite::setTextureName(std::string name, bool switchImmediately) {
   textureName = name;
   textureSet = false;
   textureId = -1;
+
+  if (switchImmediately) {
+      update();
+  }
 }
 
 void Sprite::setPosition(int x, int y) {
-  mySprite->setPosition(sf::Vector2f((float)x,(float)y));
+    myPosition = sf::Vector2f((float)x,(float)y);
+    mySprite->setPosition(myPosition);
 }
 
 void Sprite::update() {
@@ -62,7 +69,7 @@ void Sprite::update() {
     return;
   }
 
-  if (textureName == "") {
+  if (textureName.empty()) {
     return;
   }
 
