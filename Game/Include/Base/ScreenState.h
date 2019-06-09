@@ -15,7 +15,7 @@ public:
     }
 
     void changeState(int newState) {
-        currentState = newState;
+        upcomingState = newState;
     };
 
     int getCurrentState() {
@@ -26,12 +26,20 @@ public:
         return previousState;
     }
 
+    int getUpcomingState() {
+        return upcomingState;
+    }
+
+    void update() {
+        currentState = upcomingState;
+    }
+
     /**
      * Returns true if the state of the game has changed. Sets previousState to currentState when called.
      * @return
      */
     bool hasStateChanged() {
-        int previousStateBeforeReset = previousState;
+        int previousStateBeforeReset = upcomingState;
         previousState = currentState;
         return previousStateBeforeReset != currentState;
     }

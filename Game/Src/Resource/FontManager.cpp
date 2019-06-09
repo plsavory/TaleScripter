@@ -113,7 +113,7 @@ Font *FontManager::getFont(const std::string &name) {
     int fontId = findFont(name);
 
     if (fontId < 0) {
-        return nullptr;
+        throw ResourceException(Utils::implodeString({"No font named '", name, "' was found."}));
     }
 
     return font[fontId];

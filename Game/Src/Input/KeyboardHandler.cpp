@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include "Input/KeyboardHandler.hpp"
 #include <iostream>
+#include "Exceptions/InputHandlerException.hpp"
 
 KeyboardHandler::KeyboardHandler() {
 
@@ -34,7 +35,7 @@ int KeyboardHandler::bindEvent(std::string name, std::string key, bool onlyTrigg
   int result = bindEvent(name, keycode, onlyTriggerOnPress);
 
   if (result < 0) {
-    std::cout<<"Unable to bind keyboard event "<<name<<" with key "<<key<<std::endl;
+      throw InputHandlerException(Utils::implodeString({"Unable to bind keyboard event ",name," with key ",key}));
   }
   return result;
 

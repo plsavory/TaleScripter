@@ -22,6 +22,14 @@ GameManager::GameManager(Engine *enginePointer, const std::string &initialErrorM
     inputManager = engine->getInputManager();
     resourceManager = engine->getResourceManager();
 
+    // Register any global input events that we need
+    inputManager->bindKeyboardEvent("menu_left", "left", true);
+    inputManager->bindKeyboardEvent("menu_right", "right", true);
+    inputManager->bindKeyboardEvent("menu_up", "up", true);
+    inputManager->bindKeyboardEvent("menu_down", "down", true);
+    inputManager->bindKeyboardEvent("menu_next", "return", true);
+    inputManager->bindKeyboardEvent("menu_back", "escape", true);
+
     commonUI = new CommonUI(newWindow, resourceManager);
 
     // Create other objects
@@ -75,10 +83,11 @@ void GameManager::update() {
 
         // Start the game once initial resource loading has completed
         if (screenState->getCurrentState() == ScreenState::STATE_INIT && resourceManager->isQueueEmpty()) {
-            screenState->changeState(ScreenState::STATE_NOVEL);
+            screenState->changeState(ScreenState::STATE_TITLE);
         }
 
         handleScreenChanges();
+        screenState->update();
         gameTime->restart();
     } catch (GeneralException &e) {
         invokeErrorScreen(e);
@@ -95,6 +104,7 @@ void GameManager::draw() {
                 return;
             case ScreenState::STATE_TITLE:
                 titleScreen->draw();
+                return;
             case ScreenState::STATE_ERROR:
                 errorScreen->draw();
                 return;
@@ -120,10 +130,10 @@ void GameManager::handleScreenChanges() {
     }
 
     try {
-        switch (screenState->getCurrentState()) {
+        switch (screenState->getUpcomingState()) {
             case ScreenState::STATE_TITLE:
                 if (!titleScreen) {
-                    titleScreen = new TitleScreen(engine->getWindow(), novel->getNovelDatabase(), resourceManager);
+                    titleScreen = new TitleScreen(engine->getWindow(), novel->getNovelDatabase(), resourceManager, inputManager);
                 }
                 break;
             case ScreenState::STATE_NOVEL:

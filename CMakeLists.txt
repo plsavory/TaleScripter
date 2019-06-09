@@ -146,7 +146,12 @@ add_executable(${EXECUTABLE_NAME}
         Game/Src/Menus/TitleScreen.cpp
         Game/Include/Base/ScreenState.h
         Game/Include/UI/CommonUI.h
-        Game/Src/UI/CommonUI.cpp)
+        Game/Src/UI/CommonUI.cpp
+        Game/Include/UI/Elements/Button.h
+        Game/Src/UI/Elements/Button.cpp
+        Game/Include/UI/Groups/Menu.h
+        Game/Src/UI/Groups/Menu.cpp Game/Src/UI/Groups/MenuItem.cpp
+        Game/Include/UI/Groups/MenuItem.h)
 
 add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp

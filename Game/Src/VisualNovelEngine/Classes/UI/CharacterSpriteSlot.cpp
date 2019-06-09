@@ -74,9 +74,6 @@ void CharacterSpriteSlot::morphUpdate() {
         setAlpha(1, 0);
         updateState = UPDATE_STATE_NOTHING;
     }
-
-
-
 }
 
 /**
