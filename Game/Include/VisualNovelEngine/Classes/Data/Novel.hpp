@@ -170,6 +170,9 @@ public:
   NovelScene* getPreviousScene() {
       return previousScene;
   };
+  DatabaseConnection* getNovelDatabase() {
+      return novelDb;
+  }
 
   /**
    * Gets the current scene index within the chapter

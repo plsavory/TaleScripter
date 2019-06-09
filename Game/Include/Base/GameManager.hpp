@@ -4,14 +4,11 @@
 #define BASE_GAME_MANAGER_INCLUDED
 
 // Include all of the game GameScreens
+#include "ScreenState.h"
 #include "VisualNovelEngine/Screens/NovelScreen.hpp"
+#include "Menus/TitleScreen.h"
 #include "Base/ErrorScreen.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
-
-// Don't give anything in this enum the same name as a class, it breaks the build process - I learned this the hard way.
-enum GameState {
-    Init, Title, Menu, GameField, Test, Novel, ExceptionCaught
-};
 
 class GameManager {
 public:
@@ -27,20 +24,26 @@ public:
 
     void updateWindowPointers(sf::RenderWindow *windowPointer);
 
-    void changeScreen(GameState newState);
+    void handleScreenChanges();
 
     void invokeErrorScreen(GeneralException &e);
 
     void invokeErrorScreen(const std::string& message);
 private:
 
-    GameState currentGameState;
     Engine *engine;
     InputManager *inputManager;
     NovelScreen *novelScreen;
     ErrorScreen *errorScreen;
     NovelData *novel;
     ResourceManager *resourceManager;
+    ScreenState *screenState;
+
+    // Menus
+    CommonUI *commonUI;
+    TitleScreen *titleScreen;
+
+    sf::Clock *gameTime;
 };
 
 #endif

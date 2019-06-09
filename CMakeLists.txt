@@ -103,6 +103,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/VisualNovelEngine/Screens/NovelScreen.hpp
         Game/Include/VisualNovelEngine/NovelScreenClasses.hpp
         Game/Include/VisualNovelEngine/Classes/Data/VisualNovelEngineConstants.hpp
+        Game/Include/Menus/TitleScreen.h
         Game/Src/BackgroundRenderer/BackgroundImageRenderer.cpp
         Game/Src/BackgroundRenderer/BackgroundTransition.cpp
         Game/Src/BackgroundRenderer/BackgroundTransitionHandler.cpp
@@ -141,7 +142,11 @@ add_executable(${EXECUTABLE_NAME}
         Game/Src/VisualNovelEngine/Classes/UI/NovelTextDisplay.cpp
         Game/Src/VisualNovelEngine/Screens/NovelScreen.cpp
         Game/Src/EntryPoint.cpp
-        Game/Src/BackgroundRenderer/BackgroundOverlay.cpp)
+        Game/Src/BackgroundRenderer/BackgroundOverlay.cpp
+        Game/Src/Menus/TitleScreen.cpp
+        Game/Include/Base/ScreenState.h
+        Game/Include/UI/CommonUI.h
+        Game/Src/UI/CommonUI.cpp)
 
 add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp
@@ -166,7 +171,8 @@ add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Src/GameCompiler/ProjectBuilder.cpp
         Game/Src/GameCompiler/ResourceBuilder.cpp
         Game/Src/Misc/Utils.cpp
-        Game/Src/GameCompilerEntryPoint.cpp Game/Include/VisualNovelEngine/Classes/Data/VisualNovelEngineConstants.hpp)
+        Game/Src/GameCompilerEntryPoint.cpp
+        Game/Include/VisualNovelEngine/Classes/Data/VisualNovelEngineConstants.hpp)
 
 find_package(SFML 2.5.1 REQUIRED audio graphics window system )
 
