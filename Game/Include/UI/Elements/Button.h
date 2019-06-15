@@ -23,12 +23,15 @@ public:
 
     void setText(std::string newText);
 
-    void setPosition(sf::Vector2i newPosition);
+    void setPosition(sf::Vector2f newPosition);
 
+    sf::Vector2f getPosition();
+
+    sf::FloatRect getSize();
 private:
     sf::RenderWindow *window;
     ResourceManager *resourceManager;
-    sf::Vector2i position;
+    sf::Vector2f position;
     std::string name;
     sf::Text *text;
     sf::RectangleShape *selectedRectangle;

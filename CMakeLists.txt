@@ -151,7 +151,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Src/UI/Elements/Button.cpp
         Game/Include/UI/Groups/Menu.h
         Game/Src/UI/Groups/Menu.cpp Game/Src/UI/Groups/MenuItem.cpp
-        Game/Include/UI/Groups/MenuItem.h)
+        Game/Include/UI/Groups/MenuItem.h Game/Src/UI/Groups/ChoiceDialog.cpp Game/Include/UI/Groups/ChoiceDialog.h)
 
 add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp

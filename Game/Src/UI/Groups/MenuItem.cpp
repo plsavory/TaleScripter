@@ -50,7 +50,7 @@ void MenuItem::drawBack(bool selected) {
 
 }
 
-void MenuItem::setAsButton(std::string name, std::string text, sf::Vector2i position) {
+void MenuItem::setAsButton(std::string name, std::string text, sf::Vector2f position) {
 
     typeSetValidation();
 
@@ -78,4 +78,36 @@ std::string MenuItem::getName() {
         default:
             throw MisuseException("Unknown menu item type");
     }
+}
+
+sf::FloatRect MenuItem::getSize() {
+    // TODO: Handle other types
+    if (type != TYPE_BUTTON) {
+        throw MisuseException("Unimplemented MenuItem type");
+    }
+    return button->getSize();
+}
+
+void MenuItem::setPosition(sf::Vector2f position) {
+    button->setPosition(position);
+}
+
+sf::Vector2f MenuItem::getPosition() {
+    switch (type) {
+        case TYPE_BUTTON:
+            return button->getPosition();
+        default:
+            throw MisuseException("Unknown menu item type");
+    }
+}
+
+sf::FloatRect MenuItem::getGlobalBounds() {
+
+    switch (type) {
+        case TYPE_BUTTON:
+            return button->getSize();
+        default:
+            throw MisuseException("Unknown menu item type");
+    }
+
 }

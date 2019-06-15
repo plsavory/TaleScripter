@@ -61,7 +61,7 @@ void Button::setText(std::string newText) {
     text->setOrigin(text->getGlobalBounds().width/2, text->getGlobalBounds().height/2);
 }
 
-void Button::setPosition(sf::Vector2i newPosition) {
+void Button::setPosition(sf::Vector2f newPosition) {
 
     position = newPosition;
 
@@ -75,4 +75,12 @@ void Button::setPosition(sf::Vector2i newPosition) {
     selectedRectangle->setFillColor(sf::Color(200,200,200,200));
 
     text->setPosition(position.x, position.y);
+}
+
+sf::Vector2f Button::getPosition() {
+    return position;
+}
+
+sf::FloatRect Button::getSize() {
+    return selectedRectangle->getGlobalBounds();
 }

@@ -20,11 +20,19 @@ public:
 
     void drawBack(bool selected);
 
-    void setAsButton(std::string name, std::string text, sf::Vector2i position);
+    void setAsButton(std::string name, std::string text, sf::Vector2f position);
 
     bool isSelected();
 
     std::string getName();
+
+    sf::FloatRect getSize();
+
+    void setPosition(sf::Vector2f position);
+
+    sf::Vector2f getPosition();
+
+    sf::FloatRect getGlobalBounds();
 
 private:
     sf::RenderWindow *window;

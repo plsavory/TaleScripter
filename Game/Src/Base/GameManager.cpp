@@ -30,7 +30,7 @@ GameManager::GameManager(Engine *enginePointer, const std::string &initialErrorM
     inputManager->bindKeyboardEvent("menu_next", "return", true);
     inputManager->bindKeyboardEvent("menu_back", "escape", true);
 
-    commonUI = new CommonUI(newWindow, resourceManager);
+    commonUI = new CommonUI(newWindow, resourceManager, inputManager);
 
     // Create other objects
     errorScreen = nullptr;
@@ -61,7 +61,7 @@ void GameManager::init() {
 
 void GameManager::update() {
 
-    if (!commonUI->isDoingNothing()) {
+    if (screenState->getCurrentState() != ScreenState::STATE_ERROR && !commonUI->isDoingNothing()) {
         commonUI->update(gameTime);
         gameTime->restart();
         return;
@@ -72,10 +72,12 @@ void GameManager::update() {
         switch (screenState->getCurrentState()) {
             case ScreenState::STATE_NOVEL:
                 novelScreen->update();
-                return;
+                break;
             case ScreenState::STATE_TITLE:
                 titleScreen->update(gameTime);
+                break;
             case ScreenState::STATE_ERROR:
+                gameTime->restart();
                 return;
             default:
                 break;
@@ -101,10 +103,10 @@ void GameManager::draw() {
         switch (screenState->getCurrentState()) {
             case ScreenState::STATE_NOVEL:
                 novelScreen->draw();
-                return;
+                break;
             case ScreenState::STATE_TITLE:
                 titleScreen->draw();
-                return;
+                break;
             case ScreenState::STATE_ERROR:
                 errorScreen->draw();
                 return;
@@ -133,7 +135,8 @@ void GameManager::handleScreenChanges() {
         switch (screenState->getUpcomingState()) {
             case ScreenState::STATE_TITLE:
                 if (!titleScreen) {
-                    titleScreen = new TitleScreen(engine->getWindow(), novel->getNovelDatabase(), resourceManager, inputManager);
+                    titleScreen = new TitleScreen(engine->getWindow(), novel->getNovelDatabase(), resourceManager,
+                                                  inputManager, screenState, commonUI);
                 }
                 break;
             case ScreenState::STATE_NOVEL:
@@ -147,7 +150,7 @@ void GameManager::handleScreenChanges() {
         // TODO: Will be moved into a separate function to be called when the screen has faded out when we are doing that
         switch (screenState->getPreviousState()) {
             case ScreenState::STATE_TITLE:
-                delete(titleScreen);
+                delete (titleScreen);
                 titleScreen = nullptr;
                 break;
             default:
@@ -169,6 +172,8 @@ void GameManager::invokeErrorScreen(GeneralException &e) {
     errorScreen = new ErrorScreen(engine->getWindow());
     errorScreen->start(e);
     screenState->changeState(ScreenState::STATE_ERROR);
+    handleScreenChanges();
+    screenState->update();
 }
 
 /**
@@ -181,4 +186,6 @@ void GameManager::invokeErrorScreen(const std::string &message) {
     errorScreen = new ErrorScreen(engine->getWindow());
     errorScreen->start(message);
     screenState->changeState(ScreenState::STATE_ERROR);
+    handleScreenChanges();
+    screenState->update();
 }

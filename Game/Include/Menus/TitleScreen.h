@@ -10,7 +10,7 @@
 class TitleScreen {
 public:
     TitleScreen(sf::RenderWindow *renderWindow, DatabaseConnection *novelDatabase, ResourceManager *rManager,
-                InputManager *iManager);
+                InputManager *iManager, ScreenState *sState, CommonUI *cui);
 
     ~TitleScreen();
 
@@ -26,6 +26,9 @@ private:
     ResourceManager *resourceManager;
     Menu *menu;
     InputManager *inputManager;
+    ScreenState *screenState;
+    CommonUI *commonUI;
+    ChoiceDialog *quitChoice;
 };
 
 #endif //TALESCRIPTER_TITLESCREEN_H

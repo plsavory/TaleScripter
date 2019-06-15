@@ -9,23 +9,52 @@
 #include "ResourceManager.hpp"
 #include "UI/CommonUI.h"
 
-CommonUI::CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager) {
+CommonUI::CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager) {
     window = renderWindow;
     resourceManager = rManager;
+    inputManager = iManager;
 }
 
 CommonUI::~CommonUI() {
-
+    if (activeDialog) {
+        delete (activeDialog);
+    }
 }
 
 void CommonUI::update(sf::Clock *gameTime) {
+
+    if (activeDialog) {
+        activeDialog->update(gameTime);
+        return;
+    }
 
 }
 
 void CommonUI::draw() {
 
+    if (activeDialog) {
+        activeDialog->draw();
+    }
+
 }
 
 bool CommonUI::isDoingNothing() {
-    return true; // Not very useful right now I will admit...
+
+    if (activeDialog) {
+        if (activeDialog->getState() == ChoiceDialog::STATE_ACTIVE) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+ChoiceDialog *CommonUI::showChoiceDialog(const std::string &text, const std::vector<std::string> &optionNames,
+                                         const std::vector<std::string> &optionText) {
+    if (activeDialog) {
+        throw MisuseException(
+                Utils::implodeString({"Attempting to show a dialog (", text, ") while one is already being drawn."}));
+    }
+    activeDialog = new ChoiceDialog(window, resourceManager, text, optionNames, optionText, inputManager);
+    return activeDialog;
 }
