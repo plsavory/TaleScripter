@@ -243,14 +243,9 @@ public:
             return nullptr;
         }
 
-        for (auto &potentialNewColumn : column) {
-            if (!potentialNewColumn) {
-                potentialNewColumn = new DataSetColumn(name, data, isNull);
-                return potentialNewColumn;
-            }
-        }
-
-        return nullptr;
+        DataSetColumn *newColumn = new DataSetColumn(name, data, isNull);
+        column.push_back(newColumn);
+        return newColumn;
     }
 
     /**
@@ -330,8 +325,12 @@ public:
 
     }
 
+    int getColumnCount() {
+        return column.size();
+    }
+
 private:
-    DataSetColumn *column[DATA_SET_MAX_COLUMNS]{};
+    std::vector<DataSetColumn*> column;
 };
 
 struct DataSet {
@@ -420,7 +419,7 @@ public:
             std::vector<std::string> errorVector = {
                     "A row with index ",
                     std::to_string(index),
-                    "could not be found"
+                    " could not be found"
             };
 
             throw DataSetException(Utils::implodeString(errorVector));

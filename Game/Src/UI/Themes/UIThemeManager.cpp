@@ -18,6 +18,21 @@ UIThemeManager::UIThemeManager(sf::RenderWindow *renderWindow, ResourceManager *
     resourceManager = rManager;
     activeTheme = 0;
     novel = novelDB;
+
+    // Load the UI themes from the database
+    auto *dataSet = new DataSet();
+    novelDB->executeQuery("SELECT * FROM ui_themes;", dataSet);
+
+    if (dataSet->getRowCount() == 0) {
+        throw ResourceException("No UI themes exist in the database");
+    }
+
+    for (int i = 0; i < dataSet->getRowCount(); i++) {
+        auto newTheme = new UITheme(window, resourceManager, novelDB, dataSet->getRow(i));
+        themes.push_back(newTheme);
+    }
+
+    delete(dataSet);
 }
 
 UIThemeManager::~UIThemeManager() {
@@ -33,5 +48,7 @@ UITheme *UIThemeManager::getActiveTheme() {
         throw MisuseException(Utils::implodeString(
                 {"Attempted to use a theme that has not been loaded (", std::to_string(activeTheme), ")"}));
     }
+
+    return themes[activeTheme];
 
 }
