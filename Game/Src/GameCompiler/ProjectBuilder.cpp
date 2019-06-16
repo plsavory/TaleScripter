@@ -11,6 +11,7 @@
 #include <fstream>
 #include <regex>
 #include "Misc/Utils.hpp"
+#include "ThemeBuilder.hpp"
 
 #define VERBOSE_PROJECT_BUILDER_MESSAGES
 
@@ -119,6 +120,9 @@ void ProjectBuilder::process() {
   if (projectJson.find("chapters") == projectJson.end()) {
     throw ProjectBuilderException("No 'chapters' attribute found in project.json");
   }
+
+  // Process the UI themes
+  auto *themeBuilder = new ThemeBuilder(Utils::implodeString({projectDirectory, "UI/Themes.json"}), novel, resource, fHandler);
 
   // Process all of the characters
   processCharacters();

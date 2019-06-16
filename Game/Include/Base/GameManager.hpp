@@ -38,6 +38,7 @@ private:
     NovelData *novel;
     ResourceManager *resourceManager;
     ScreenState *screenState;
+    UIThemeManager *uiThemeManager;
 
     // Menus
     CommonUI *commonUI;

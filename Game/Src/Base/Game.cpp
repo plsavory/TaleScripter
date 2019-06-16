@@ -10,6 +10,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/Engine.hpp"
+#include "UI/Themes/UIThemeManager.h"
 #include "UI/CommonUI.h"
 #include "Base/GameManager.hpp"
 #include <thread>

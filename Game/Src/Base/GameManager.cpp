@@ -3,6 +3,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/Engine.hpp"
+#include "UI/Themes/UIThemeManager.h"
 #include "UI/CommonUI.h"
 #include "Base/GameManager.hpp"
 #include <sstream>
@@ -30,8 +31,6 @@ GameManager::GameManager(Engine *enginePointer, const std::string &initialErrorM
     inputManager->bindKeyboardEvent("menu_next", "return", true);
     inputManager->bindKeyboardEvent("menu_back", "escape", true);
 
-    commonUI = new CommonUI(newWindow, resourceManager, inputManager);
-
     // Create other objects
     errorScreen = nullptr;
     titleScreen = nullptr;
@@ -39,6 +38,11 @@ GameManager::GameManager(Engine *enginePointer, const std::string &initialErrorM
     try {
         novel = new NovelData();
         engine->getCharacterSpriteRenderer()->initData(novel);
+
+        // Initialise the UI
+        uiThemeManager = new UIThemeManager(engine->getWindow(), resourceManager, novel->getNovelDatabase());
+        commonUI = new CommonUI(newWindow, resourceManager, inputManager);
+
 
         std::string windowTitle = novel->getProjectInformation()->getGameTitle();
         newWindow->setTitle(windowTitle);

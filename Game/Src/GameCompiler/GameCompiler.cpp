@@ -283,6 +283,37 @@ void GameCompiler::createNovelDatabase() {
     musicPlaybackRequestMetadataTable->addColumn("endTime", ColumnType::tInteger, false, "");
     musicPlaybackRequestMetadataTable->addColumn("muted", ColumnType::tBoolean, false, "");
 
-  novelDb->createDatabase();
+    // Create UI themes-related database tables
+    DatabaseTable *uiThemesTable = novelDb->addTable("ui_themes");
+    uiThemesTable->addPrimaryKey();
+    uiThemesTable->addColumn("name", ColumnType::tText, true, "");
+
+    DatabaseTable *uiThemeAttributeTypeTable = novelDb->addTable("ui_theme_attribute_types");
+    uiThemeAttributeTypeTable->addPrimaryKey();
+    uiThemeAttributeTypeTable->addColumn("name", ColumnType::tText, true, "");
+
+    DatabaseTable *uiThemeAttributesTable = novelDb->addTable("ui_theme_attributes");
+    uiThemeAttributesTable->addPrimaryKey();
+    uiThemeAttributesTable->addColumn("ui_theme_id", ColumnType::tInteger, true, "");
+    uiThemeAttributesTable->addColumn("ui_theme_attribute_type_id", ColumnType::tInteger, true, "");
+    uiThemeAttributesTable->addColumn("fill_gradient_id", ColumnType::tInteger, true, "");
+    uiThemeAttributesTable->addColumn("outline_gradient_id", ColumnType::tInteger, true, "");
+    uiThemeAttributesTable->addColumn("selected_gradient_id", ColumnType::tInteger, true, "");
+
+    DatabaseTable *uiThemeGradientsTable = novelDb->addTable("ui_theme_gradients");
+    uiThemeGradientsTable->addPrimaryKey();
+    uiThemeGradientsTable->addColumn("top_left_colour_id", ColumnType::tInteger, true, "");
+    uiThemeGradientsTable->addColumn("top_right_colour_id", ColumnType::tInteger, true, "");
+    uiThemeGradientsTable->addColumn("bottom_left_colour_id", ColumnType::tInteger, true, "");
+    uiThemeGradientsTable->addColumn("bottom_right_colour_id", ColumnType::tInteger, true, "");
+
+    DatabaseTable *coloursTable = novelDb->addTable("colours");
+    coloursTable->addPrimaryKey();
+    coloursTable->addColumn("r", ColumnType::tInteger, true, "");
+    coloursTable->addColumn("g", ColumnType::tInteger, true, "");
+    coloursTable->addColumn("b", ColumnType::tInteger, true, "");
+    coloursTable->addColumn("a", ColumnType::tInteger, true, "");
+
+    novelDb->createDatabase();
 
 }

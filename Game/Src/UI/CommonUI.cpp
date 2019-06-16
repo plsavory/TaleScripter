@@ -13,6 +13,7 @@ CommonUI::CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, In
     window = renderWindow;
     resourceManager = rManager;
     inputManager = iManager;
+    activeDialog = nullptr;
 }
 
 CommonUI::~CommonUI() {
