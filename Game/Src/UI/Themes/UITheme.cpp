@@ -45,6 +45,8 @@ UITheme::UITheme(sf::RenderWindow *renderWindow, ResourceManager *rManager, Data
 
     // TODO: Process any custom elements when this is supported.
 
+    // Process the theme data for the NovelScreen
+    novelScreenThemeData = new NovelScreenThemeData(data->getColumn("id")->getData()->asInteger(), novel);
     delete (dataSet);
 }
 
@@ -209,4 +211,48 @@ UIElementTexture::~UIElementTexture() {
 
 Texture* UIElementTexture::getTexture() {
     return texture;
+}
+
+/**
+ * Fetches all of the NovelScreen information for a given theme
+ * @param themeId - the id of the theme in the database
+ */
+NovelScreenThemeData::NovelScreenThemeData(int themeId, DatabaseConnection *novel) {
+
+    // It is required that every piece of data for this exists in the database and has values, so it's ok to fetch them directly.
+    auto *dataSet = new DataSet();
+
+    novel->executeQuery(Utils::implodeString({"SELECT * FROM novel_screen_attribute_groups WHERE ui_theme_id = ", std::to_string(themeId)}), dataSet);
+
+    if (dataSet->getRowCount() == 0) {
+        throw DataSetException(Utils::implodeString({"No novel screen attribute groups were found for theme ", std::to_string(themeId)}));
+    }
+
+    auto *novelTextDisplayRow = dataSet->findRow("name", "textDisplay");
+
+    if (!novelTextDisplayRow) {
+        throw DataSetException(Utils::implodeString({"No 'textDisplay' attribute group was found for theme ", std::to_string(themeId)}));
+    }
+
+    novelScreenTextDisplay = new NovelScreenTextDisplay(novelTextDisplayRow, novel);
+
+    delete(dataSet);
+
+}
+
+NovelScreenTextDisplay::NovelScreenTextDisplay(DataSetRow *groupRow, DatabaseConnection *novel) {
+
+    int groupId = groupRow->getColumn("id")->getData()->asInteger();
+
+    // Find the attributes that we care about, throwing errors if they don't exist.
+    auto *dataSet = new DataSet();
+    novel->executeQuery(Utils::implodeString({"SELECT * FROM novel_screen_attributes WHERE novel_screen_attribute_group_id = ", std::to_string(groupId)}), dataSet);
+    framePositionX = dataSet->findRow("name", "framePositionX", true)->getColumn("value")->getData()->asInteger();
+    framePositionY = dataSet->findRow("name", "framePositionY", true)->getColumn("value")->getData()->asInteger();
+    frameFillAlpha = dataSet->findRow("name", "frameFillAlpha", true)->getColumn("value")->getData()->asInteger();
+    frameBorderAlpha = dataSet->findRow("name", "frameBorderAlpha", true)->getColumn("value")->getData()->asInteger();
+    textOffsetX = dataSet->findRow("name", "textOffsetX", true)->getColumn("value")->getData()->asInteger();
+    textOffsetY = dataSet->findRow("name", "textOffsetY", true)->getColumn("value")->getData()->asInteger();
+    maxTextWidth = dataSet->findRow("name", "maxTextWidth", true)->getColumn("value")->getData()->asInteger();
+
 }

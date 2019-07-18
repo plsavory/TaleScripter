@@ -25,10 +25,14 @@ NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRen
     currentDisplayText = "";
     fullDisplayText = "";
 
+    auto *activeTheme = commonUI->getUIThemeManager()->getActiveTheme();
+    auto *textDisplayAttributes = activeTheme->getNovelScreenThemeData()->getTextDisplayData();
+
     storyFont = "story_font"; // TODO: Load from config
 
     myText = textRenderer->addText("novel_text_display_text", storyFont);
-    myText->setPosition(150, 600);
+    myText->setPosition(textDisplayAttributes->getFramePositionX()+textDisplayAttributes->getTextOffsetX(),
+            textDisplayAttributes->getFramePositionY()+textDisplayAttributes->getTextOffsetY());
     myText->setOutline(sf::Color::Black, 2); // TODO: Load from game theme in database
 
     nameDisplayText = textRenderer->addText("novel_text_display_name", storyFont);
@@ -36,18 +40,23 @@ NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRen
     nameDisplayText->setOutline(sf::Color::Black, 2); // TODO: Load from game theme in database
     nameDisplayText->setString("");
     updateNameDisplayText = false;
-    maxTextWidth = 980;
+    maxTextWidth = textDisplayAttributes->getMaxTextWidth();
 
-    auto *uiElement = commonUI->getUIThemeManager()->getActiveTheme()->getElement("novelTextBackground");
+    auto *uiElement = activeTheme->getElement("novelTextBackground");
 
     if (uiElement) {
         auto textureName = uiElement->getTextureByHorizontalSize(maxTextWidth)->getTexture()->name;
         backgroundSprite = spriteRenderer->addSprite(textureName, "novel_text_display_background", 2);
+
+        // Set the colour on the sprite
+        sf::Color colour = backgroundSprite->getSfmlSprite()->getColor();
+        colour.a = textDisplayAttributes->getFrameFillAlpha();
+        backgroundSprite->setColour(colour);
     }
 
 
     if (backgroundSprite) {
-        backgroundSprite->setPosition(140, 585);
+        backgroundSprite->setPosition(textDisplayAttributes->getFramePositionX(), textDisplayAttributes->getFramePositionY());
     }
 
     setInvisible();

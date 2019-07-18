@@ -444,6 +444,26 @@ public:
     }
 
     /**
+ * Returns a data set row where the given column has the given value
+ * Does not throw exceptions if a row was not found.
+ * Does throw an exception if the column does not exist on a row or if the data type is incorrect and unable to be cast
+ *
+ * @param columnName The name of the column to search
+ * @param columnValue The value of the column to search
+ * @param throwNotFoundError - If set to true, will throw an error if the row is not found
+ * @return nullptr if nothing found, otherwise a DataSetRow.
+ */
+    DataSetRow* findRow(const std::string &columnName, const std::string &columnValue, bool throwNotFoundError) {
+        auto *foundRow = findRow(columnName, columnValue);
+
+        if (!foundRow && throwNotFoundError) {
+            throw DataSetException(Utils::implodeString({"No row with value of ", columnValue, "in column ", columnName, " was found."}));
+        }
+
+        return foundRow;
+    }
+
+    /**
     * Returns a data set row where the given column has the given value
     * Does not throw exceptions if a row was not found.
     * Does throw an exception if the column does not exist on a row or if the data type is incorrect and unable to be cast
@@ -472,16 +492,16 @@ public:
     * @param columnValue The value of the column to search
     * @return nullptr if nothing found, otherwise a DataSetRow.
     */
-    DataSetRow* findRow(const std::string &columnName, bool columnValue) {
-
-        for (auto &currentRow : row) {
-            if (currentRow->getColumn(columnName)->getData()->asBoolean() == columnValue) {
-                return currentRow;
-            }
-        }
-
-        return nullptr;
-    }
+//    DataSetRow* findRow(const std::string &columnName, bool columnValue) {
+//
+//        for (auto &currentRow : row) {
+//            if (currentRow->getColumn(columnName)->getData()->asBoolean() == columnValue) {
+//                return currentRow;
+//            }
+//        }
+//
+//        return nullptr;
+//    }
 
 private:
     std::vector<DataSetRow*> row;

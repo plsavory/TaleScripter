@@ -299,6 +299,18 @@ void GameCompiler::createNovelDatabase() {
     uiThemeElementTexturesTable->addColumn("ui_theme_element_id", ColumnType::tInteger, true, "");
     uiThemeElementTexturesTable->addColumn("texture_id", ColumnType::tInteger, true, "");
 
+    // Screen-specific tables
+    DatabaseTable *novelScreenAttributeGroupsTable = novelDb->addTable("novel_screen_attribute_groups");
+    novelScreenAttributeGroupsTable->addPrimaryKey();
+    novelScreenAttributeGroupsTable->addColumn("name", ColumnType::tText, true, "");
+    novelScreenAttributeGroupsTable->addColumn("ui_theme_id", ColumnType::tInteger, true, "");
+
+    DatabaseTable *novelScreenAttributesTable = novelDb->addTable("novel_screen_attributes");
+    novelScreenAttributesTable->addPrimaryKey();
+    novelScreenAttributesTable->addColumn("novel_screen_attribute_group_id", ColumnType::tInteger, true, "");
+    novelScreenAttributesTable->addColumn("name", ColumnType::tInteger, true, "");
+    novelScreenAttributesTable->addColumn("value", ColumnType::tText, true, "");
+
     novelDb->createDatabase();
 
 }

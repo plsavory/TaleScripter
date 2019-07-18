@@ -6,6 +6,7 @@
 #define TALESCRIPTER_UI_CONSTANTS_H
 
 #include "MisuseException.hpp"
+#include "Database/DataAttribute.hpp"
 
 namespace UIConstants {
 
@@ -41,10 +42,6 @@ namespace UIConstants {
         std::string name;
         bool required;
         int id;
-    };
-
-    struct Element {
-
     };
 
     struct AttributeType {

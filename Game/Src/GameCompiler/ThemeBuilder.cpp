@@ -70,30 +70,22 @@ void ThemeBuilder::processTheme(const json &theme) {
             processElement(themeId, item->getName(), elements[item->getName()]);
         }
     }
+
+    // Process individual screens that need it
+    if (theme.find("novelScreen") == theme.end()) {
+        throw ProjectBuilderException(Utils::implodeString({"Required attribute 'novelScreen' is missing on theme ", name}));
+    }
+
+    processNovelScreen(name, themeId, theme["novelScreen"]);
 }
 
-void ThemeBuilder::processAttribute(const json &attribute, int themeId, const std::string &attributeName, int attributeId) {
+void ThemeBuilder::processNovelScreenAttributes(int themeId) {
 
-    // Insert the gradients which will be used for this attribute
-    std::vector<std::string> requiredGradients = {"fill", "outline", "selected"};
-    std::vector<std::string> columns = {"ui_theme_id", "ui_theme_attribute_type_id", "fill_gradient_id", "outline_gradient_id", "selected_gradient_id"};
-    std::vector<std::string> values = {std::to_string(themeId), std::to_string(attributeId)};
-    std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER};
+    auto *dataSet = new DataSet();
 
-    for (auto &gradientName : requiredGradients) {
+    novel->executeQuery(Utils::implodeString({"SELECT * FROM novel_screen_attributes WHERE ui_theme_id = ", std::to_string(themeId)}));
 
-        if (attribute.find(gradientName) == attribute.end()) {
-            throw ProjectBuilderException(Utils::implodeString({"A '", gradientName, "' parameter is required a ", attributeName, " attribute."}));
-        }
 
-        // Store each gradient in the database and record the id's
-        int newGradientId = processGradient(attribute[gradientName]);
-        values.push_back(std::to_string(newGradientId));
-        types.push_back(DATA_TYPE_NUMBER);
-    };
-
-    // Write the attribute to the database
-    novel->insert("ui_theme_attributes", columns, values, types);
 }
 
 /**
@@ -213,5 +205,52 @@ void ThemeBuilder::processElementTexture(int elementId, const std::string &textu
     // Insert the link into the database
     std::vector<std::string> data = {std::to_string(elementId), dataSet->getRow(0)->getColumn("id")->getData()->asString()};
     novel->insert("ui_theme_element_textures", {"ui_theme_element_id", "texture_id"}, data, {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER});
+
+}
+
+void ThemeBuilder::processNovelScreen(const std::string &themeName,int themeId, json novelScreenJson) {
+
+    if (novelScreenJson.find("attributes") == novelScreenJson.end()) {
+        throw ProjectBuilderException(Utils::implodeString({"Missing attribute 'attributes' on NovelScreen for theme ", themeName}));
+    }
+
+    auto attributes = novelScreenJson["attributes"];
+
+    std::vector<DataAttributeGroup*> possibleGroups = UIUtils::getAllPossibleNovelScreenAttributeGroups();
+
+    for (auto & currentGroup : possibleGroups) {
+
+        // Store the group in the database
+        std::vector<std::string> columns = {"name", "ui_theme_id"};
+        std::vector<std::string> data = {currentGroup->getName(), std::to_string(themeId)};
+        std::vector<int> types = {DATA_TYPE_STRING, DATA_TYPE_NUMBER};
+
+        int groupId = novel->insert("novel_screen_attribute_groups", columns, data, types);
+
+        bool groupFoundInJson = attributes.find(currentGroup->getName()) != attributes.end();
+
+        // Print a message saying we are setting default types if the group does not exist
+        if (!groupFoundInJson) {
+            std::cout<<"NOTICE: Attribute group "<<currentGroup->getName()<<" does not exist, setting default values..."<<std::endl;
+        }
+
+        auto groupJson = groupFoundInJson ? attributes[currentGroup->getName()] : json();
+
+        for (auto & currentAttribute : currentGroup->getAcceptedAttributes()) {
+
+            bool attributeFoundInJson = groupJson.find(currentAttribute->getName()) != groupJson.end();
+
+            if (!groupFoundInJson || !attributeFoundInJson) {
+                std::cout<<"NOTICE: "<<currentGroup->getName()<<"\\"<<currentAttribute->getName()<<" attribute not found, setting default ("<<currentAttribute->getDefaultValue()<<")"<<std::endl;
+            };
+
+            // Insert the value in to the database
+            std::string value = attributeFoundInJson ? std::to_string(JsonHandler::getInteger(groupJson, currentAttribute->getName())) : currentAttribute->getDefaultValue();
+            std::vector<std::string> columns = {"novel_screen_attribute_group_id", "name", "value"};
+            std::vector<std::string> data = {std::to_string(groupId), currentAttribute->getName(), value};
+            std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_STRING, DATA_TYPE_STRING};
+            novel->insert("novel_screen_attributes", columns, data, types);
+        }
+    }
 
 }

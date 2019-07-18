@@ -28,6 +28,14 @@ public:
 
         return types;
     };
+
+    static std::vector<DataAttributeGroup*> getAllPossibleNovelScreenAttributeGroups() {
+        std::vector<DataAttributeGroup*> groups;
+
+        groups.push_back(new DataAttributeGroup("textDisplay"));
+        groups.push_back(new DataAttributeGroup("characterNameDisplay"));
+        return groups;
+    }
 private:
 };
 

@@ -15,7 +15,8 @@ private:
     void processTheme(const json &theme);
     int processElement(int themeId, const std::string &name, const json &element);
     void processElementTexture(int elementId, const std::string &textureName);
-    void processAttribute(const json &attribute, int themeId, const std::string &attributeName, int attributeId);
+    void processNovelScreen(const std::string &themeName, int themeId, json NovelScreenJson);
+    void processNovelScreenAttributes(int themeId);
     int processGradient(const json &gradient);
     int processColour(const json &colourData);
     static std::vector<std::vector<std::string>> getUiElementTypes;
