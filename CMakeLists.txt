@@ -151,7 +151,7 @@ add_executable(${EXECUTABLE_NAME}
         Game/Src/UI/Elements/Button.cpp
         Game/Include/UI/Groups/Menu.h
         Game/Src/UI/Groups/Menu.cpp Game/Src/UI/Groups/MenuItem.cpp
-        Game/Include/UI/Groups/MenuItem.h Game/Src/UI/Groups/ChoiceDialog.cpp Game/Include/UI/Groups/ChoiceDialog.h Game/Include/UI/Themes/UIThemeManager.h Game/Src/UI/Themes/UIThemeManager.cpp Game/Include/UI/Themes/UITheme.h Game/Src/UI/Themes/UITheme.cpp Game/Include/UI/UIConstants.h)
+        Game/Include/UI/Groups/MenuItem.h Game/Src/UI/Groups/ChoiceDialog.cpp Game/Include/UI/Groups/ChoiceDialog.h Game/Include/UI/Themes/UIThemeManager.h Game/Src/UI/Themes/UIThemeManager.cpp Game/Include/UI/Themes/UITheme.h Game/Src/UI/Themes/UITheme.cpp Game/Include/UI/UIConstants.h Game/Include/UI/UIUtils.hpp)
 
 add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp
@@ -177,7 +177,7 @@ add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Src/GameCompiler/ResourceBuilder.cpp
         Game/Src/Misc/Utils.cpp
         Game/Src/GameCompilerEntryPoint.cpp
-        Game/Include/VisualNovelEngine/Classes/Data/VisualNovelEngineConstants.hpp Game/Include/GameCompiler/ThemeBuilder.hpp Game/Src/GameCompiler/ThemeBuilder.cpp Game/Include/UI/UIConstants.h)
+        Game/Include/VisualNovelEngine/Classes/Data/VisualNovelEngineConstants.hpp Game/Include/GameCompiler/ThemeBuilder.hpp Game/Src/GameCompiler/ThemeBuilder.cpp Game/Include/UI/UIConstants.h Game/Include/UI/UIUtils.hpp)
 
 find_package(SFML 2.5.1 REQUIRED audio graphics window system )
 

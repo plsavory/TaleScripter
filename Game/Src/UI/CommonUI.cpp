@@ -9,11 +9,12 @@
 #include "ResourceManager.hpp"
 #include "UI/CommonUI.h"
 
-CommonUI::CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager) {
+CommonUI::CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager, UIThemeManager *uiTManager) {
     window = renderWindow;
     resourceManager = rManager;
     inputManager = iManager;
     activeDialog = nullptr;
+    uiThemeManager = uiTManager;
 }
 
 CommonUI::~CommonUI() {
@@ -58,4 +59,12 @@ ChoiceDialog *CommonUI::showChoiceDialog(const std::string &text, const std::vec
     }
     activeDialog = new ChoiceDialog(window, resourceManager, text, optionNames, optionText, inputManager);
     return activeDialog;
+}
+
+UIThemeManager* CommonUI::getUIThemeManager() {
+    if (!uiThemeManager) {
+        throw MisuseException("UI Theme manager has not yet been set");
+    }
+
+    return uiThemeManager;
 }

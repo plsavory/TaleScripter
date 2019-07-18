@@ -5,31 +5,29 @@
 #ifndef TALESCRIPTER_UI_THEME_H
 #define TALESCRIPTER_UI_THEME_H
 
-class UIThemeGradient {
+#include "UI/UIUtils.hpp"
+
+class UIElementTexture {
 public:
-    UIThemeGradient(DataSetRow *data, DatabaseConnection *novel);
-    ~UIThemeGradient();
-    static const int COLOUR_TOP_LEFT = 0;
-    static const int COLOUR_TOP_RIGHT = 1;
-    static const int COLOUR_BOTTOM_LEFT = 2;
-    static const int COLOUR_BOTTOM_RIGHT = 3;
+    UIElementTexture(DataSetRow *data, DatabaseConnection *novel, ResourceManager *rManager);
+    ~UIElementTexture();
+    Texture* getTexture();
 private:
-    std::vector<sf::Color*> colours;
-    sf::Color* getColourFromDatabase(int colourId, DatabaseConnection *novel);
+    int id;
+    Texture *texture;
 };
 
-class UIThemeAttribute {
+class UIElement {
 public:
-    UIThemeAttribute(sf::RenderWindow *renderWindow, ResourceManager *rManager, DatabaseConnection *novel, DataSetRow *data);
-    ~UIThemeAttribute();
-    int getType();
+    UIElement(DataSetRow *data, DatabaseConnection *novel, ResourceManager *rManager);
+    ~UIElement();
+    std::string getName();
+    UIElementTexture* getTextureByHorizontalSize(int width);
+    UIElementTexture* getTextureByVerticalSize(int height);
 private:
-    sf::RenderWindow *window;
-    ResourceManager *resourceManager;
-    int type;
-    UIThemeGradient *fillGradient;
-    UIThemeGradient *outlineGradient;
-    UIThemeGradient *selectedGradient;
+    int id;
+    std::string name;
+    std::vector<UIElementTexture*> uiElementTextures;
 };
 
 class UITheme {
@@ -45,12 +43,12 @@ public:
 
     ~UITheme();
 
-    UIThemeAttribute* getAttribute(int type);
+    UIElement* getElement(const std::string& name);
 
 private:
     sf::RenderWindow *window;
     ResourceManager *resourceManager;
-    std::vector<UIThemeAttribute*> attributes;
+    std::vector<UIElement*> elements;
 };
 
 #endif //TALESCRIPTER_UITHEME_H

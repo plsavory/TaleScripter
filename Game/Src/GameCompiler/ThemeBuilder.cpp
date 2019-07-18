@@ -18,6 +18,9 @@ ThemeBuilder::ThemeBuilder(std::string fileName, DatabaseConnection *novelDb, Da
         throw ProjectBuilderException(Utils::implodeString({"Could not build UI themes, (file ", fileName," does not exist.)"}));
     }
 
+    // Get all possible element types
+    allPossibleElementTypes = UIUtils::getAllPossibleElementTypes();
+
     novel = novelDb;
     resource = resourceDb;
 
@@ -38,8 +41,8 @@ void ThemeBuilder::processTheme(const json &theme) {
         throw ProjectBuilderException("Couldn't process theme: each theme must have a 'name' property");
     }
 
-    if (theme.find("data") == theme.end()) {
-        throw ProjectBuilderException("Couldn't process theme: each theme must have a 'data' property");
+    if (theme.find("elementTextures") == theme.end()) {
+        throw ProjectBuilderException("Couldn't process theme: each theme must have an 'elementTextures' property");
     }
 
     std::string name = JsonHandler::getString(theme, "name");
@@ -50,35 +53,21 @@ void ThemeBuilder::processTheme(const json &theme) {
     std::vector<int> types = {DATA_TYPE_STRING};
     int themeId = novel->insert("ui_themes", columns, data, types);
 
-    // Process each element inside this object
-    std::vector<bool> processedTypes;
+    // Process each possible element inside this object
+    auto &elements = theme["elementTextures"];
+    for (auto &item : allPossibleElementTypes) {
 
-    for (int i = 0; i<UIConstants::AttributeType::getTypeNames().size(); i++) {
-        processedTypes.push_back(false);
-    }
+        if (elements.find(item->getName()) == elements.end()) {
 
-    for (int i = 0; i<UIConstants::AttributeType::getTypeNames().size(); i++) {
+            if (item->isRequired()) {
+                throw ProjectBuilderException(Utils::implodeString({"Required UI element type '", item->getName(), "' was not found linked to theme", name}));
+            } else {
+                continue;
+                // TODO: Set a default style/image for the missing element if it does not exist (if there are any that need this)
+            }
 
-        if (theme["data"].find(UIConstants::AttributeType::getTypeName(i)) == theme["data"].end()) {
-            continue;
-        }
-
-        std::string attributeName = UIConstants::AttributeType::getTypeName(i);
-        processAttribute(theme["data"][attributeName], themeId, attributeName, i+1);
-        processedTypes[i] = true;
-    }
-
-    // Missing type checking
-    for (int i = 0; i < processedTypes.size(); i++) {
-        switch (i) {
-            // Put required values here
-            case UIConstants::AttributeType::UIContainer:
-                if (!processedTypes[i]) {
-                    throw ProjectBuilderException(Utils::implodeString({"An attribute type '", UIConstants::AttributeType::getTypeName(i), " is required."}));
-                }
-                break;
-            default:
-                throw ProjectBuilderException("Unknown attribute type");
+        } else {
+            processElement(themeId, item->getName(), elements[item->getName()]);
         }
     }
 }
@@ -174,4 +163,55 @@ int ThemeBuilder::processColour(const json &colourData) {
 
     // Write the colour to the database and return the id
     return novel->insert("colours", requiredValues, colourValues, {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER});
+}
+
+/**
+ *
+ * @param element
+ * @return id in the database of the element
+ */
+int ThemeBuilder::processElement(int themeId, const std::string &name, const json &element) {
+
+    // Insert the element into the database
+    std::vector<std::string> data = {std::to_string(themeId), name};
+    int elementId = novel->insert("ui_theme_elements", {"ui_theme_id", "name"}, data, {DATA_TYPE_NUMBER, DATA_TYPE_STRING});
+
+    if (element.find("textureName") != element.end()) {
+        processElementTexture(elementId, JsonHandler::getString(element, "textureName"));
+        return elementId;
+    }
+
+    if (element.find("textureNames") != element.end()) {
+
+        // Store each texture -> element link in the database, just makes things a little nicer for those who edit the json files.
+        for (auto &item : element["textureNames"]) {
+            processElementTexture(elementId, item);
+        }
+
+        return elementId;
+    }
+
+    throw ProjectBuilderException(Utils::implodeString({"Element ", name, "must have either a 'textureName' or 'textureNames' property"}));
+
+}
+
+/**
+ * Insert an element texture in to the database, doesn't return anything as we don't care what its id is at this point.
+ * @param elementId
+ * @param textureName
+ */
+void ThemeBuilder::processElementTexture(int elementId, const std::string &textureName) {
+
+    // Determine that the texture exists in the resource database's textures table and get its id
+    auto *dataSet = new DataSet();
+    resource->executeQuery(Utils::implodeString({"SELECT id FROM textures WHERE name = '", textureName, "';"}), dataSet);
+
+    if (dataSet->getRowCount() == 0) {
+        throw ProjectBuilderException(Utils::implodeString({"No texture named '", textureName, "' was found in the resource database."}));
+    }
+
+    // Insert the link into the database
+    std::vector<std::string> data = {std::to_string(elementId), dataSet->getRow(0)->getColumn("id")->getData()->asString()};
+    novel->insert("ui_theme_element_textures", {"ui_theme_element_id", "texture_id"}, data, {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER});
+
 }

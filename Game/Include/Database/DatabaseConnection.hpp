@@ -26,6 +26,7 @@ struct DataContainer {
         data = isNull ? "" : value;
         columnName = parentColumnName;
     }
+
     /**
      * Returns the raw data contained within this object as a string
      * @return unformatted data
@@ -97,7 +98,7 @@ struct DataContainer {
         std::vector<std::string> acceptedValues = {"1", "0"};
 
         if (!Utils::isAcceptedValue(acceptedValues, data, false)) {
-            std::vector<std::string> error {
+            std::vector<std::string> error{
                     "DataContainer.asBoolean called on a datum which does not contain a boolean. \n\n",
                     "Column name: '", columnName, "' \n",
                     "Value: '", data, "'"
@@ -141,7 +142,7 @@ struct DataContainer {
         int day = std::stoi(datePortions[2]);
 
         // Initial range validation
-        bool validDate = (month > 0 && month <=12) && (day > 0 && day <= 31);
+        bool validDate = (month > 0 && month <= 12) && (day > 0 && day <= 31);
 
         if (!validDate) {
             std::vector<std::string> error = {
@@ -156,12 +157,12 @@ struct DataContainer {
         bool isLeapYear = (year % 100 == 0) ? (year % 400 == 0) : (year % 4 == 0);
 
         // Check to see if the days are within the length of the month
-        int monthLength = Utils::getMonthLengthMatrix(isLeapYear)[month-1];
+        int monthLength = Utils::getMonthLengthMatrix(isLeapYear)[month - 1];
 
         if (day > monthLength) {
             std::vector<std::string> error = {
                     "DataContainer.asDate() called on a date which is out of range (More days than the length of the month) \n\n",
-                    "Column name: '", columnName,"'",
+                    "Column name: '", columnName, "'",
                     "Data: '", date, "'\n"
             };
         }
@@ -173,6 +174,7 @@ struct DataContainer {
             return date;
         }
     }
+
 private:
     std::string data;
     std::string columnName; // Used for printing errors
@@ -187,7 +189,7 @@ public:
     };
 
     ~DataSetColumn() {
-        delete(dataContainer);
+        delete (dataContainer);
     };
 
     std::string getName() {
@@ -198,7 +200,7 @@ public:
      * Returns the DataContainer object containing the data in this column
      * @return - DataContainer object
      */
-    DataContainer* getData() {
+    DataContainer *getData() {
         return dataContainer;
     }
 
@@ -259,9 +261,9 @@ public:
         // Throw an exception when this column does not exist so that we never can end up with null pointer errors.
         if (!column[index]) {
             std::vector<std::string> errorVector = {
-              "No column with index ",
-              std::to_string(index),
-              "was found"
+                    "No column with index ",
+                    std::to_string(index),
+                    "was found"
             };
             throw DataSetException(std::string(Utils::implodeString(errorVector)));
         }
@@ -330,7 +332,7 @@ public:
     }
 
 private:
-    std::vector<DataSetColumn*> column;
+    std::vector<DataSetColumn *> column;
 };
 
 struct DataSet {
@@ -340,8 +342,6 @@ public:
         for (auto &emptyRow : row) {
             emptyRow = nullptr;
         }
-
-        rowCount = 0;
 
     };
 
@@ -366,17 +366,9 @@ public:
      * @return Pointer to the newly-created row
      */
     DataSetRow *addRow() {
-
-        for (auto &currentRow : row) {
-            if (!currentRow) {
-                currentRow = new DataSetRow();
-                rowCount++;
-                return currentRow;
-            }
-        }
-
-        return nullptr;
-
+        auto *newRow = new DataSetRow();
+        row.push_back(newRow);
+        return newRow;
     }
 
     /**
@@ -405,7 +397,11 @@ public:
      * @return count of rows within the data set
      */
     int getRowCount() {
-        return rowCount;
+        return row.size();
+    }
+
+    std::vector<DataSetRow*> getRows() {
+        return row;
     }
 
     /**
@@ -427,9 +423,68 @@ public:
         return row[index];
     }
 
+    /**
+     * Returns a data set row where the given column has the given value
+     * Does not throw exceptions if a row was not found.
+     * Does throw an exception if the column does not exist on a row or if the data type is incorrect and unable to be cast
+     *
+     * @param columnName The name of the column to search
+     * @param columnValue The value of the column to search
+     * @return nullptr if nothing found, otherwise a DataSetRow.
+     */
+    DataSetRow* findRow(const std::string &columnName, const std::string &columnValue) {
+
+        for (auto &currentRow : row) {
+            if (currentRow->getColumn(columnName)->getData()->asString() == columnValue) {
+                return currentRow;
+            }
+        }
+
+        return nullptr;
+    }
+
+    /**
+    * Returns a data set row where the given column has the given value
+    * Does not throw exceptions if a row was not found.
+    * Does throw an exception if the column does not exist on a row or if the data type is incorrect and unable to be cast
+    *
+    * @param columnName The name of the column to search
+    * @param columnValue The value of the column to search
+    * @return nullptr if nothing found, otherwise a DataSetRow.
+    */
+    DataSetRow* findRow(const std::string &columnName, int columnValue) {
+
+        for (auto &currentRow : row) {
+            if (currentRow->getColumn(columnName)->getData()->asInteger() == columnValue) {
+                return currentRow;
+            }
+        }
+
+        return nullptr;
+    }
+
+    /**
+    * Returns a data set row where the given column has the given value
+    * Does not throw exceptions if a row was not found.
+    * Does throw an exception if the column does not exist on a row or if the data type is incorrect and unable to be cast
+    *
+    * @param columnName The name of the column to search
+    * @param columnValue The value of the column to search
+    * @return nullptr if nothing found, otherwise a DataSetRow.
+    */
+    DataSetRow* findRow(const std::string &columnName, bool columnValue) {
+
+        for (auto &currentRow : row) {
+            if (currentRow->getColumn(columnName)->getData()->asBoolean() == columnValue) {
+                return currentRow;
+            }
+        }
+
+        return nullptr;
+    }
+
 private:
-    DataSetRow *row[DATA_SET_MAX_ROWS]{};
-    int rowCount;
+    std::vector<DataSetRow*> row;
 };
 
 class DatabaseConnection {

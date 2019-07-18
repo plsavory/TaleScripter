@@ -14,6 +14,7 @@
 #include "Input/InputManager.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "VisualNovelEngine/Classes/UI/CharacterSpriteRenderer.hpp"
+#include "UI/Themes/UIThemeManager.h"
 
 class Engine {
 public:

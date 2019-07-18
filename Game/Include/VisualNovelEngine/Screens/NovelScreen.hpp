@@ -5,7 +5,7 @@
 
 class NovelScreen {
 public:
-  NovelScreen(Engine *enginePointer, NovelData *novelPointer);
+  NovelScreen(Engine *enginePointer, NovelData *novelPointer, CommonUI *cUI);
   ~NovelScreen();
   void start();
   void update();
@@ -31,6 +31,7 @@ private:
   void nextScene();
   void transitionToNextScene();
   bool sceneTransitioning; // Indicates that we need to advance the scene after an end transition
+  CommonUI *commonUI;
 };
 
 #endif

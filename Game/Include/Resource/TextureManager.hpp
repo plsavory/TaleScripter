@@ -10,31 +10,57 @@
 
 struct Texture {
 public:
-  explicit Texture(const std::string& assignableName) {
-    texture = new sf::Texture();
-    loaded = false;
+  explicit Texture(const std::string& assignableName, const std::string &fileName) {
+    texture = nullptr;
 
-    assign(assignableName);
+    assign(assignableName, fileName);
   };
   ~Texture() {
     delete texture;
   };
-  void assign(const std::string& assignableName) {
+  void assign(const std::string& assignableName, const std::string &fileName) {
     name = assignableName;
-    loaded = false;
+    setFileName(fileName);
   }
-  void loadFromFile(const std::string& fileName) {
-      if (!texture->loadFromFile(fileName)) {
+  void loadFromFile() {
+
+      if (!texture) {
+          texture = new sf::Texture();
+      }
+
+      if (!texture->loadFromFile(textureFileName)) {
           std::vector<std::string> errorMessage = {
-                  "Unable to load texture 'name' (File: '", fileName, "' is either missing, in the wrong format or corrupted)"
+                  "Unable to load texture '", name, "', (File: '", textureFileName, "' is either missing, in the wrong format or corrupted)"
           };
 
           throw ResourceException(Utils::implodeString(errorMessage));
       };
+
   }
   std::string name;
-  sf::Texture *texture;
-  bool loaded;
+
+  sf::Texture *getTexture() {
+      if (!texture) {
+          loadFromFile();
+      }
+
+      return texture;
+  };
+
+  void setFileName(const std::string &fileName) {
+      textureFileName = fileName;
+  }
+
+  /**
+   * Returns true if the texture is currently loaded in memory
+   * @return
+   */
+  bool isLoaded() {
+      return texture != nullptr;
+  }
+private:
+    sf::Texture *texture;
+    std::string textureFileName;
 };
 
 struct TextureLoadRequest {

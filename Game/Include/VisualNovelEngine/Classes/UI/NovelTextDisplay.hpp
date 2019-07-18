@@ -3,7 +3,7 @@
 
 class NovelTextDisplay {
 public:
-  NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRenderer, ResourceManager *rManager);
+  NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRenderer, ResourceManager *rManager, CommonUI *cUI);
   ~NovelTextDisplay();
   bool hasTextFinished();
   void update();
@@ -30,6 +30,7 @@ private:
   int maxTextWidth;
   Sprite *backgroundSprite;
   bool updateNameDisplayText;
+  CommonUI *commonUI;
 };
 
 #endif

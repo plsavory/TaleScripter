@@ -7,9 +7,9 @@
  */
 TextureManager::TextureManager() {
 
-  for (int i = 0; i<MAX_TEXTURES; i++) {
-    texture[i] = nullptr;
-  }
+    for (int i = 0; i < MAX_TEXTURES; i++) {
+        texture[i] = nullptr;
+    }
 
 }
 
@@ -18,11 +18,11 @@ TextureManager::TextureManager() {
  */
 TextureManager::~TextureManager() {
 
-  for (auto & currentTexture : texture) {
-    if (currentTexture) {
-      delete currentTexture;
+    for (auto &currentTexture : texture) {
+        if (currentTexture) {
+            delete currentTexture;
+        }
     }
-  }
 
 }
 
@@ -32,30 +32,30 @@ TextureManager::~TextureManager() {
  * @param  name      [Name of the texture]
  * @return           [ID of the texture, -1 on failure]
  */
-int TextureManager::loadTexture(const std::string& fname, const std::string& name) {
+int TextureManager::loadTexture(const std::string &fname, const std::string &name) {
 
-  // Find a texture with the same name if it exists
-  int existingTextureId = findTexture(name);
+    // Find a texture with the same name if it exists
+    int existingTextureId = findTexture(name);
 
-  if (existingTextureId >= 0) {
-    assignTexture(fname, name, existingTextureId);
-    return existingTextureId;
-  }
-
-  // Find an empty texture slot
-  for (auto i = 0; i<MAX_TEXTURES; i++) {
-    if (!texture[i]) {
-      assignTexture(fname, name, i);
-      return i;
+    if (existingTextureId >= 0) {
+        assignTexture(fname, name, existingTextureId);
+        return existingTextureId;
     }
-  }
 
-  // TODO: Store textures in a vector so that this never happens.
-  std::vector<std::string> errorMessage = {
-          "Error loading texture: Max number of textures (", std::to_string(MAX_TEXTURES),") are already loaded."
-  };
+    // Find an empty texture slot
+    for (auto i = 0; i < MAX_TEXTURES; i++) {
+        if (!texture[i]) {
+            assignTexture(fname, name, i);
+            return i;
+        }
+    }
 
-  throw ResourceException(Utils::implodeString(errorMessage));
+    // TODO: Store textures in a vector so that this never happens.
+    std::vector<std::string> errorMessage = {
+            "Error loading texture: Max number of textures (", std::to_string(MAX_TEXTURES), ") are already loaded."
+    };
+
+    throw ResourceException(Utils::implodeString(errorMessage));
 
 }
 
@@ -65,18 +65,18 @@ int TextureManager::loadTexture(const std::string& fname, const std::string& nam
  * @param name  [accessible name]
  * @param id    [ID slot to use]
  */
-void TextureManager::assignTexture(const std::string& fname, const std::string& name, int id) {
+void TextureManager::assignTexture(const std::string &fname, const std::string &name, int id) {
 
-  if (texture[id]) {
-    // Texture already exists
-    texture[id]->assign(name);
-  } else {
-    // Texture does not exist
-    texture[id] = new Texture(name);
-  }
+    if (texture[id]) {
+        // Texture already exists
+        texture[id]->assign(name, fname);
+    } else {
+        // Texture does not exist
+        texture[id] = new Texture(name, fname);
+    }
 
-  // Create a texture load request for this texture
-  textureLoadQueue.push(TextureLoadRequest(fname, id));
+    // Create a texture load request for this texture
+    textureLoadQueue.push(TextureLoadRequest(fname, id));
 }
 
 /**
@@ -84,16 +84,16 @@ void TextureManager::assignTexture(const std::string& fname, const std::string& 
  * @param  name [Name of the texture]
  * @return      [Texture ID if found, -1 if not found]
  */
-int TextureManager::findTexture(const std::string& name) {
+int TextureManager::findTexture(const std::string &name) {
 
-  for (int i = 0; i<MAX_TEXTURES; i++) {
-    if (texture[i]) {
-      if (texture[i]->name == name) {
-        return i;
-      }
+    for (int i = 0; i < MAX_TEXTURES; i++) {
+        if (texture[i]) {
+            if (texture[i]->name == name) {
+                return i;
+            }
+        }
     }
-  }
-  return -1;
+    return -1;
 }
 
 /**
@@ -101,16 +101,13 @@ int TextureManager::findTexture(const std::string& name) {
  */
 void TextureManager::processQueue() {
 
-  if (textureLoadQueue.empty()) {
-    return;
-  }
+    while (!textureLoadQueue.empty()) {
+        // Load the texture into memory
+        texture[textureLoadQueue.front().getId()]->loadFromFile();
 
-  // Load the texture into memory
-  texture[textureLoadQueue.front().getId()]->loadFromFile(textureLoadQueue.front().getFilename());
-  texture[textureLoadQueue.front().getId()]->loaded = true;
-
-  // Remove the texture load request from memory
-  textureLoadQueue.pop();
+        // Remove the texture load request from memory
+        textureLoadQueue.pop();
+    }
 
 }
 
@@ -119,7 +116,7 @@ void TextureManager::processQueue() {
  * @return [True if queue is empty, otherwise false]
  */
 bool TextureManager::isQueueEmpty() {
-  return (textureLoadQueue.empty());
+    return (textureLoadQueue.empty());
 }
 
 /**
@@ -127,8 +124,8 @@ bool TextureManager::isQueueEmpty() {
  * @param  id [The ID of the texture]
  * @return    [Texture object pointer]
  */
-Texture* TextureManager::getTexture(int id) {
-  return (texture[id]);
+Texture *TextureManager::getTexture(int id) {
+    return (texture[id]);
 }
 
 /**
@@ -139,36 +136,37 @@ Texture* TextureManager::getTexture(int id) {
  * @return      [Success: Texture object pointer
  *               Failure: nullptr]
  */
-Texture* TextureManager::getTexture(const std::string& name) {
-  int textureId = findTexture(name);
+Texture *TextureManager::getTexture(const std::string &name) {
+    int textureId = findTexture(name);
 
-  if (textureId >= 0) {
-    return texture[textureId];
-  }
+    if (textureId >= 0) {
+        return texture[textureId];
+    }
 
-  return nullptr;
+    return nullptr;
 }
 
 /**
  * [TextureManager::loadAllFromDatabase Reads all textures from the database and creates the neccesary class instances]
  */
 void TextureManager::loadAllFromDatabase(DatabaseConnection *resource) {
-  /*
-  TODO: Memory manage this so that we don't just have all of them loaded.
-  This is outside of the scope of this class. Once we have the memory management, we can
-  create all of the class instances but don't set the images to load into memory immediately by default.
-  For instance, for every chapter or scene, we can load or unload textures for character sprites as required if they appear in that scene/chapter or not.
-  */
+    /*
+    TODO: Memory manage this so that we don't just have all of them loaded.
+    This is outside of the scope of this class. Once we have the memory management, we can
+    create all of the class instances but don't set the images to load into memory immediately by default.
+    For instance, for every chapter or scene, we can load or unload textures for character sprites as required if they appear in that scene/chapter or not.
+    */
 
- auto *dataSet = new DataSet();
- resource->executeQuery("SELECT * FROM textures;", dataSet);
+    auto *dataSet = new DataSet();
+    resource->executeQuery("SELECT * FROM textures;", dataSet);
 
- int numberOfTextures = dataSet->getRowCount();
+    int numberOfTextures = dataSet->getRowCount();
 
- for (int i = 0; i < numberOfTextures; i++) {
-   std::string name = dataSet->getRow(i)->getColumn("name")->getRawData();
-   std::string fileName = "resource/textures/";
-   fileName.append(dataSet->getRow(i)->getColumn("filename")->getRawData());
-   loadTexture(fileName, name);
- }
+    for (int i = 0; i < numberOfTextures; i++) {
+        std::string name = dataSet->getRow(i)->getColumn("name")->getRawData();
+        std::string fileName = "resource/textures/";
+        fileName.append(dataSet->getRow(i)->getColumn("filename")->getRawData());
+        loadTexture(fileName, name);
+    }
+
 }

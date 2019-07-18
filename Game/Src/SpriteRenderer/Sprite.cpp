@@ -99,8 +99,8 @@ void Sprite::update() {
     throw ResourceException(Utils::implodeString(errorMessage));
   }
 
-  if (texture->loaded) {
-    setImage(texture->texture);
+  if (texture->isLoaded()) {
+    setImage(texture->getTexture());
   }
 
   // If no image exists with the given name, keep trying to find one as it may be loaded in later

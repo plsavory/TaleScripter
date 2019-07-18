@@ -41,14 +41,14 @@ GameManager::GameManager(Engine *enginePointer, const std::string &initialErrorM
 
         // Initialise the UI
         uiThemeManager = new UIThemeManager(engine->getWindow(), resourceManager, novel->getNovelDatabase());
-        commonUI = new CommonUI(newWindow, resourceManager, inputManager);
+        commonUI = new CommonUI(newWindow, resourceManager, inputManager, uiThemeManager);
 
 
         std::string windowTitle = novel->getProjectInformation()->getGameTitle();
         newWindow->setTitle(windowTitle);
 
         // Create each game GameScreen
-        novelScreen = new NovelScreen(engine, novel);
+        novelScreen = new NovelScreen(engine, novel, commonUI);
     } catch (GeneralException &e) {
         invokeErrorScreen(e);
     }

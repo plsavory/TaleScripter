@@ -1,6 +1,7 @@
 #include "Base/Engine.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
+#include "UI/CommonUI.h"
 #include "VisualNovelEngine/Screens/NovelScreen.hpp"
 #include "Misc/ColourBuilder.hpp"
 #include <iostream>
@@ -9,7 +10,7 @@
 // Objects used on this screen
 #include "VisualNovelEngine/Classes/UI/NovelTextDisplay.hpp"
 
-NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer) {
+NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer, CommonUI *cUI) {
     engine = enginePointer;
     window = engine->getWindow();
     spriteRenderer = engine->getSpriteRenderer();
@@ -22,10 +23,11 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer) {
     backgroundTransitionRenderer = engine->getBackgroundTransitionRenderer();
     characterSpriteRenderer = engine->getCharacterSpriteRenderer();
     sceneTransitioning = false;
+    commonUI = cUI;
 
-    textDisplay = new NovelTextDisplay(textRenderer, spriteRenderer, resourceManager);
+    textDisplay = new NovelTextDisplay(textRenderer, spriteRenderer, resourceManager, commonUI);
 
-    // User input bindings for this screen (TODO: Also react to gamepad and mouse input)
+    // User input bindings for this screen (TODO: Also react to gamepad input)
     advanceEventId = inputManager->bindKeyboardEvent("novel_screen_text_advance", "return", true);
     advanceMouseEvent = inputManager->getMouseHandler()->addEvent("novel_screen_text_advance",
                                                                   MouseEventType::LeftClick);

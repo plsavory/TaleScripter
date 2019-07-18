@@ -5,17 +5,19 @@
 #include "Resource/ResourceManager.hpp"
 #include "TextRenderer/TextRenderer.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
+#include "UI/CommonUI.h"
 #include "VisualNovelEngine/Classes/UI/NovelTextDisplay.hpp"
 #include <sstream>
 #include <vector>
 #include "Misc/Utils.hpp"
 
-NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRenderer, ResourceManager *rManager) {
+NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRenderer, ResourceManager *rManager, CommonUI *cUI) {
 
     textRenderer = tRenderer;
     fontManager = tRenderer->getFontManager();
     spriteRenderer = sRenderer;
     resourceManager = rManager;
+    commonUI = cUI;
 
     textCounterDelay = 35;
     textCounterClock = new sf::Clock();
@@ -36,9 +38,13 @@ NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRen
     updateNameDisplayText = false;
     maxTextWidth = 980;
 
-    // TODO: Load this from the database rather than hardcoded here
-    resourceManager->loadTexture("resource/textures/vn_line.png", "novel_text_display_background");
-    backgroundSprite = spriteRenderer->addSprite("novel_text_display_background", "novel_text_display_background", 2);
+    auto *uiElement = commonUI->getUIThemeManager()->getActiveTheme()->getElement("novelTextBackground");
+
+    if (uiElement) {
+        auto textureName = uiElement->getTextureByHorizontalSize(maxTextWidth)->getTexture()->name;
+        backgroundSprite = spriteRenderer->addSprite(textureName, "novel_text_display_background", 2);
+    }
+
 
     if (backgroundSprite) {
         backgroundSprite->setPosition(140, 585);

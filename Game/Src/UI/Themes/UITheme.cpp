@@ -9,7 +9,6 @@
 #include "BackgroundImageRenderer.hpp"
 #include "ResourceManager.hpp"
 #include "UI/Themes/UITheme.h"
-#include "UI/UIConstants.h"
 #include "MisuseException.hpp"
 
 UITheme::UITheme(sf::RenderWindow *renderWindow, ResourceManager *rManager, DatabaseConnection *novel,
@@ -21,152 +20,193 @@ UITheme::UITheme(sf::RenderWindow *renderWindow, ResourceManager *rManager, Data
     auto *dataSet = new DataSet();
 
     novel->executeQuery(Utils::implodeString(
-            {"SELECT * FROM ui_theme_attributes WHERE ui_theme_id = ", data->getColumn("id")->getData()->asString()}),
+            {"SELECT * FROM ui_theme_elements WHERE ui_theme_id = ", data->getColumn("id")->getData()->asString()}),
                         dataSet);
 
-    for (int i = 0; i < dataSet->getRowCount(); i++) {
-        auto *newAttribute = new UIThemeAttribute(renderWindow, rManager, novel, dataSet->getRow(i));
-        attributes.push_back(newAttribute);
+    // Ensure that all possible element types which are required actually exist in the theme
+    std::vector<ElementType*> types = UIUtils::getAllPossibleElementTypes();
+
+    for (auto &type : types) {
+        auto *existingRow = dataSet->findRow("name", type->getName());
+
+        if (!existingRow) {
+            if (type->isRequired()) {
+                throw MisuseException(Utils::implodeString({"Required UI theme element '", type->getName(), "' is missing."}));
+            } else {
+                // TODO: Load some kind of default style, might not be needed if this is handled by GameCompiler
+                continue;
+            }
+        }
+
+        // Fetch the element's data, store its graphics pointers and store it against the theme (handled by the object we're newing up here).
+        auto *newElement = new UIElement(existingRow, novel, rManager);
+        elements.push_back(newElement);
     }
 
-    // Check that we have all of the attributes that we want...
-    for (int i = 0; i < 1; i++) {
-        // This loop does not actually loop right now... (There is a reason for doing this in the future, really!)
-        // TODO: Continue without the check if an attribute is optional
-        if (attributes.size() < i + 1) {
-            throw ResourceException(Utils::implodeString(
-                    {"Required attribute type '", UIConstants::AttributeType::getTypeName(i), "' is missing"}));
-        }
-    }
+    // TODO: Process any custom elements when this is supported.
 
     delete (dataSet);
 }
 
+UIElement* UITheme::getElement(const std::string& name) {
+
+    for (auto & element : elements) {
+        if (element->getName() == name) {
+            return element;
+        }
+    }
+
+    return nullptr;
+}
+
 UITheme::~UITheme() {
-    for (auto &attribute : attributes) {
-        delete (attribute);
+    for (auto & item : elements) {
+        delete(item);
     }
 }
 
-UIThemeAttribute *UITheme::getAttribute(int type) {
+/**
+ * Loads UI element data
+ * @param data - A DataSet object containing a row from the ui_theme_elements table.
+ */
+UIElement::UIElement(DataSetRow *data, DatabaseConnection *novel, ResourceManager *rManager) {
+    id = data->getColumn("id")->getData()->asInteger();
+    name = data->getColumn("name")->getData()->asString();
 
-    for (auto &attribute : attributes) {
-        if (attribute->getType() == type) {
-            return attribute;
-        }
+    auto *dataSet = new DataSet();
+    novel->executeQuery(Utils::implodeString({"SELECT * FROM ui_theme_element_textures WHERE ui_theme_element_id = ", std::to_string(id)}), dataSet);
+
+    if (dataSet->getRowCount() == 0) {
+        throw MisuseException(Utils::implodeString({"UI element '", name, "' does not have any textures linked to it."}));
     }
 
-    throw ResourceException(
-            Utils::implodeString({"No UI theme attribute of type ", std::to_string(type), " was found"}));
-}
-
-// Attribute functions
-int UIThemeAttribute::getType() {
-    return type;
-}
-
-UIThemeAttribute::UIThemeAttribute(sf::RenderWindow *renderWindow, ResourceManager *rManager, DatabaseConnection *novel,
-                                   DataSetRow *data) {
-
-    std::vector<std::string> fields = {"fill_gradient_id", "outline_gradient_id", "selected_gradient_id"};
-
-    for (int i = 0; i < fields.size(); i++) {
-        // Get all of the gradients that we need
-        auto *dataSet = new DataSet();
-
-        novel->executeQuery(Utils::implodeString({"SELECT * FROM ui_theme_gradients WHERE id = ",
-                                                  data->getColumn(fields[i])->getData()->asString()}), dataSet);
-
-        if (dataSet->getRowCount() == 0) {
-            throw ResourceException(Utils::implodeString(
-                    {"No gradient found linked to attribute ", UIConstants::AttributeType::getTypeName(
-                            data->getColumn("ui_theme_attribute_type_id")->getData()->asInteger())}));
-        }
-
-        auto *newGradient = new UIThemeGradient(dataSet->getRow(0), novel);
-
-        if (fields[i] == "fill_gradient_id") {
-            fillGradient = newGradient;
-        }
-
-        if (fields[i] == "outline_gradient_id") {
-            outlineGradient = newGradient;
-        }
-
-        if (fields[i] == "selected_gradient_id") {
-            selectedGradient = newGradient;
-        }
-
-        delete (dataSet);
+    for (auto &row : dataSet->getRows()) {
+        auto *newUIElementTexture = new UIElementTexture(row, novel, rManager);
+        uiElementTextures.push_back(newUIElementTexture);
     }
 }
 
-UIThemeAttribute::~UIThemeAttribute() {
-
-}
-
-// Gradient functions
-UIThemeGradient::UIThemeGradient(DataSetRow *data, DatabaseConnection *novel) {
-
-    std::vector<std::string> fields = {"top_left_colour_id", "top_right_colour_id", "bottom_left_colour_id",
-                                       "bottom_right_colour_id"};
-
-    // Load all of the colours into memory
-    for (int i = 0; i < fields.size(); i++) {
-
-        auto *dataSet = new DataSet();
-
-        colours.push_back(getColourFromDatabase(data->getColumn(fields[i])->getData()->asInteger(), novel));
-
-        delete(dataSet);
+UIElement::~UIElement() {
+    for (auto &item : uiElementTextures) {
+        delete(item);
     }
 }
 
-UIThemeGradient::~UIThemeGradient() {
-    for (auto &colour : colours) {
-        delete(colour);
-    }
+std::string UIElement::getName() {
+    return name;
 }
 
-sf::Color* UIThemeGradient::getColourFromDatabase(int colourId, DatabaseConnection *novel) {
+/**
+ * @param width - the desired width
+ * @return
+ */
+UIElementTexture* UIElement::getTextureByHorizontalSize(int width) {
 
-    auto *colourData = new DataSet();
-    novel->executeQuery(Utils::implodeString({"SELECT * FROM colours WHERE id = ", std::to_string(colourId)}), colourData);
+    std::vector<UIElementTexture*> hLargestFirstTextures;
 
-    if (colourData->getRowCount() == 0) {
-        throw ResourceException(Utils::implodeString({"No colour with id '", std::to_string(colourId), "' was found"}));
-    }
+    // Arrange them all largest-first
+    std::vector<UIElementTexture*> processedTextures = uiElementTextures;
 
-    auto *row = colourData->getRow(0);
+    while (hLargestFirstTextures.size() != uiElementTextures.size()) {
 
-    auto *colour = new sf::Color();
+        int largestX = 0;
+        UIElementTexture *largestTexture = nullptr;
 
-    for (int i = 0; i < row->getColumnCount(); i++) {
+        int largestTextureIndex = 0;
 
-        int value = row->getColumn(i)->getData()->asInteger();
+        // Get the largest texture size...
+        for (int i = 0; i < processedTextures.size(); i++) {
 
-        switch (i) {
-            case 0:
-                continue; // Don't want to try and process the id column...
-            case 1:
-                colour->r = value;
-                break;
-            case 2:
-                colour->g = value;
-                break;
-            case 3:
-                colour->b = value;
-                break;
-            case 4:
-                colour->a = value;
-                break;
-            default:
-                throw MisuseException(Utils::implodeString({"Unknown colour index ", std::to_string(i)}));
+            UIElementTexture *item = processedTextures[i];
+
+            if (item->getTexture()->getTexture()->getSize().x > largestX) {
+                largestX = item->getTexture()->getTexture()->getSize().x;
+                largestTexture = item;
+                largestTextureIndex = i;
+            }
         }
 
+        hLargestFirstTextures.push_back(largestTexture);
+        processedTextures.erase(processedTextures.begin() + largestTextureIndex);
     }
 
-    delete(colourData);
-    return colour;
+    // Out of the arranged textures, select the latest that is large enough to accommodate the given width
+    UIElementTexture *largestFittingTexture;
+    largestFittingTexture = processedTextures[0]; // We always want to return the largest unless a smaller one is large enough to accomodate
 
+    for (auto &texture : processedTextures) {
+        if (texture->getTexture()->getTexture()->getSize().x < width) {
+            break;
+        }
+        largestFittingTexture = texture;
+    }
+
+    return largestFittingTexture;
+}
+
+/**
+ * @param height - the height that we need
+ * @return
+ */
+UIElementTexture* UIElement::getTextureByVerticalSize(int height) {
+
+    std::vector<UIElementTexture*> vLargestFirstTextures;
+
+    // Arrange them all largest-first
+    std::vector<UIElementTexture*> processedTextures = uiElementTextures;
+
+    while (vLargestFirstTextures.size() != uiElementTextures.size()) {
+
+        int largestY = 0;
+        UIElementTexture *largestTexture = nullptr;
+
+        int largestTextureIndex = 0;
+
+        // Get the largest texture size...
+        for (int i = 0; i < processedTextures.size(); i++) {
+
+            UIElementTexture *item = processedTextures[i];
+
+            if (item->getTexture()->getTexture()->getSize().y > largestY) {
+                largestY = item->getTexture()->getTexture()->getSize().y;
+                largestTexture = item;
+                largestTextureIndex = i;
+            }
+        }
+
+        vLargestFirstTextures.push_back(largestTexture);
+        processedTextures.erase(processedTextures.begin() + largestTextureIndex);
+    }
+
+    // Out of the arranged textures, select the latest that is large enough to accommodate the given width
+    UIElementTexture *largestFittingTexture;
+    largestFittingTexture = processedTextures[0]; // We always want to return the largest unless a smaller one is large enough to accomodate
+
+    for (auto &texture : processedTextures) {
+        if (texture->getTexture()->getTexture()->getSize().y < height) {
+            break;
+        }
+        largestFittingTexture = texture;
+    }
+
+    return largestFittingTexture;
+}
+
+UIElementTexture::UIElementTexture(DataSetRow *data, DatabaseConnection *novel, ResourceManager *rManager) {
+    int textureId = data->getColumn("texture_id")->getData()->asInteger()-1; // Database is 1-indexed, memory is not.
+    Texture* foundTexture = rManager->getTexture(textureId);
+
+    if (!foundTexture) {
+        throw ResourceException(Utils::implodeString({"No texture with id ", std::to_string(textureId), " was found"}));
+    }
+
+    texture = foundTexture;
+}
+
+UIElementTexture::~UIElementTexture() {
+    // TODO: Unload any textures used by this item
+}
+
+Texture* UIElementTexture::getTexture() {
+    return texture;
 }
