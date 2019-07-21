@@ -2,6 +2,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "Database/TypeCaster.hpp"
 #include <nlohmann/json.hpp>
+#include "ProjectBuilderHelper.h"
 
 #include "Misc/JsonHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
@@ -12,6 +13,7 @@
 #include <regex>
 #include "Misc/Utils.hpp"
 #include "ThemeBuilder.hpp"
+#include "ScreenBuilder.hpp"
 
 #define VERBOSE_PROJECT_BUILDER_MESSAGES
 
@@ -41,6 +43,8 @@ void ProjectBuilder::process() {
   std::cout<<"Opening project.json..."<<std::endl;
   #endif
 
+  auto *projectBuilderHelper = new ProjectBuilderHelper(novel, resource);
+
   // Get the project directory
   std::regex regex("project\\.json$");
   std::string projectDirectory = std::regex_replace(projectFileName, regex, "");
@@ -68,7 +72,7 @@ void ProjectBuilder::process() {
 
     json credits = projectJson["contributors"];
 
-    // Store all of the names in the Credits array. TODO: Create a more comprehensive solution for game ending cvredits later
+    // Store all of the names in the Credits array. TODO: Create a more comprehensive solution for game ending credits later
     for (auto & contributor : contributors) {
       contributor = nullptr;
     }
@@ -149,6 +153,13 @@ void ProjectBuilder::process() {
   if (numberOfChapters == 0) {
     throw ProjectBuilderException("No chapters were listed to be processed in the 'chapters' attribute of project.json.");
   }
+
+  // Process the screens
+  auto *screenBuilder = new ScreenBuilder(novel, resource, fHandler, projectBuilderHelper);
+
+  // Process the title screen
+  std::string titleScreenFilePath = Utils::implodeString({projectDirectory, "UI/TitleScreens.json"});
+  screenBuilder->processTitleScreens(titleScreenFilePath);
 }
 
 void ProjectBuilder::processCharacters() {

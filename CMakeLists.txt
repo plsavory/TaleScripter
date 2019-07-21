@@ -177,7 +177,7 @@ add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Src/GameCompiler/ResourceBuilder.cpp
         Game/Src/Misc/Utils.cpp
         Game/Src/GameCompilerEntryPoint.cpp
-        Game/Include/VisualNovelEngine/Classes/Data/VisualNovelEngineConstants.hpp Game/Include/GameCompiler/ThemeBuilder.hpp Game/Src/GameCompiler/ThemeBuilder.cpp Game/Include/UI/UIConstants.h Game/Include/UI/UIUtils.hpp Game/Include/Database/DataAttribute.hpp)
+        Game/Include/VisualNovelEngine/Classes/Data/VisualNovelEngineConstants.hpp Game/Include/GameCompiler/ThemeBuilder.hpp Game/Src/GameCompiler/ThemeBuilder.cpp Game/Include/UI/UIConstants.h Game/Include/UI/UIUtils.hpp Game/Include/Database/DataAttribute.hpp Game/Include/GameCompiler/ScreenBuilder.hpp Game/Src/GameCompiler/ScreenBuilder.cpp Game/Include/GameCompiler/ProjectBuilderHelper.h)
 
 find_package(SFML 2.5.1 REQUIRED audio graphics window system )
 

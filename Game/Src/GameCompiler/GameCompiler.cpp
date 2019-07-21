@@ -4,6 +4,7 @@
 #include "Database/DatabaseConnection.hpp"
 #include "Exceptions/ProjectBuilderException.hpp"
 #include "Misc/JsonHandler.hpp"
+#include "ProjectBuilderHelper.h"
 #include "GameCompiler/ProjectBuilder.hpp"
 #include "GameCompiler/GameCompiler.hpp"
 
@@ -310,6 +311,12 @@ void GameCompiler::createNovelDatabase() {
     novelScreenAttributesTable->addColumn("novel_screen_attribute_group_id", ColumnType::tInteger, true, "");
     novelScreenAttributesTable->addColumn("name", ColumnType::tInteger, true, "");
     novelScreenAttributesTable->addColumn("value", ColumnType::tText, true, "");
+
+    DatabaseTable *titleScreensTable = novelDb->addTable("title_screens");
+    titleScreensTable->addPrimaryKey();
+    titleScreensTable->addColumn("background_image_id", ColumnType::tInteger, true, "");
+    titleScreensTable->addColumn("background_music_id", ColumnType::tInteger, true, "");
+    titleScreensTable->addColumn("menu_id", ColumnType::tInteger, true, "");
 
     novelDb->createDatabase();
 

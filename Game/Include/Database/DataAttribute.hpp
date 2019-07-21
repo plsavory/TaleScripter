@@ -54,6 +54,12 @@ private:
         }
 
         if (name == "characterNameDisplay") {
+            acceptedAttributes.push_back(new DataAttribute("framePositionX", "150"));
+            acceptedAttributes.push_back(new DataAttribute("framePositionY", "550"));
+            acceptedAttributes.push_back(new DataAttribute("frameFillAlpha", "255"));
+            acceptedAttributes.push_back(new DataAttribute("frameBorderAlpha", "255"));
+            acceptedAttributes.push_back(new DataAttribute("textOffsetX", "10"));
+            acceptedAttributes.push_back(new DataAttribute("textOffsetY", "10"));
             return;
         }
 

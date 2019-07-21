@@ -236,6 +236,14 @@ NovelScreenThemeData::NovelScreenThemeData(int themeId, DatabaseConnection *nove
 
     novelScreenTextDisplay = new NovelScreenTextDisplay(novelTextDisplayRow, novel);
 
+    auto *characterNameDisplayRow = dataSet->findRow("name", "characterNameDisplay");
+
+    if (!novelScreenCharacterNameDisplay) {
+        throw DataSetException(Utils::implodeString({"No 'characterNameDisplay' attribute group was found for theme ", std::to_string(themeId)}));
+    }
+
+    novelScreenCharacterNameDisplay = new NovelScreenCharacterNameDisplay(novelTextDisplayRow, novel);
+
     delete(dataSet);
 
 }
@@ -255,4 +263,19 @@ NovelScreenTextDisplay::NovelScreenTextDisplay(DataSetRow *groupRow, DatabaseCon
     textOffsetY = dataSet->findRow("name", "textOffsetY", true)->getColumn("value")->getData()->asInteger();
     maxTextWidth = dataSet->findRow("name", "maxTextWidth", true)->getColumn("value")->getData()->asInteger();
 
+}
+
+NovelScreenCharacterNameDisplay::NovelScreenCharacterNameDisplay(DataSetRow *groupRow, DatabaseConnection *novel) {
+
+    int groupId = groupRow->getColumn("id")->getData()->asInteger();
+
+    // Find the attributes that we care about, throwing errors if they don't exist.
+    auto *dataSet = new DataSet();
+    novel->executeQuery(Utils::implodeString({"SELECT * FROM novel_screen_attributes WHERE novel_screen_attribute_group_id = ", std::to_string(groupId)}), dataSet);
+    framePositionX = dataSet->findRow("name", "framePositionX", true)->getColumn("value")->getData()->asInteger();
+    framePositionY = dataSet->findRow("name", "framePositionY", true)->getColumn("value")->getData()->asInteger();
+    frameFillAlpha = dataSet->findRow("name", "frameFillAlpha", true)->getColumn("value")->getData()->asInteger();
+    frameBorderAlpha = dataSet->findRow("name", "frameBorderAlpha", true)->getColumn("value")->getData()->asInteger();
+    textOffsetX = dataSet->findRow("name", "textOffsetX", true)->getColumn("value")->getData()->asInteger();
+    textOffsetY = dataSet->findRow("name", "textOffsetY", true)->getColumn("value")->getData()->asInteger();
 }

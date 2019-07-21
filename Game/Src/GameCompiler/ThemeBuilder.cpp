@@ -24,6 +24,8 @@ ThemeBuilder::ThemeBuilder(std::string fileName, DatabaseConnection *novelDb, Da
     novel = novelDb;
     resource = resourceDb;
 
+    std::cout<<"Processing Themes..."<<std::endl;
+
     json themesJson = fileHandler->parseJsonFile(fileName);
 
     for (auto &theme : themesJson) {

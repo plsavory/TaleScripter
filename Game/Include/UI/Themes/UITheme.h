@@ -7,6 +7,26 @@
 
 #include "UI/UIUtils.hpp"
 
+class NovelScreenCharacterNameDisplay {
+public:
+    NovelScreenCharacterNameDisplay(DataSetRow *groupRow, DatabaseConnection *novel);
+
+    // We don't want any of these to be settable (at the moment)
+    int getFramePositionX() {return framePositionX;};
+    int getFramePositionY() {return framePositionY;};
+    int getFrameFillAlpha() {return frameFillAlpha;};
+    int getFrameBorderAlpha() {return frameBorderAlpha;};
+    int getTextOffsetX() {return textOffsetX;};
+    int getTextOffsetY() {return textOffsetY;};
+private:
+    int framePositionX;
+    int framePositionY;
+    int frameFillAlpha;
+    int frameBorderAlpha;
+    int textOffsetX;
+    int textOffsetY;
+};
+
 class NovelScreenTextDisplay {
 public:
     NovelScreenTextDisplay(DataSetRow *groupRow, DatabaseConnection *novel);
@@ -35,8 +55,12 @@ public:
     NovelScreenTextDisplay* getTextDisplayData() {
         return novelScreenTextDisplay;
     }
+    NovelScreenCharacterNameDisplay* getNovelScreenCharacterNameDisplay() {
+        return novelScreenCharacterNameDisplay;
+    }
 private:
     NovelScreenTextDisplay *novelScreenTextDisplay;
+    NovelScreenCharacterNameDisplay *novelScreenCharacterNameDisplay;
 };
 
 class UIElementTexture {
