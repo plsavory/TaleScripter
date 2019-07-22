@@ -139,8 +139,10 @@ void GameManager::handleScreenChanges() {
         switch (screenState->getUpcomingState()) {
             case ScreenState::STATE_TITLE:
                 if (!titleScreen) {
-                    titleScreen = new TitleScreen(engine->getWindow(), novel->getNovelDatabase(), resourceManager,
+                    titleScreen = new TitleScreen(engine, novel->getNovelDatabase(), resourceManager,
                                                   inputManager, screenState, commonUI);
+
+                    titleScreen->start();
                 }
                 break;
             case ScreenState::STATE_NOVEL:

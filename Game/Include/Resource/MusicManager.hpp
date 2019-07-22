@@ -140,7 +140,7 @@ public:
 
     AudioStream *getAudioStream(std::string name);
 
-    void playAudioStream(int id);
+    void playAudioStream(int id, MusicPlaybackRequestMetadata* metadata);
 
     void playAudioStream(std::string name);
 

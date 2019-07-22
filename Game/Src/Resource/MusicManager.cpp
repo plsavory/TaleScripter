@@ -45,8 +45,26 @@ void MusicManager::playAudioStream(std::string name, MusicPlaybackRequestMetadat
     playRequestQueue.push(playRequest);
 }
 
-void MusicManager::playAudioStream(int id) {
-  // TODO (I don't think this is needed, decide later when it isn't 2am.)
+/**
+ * Plays an audio stream using an id from the database
+ * @param id - an ID of a music stream stored in the database
+ * @param metadata - A metadata object pointer to determine volume and pitch, can be nullptr if that is not needed.
+ */
+void MusicManager::playAudioStream(int id, MusicPlaybackRequestMetadata* metadata) {
+    id--; // Database id's are 1-indexed, memory indices are not.
+
+    if (id < 0) {
+        return;
+    }
+
+    MusicPlayRequest playRequest(id);
+
+    if (metadata != nullptr) {
+        playRequest.setMetadata(metadata);
+    }
+
+    playRequestQueue.push(playRequest);
+
 }
 
 /**

@@ -6,6 +6,7 @@ public:
     MusicPlayRequest(int id) {
         streamId = id;
         loop = false;
+        metadata = nullptr;
     };
 
     int getId() {

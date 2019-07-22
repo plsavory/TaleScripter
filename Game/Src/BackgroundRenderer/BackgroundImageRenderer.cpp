@@ -182,6 +182,17 @@ void BackgroundImageRenderer::setBackground(std::string name) {
   enableImageDrawing();
 }
 
+void BackgroundImageRenderer::setBackground(int id) {
+    int bgId = id-1;
+
+    if (bgId < 0) {
+        return;
+    }
+
+    currentBackground = background[bgId];
+    enableImageDrawing();
+}
+
 void BackgroundImageRenderer::setUpcomingBackground(std::string name) {
     int bgId = findBackground(name);
 

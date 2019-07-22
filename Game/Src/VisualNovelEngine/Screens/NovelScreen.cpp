@@ -150,7 +150,6 @@ void NovelScreen::nextSegment() {
     // Play the music file related to the scene segment
     MusicPlaybackRequest *musicPlaybackRequest = nextSegment->getMusicPlaybackRequest();
     if (musicPlaybackRequest) {
-        // TODO: Handle metadata
         MusicPlaybackRequestMetadata *metadata = musicPlaybackRequest->getMetadata();
 
         if (metadata) {

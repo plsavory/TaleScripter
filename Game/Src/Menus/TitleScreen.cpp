@@ -10,11 +10,14 @@
 #include "ResourceManager.hpp"
 #include "ScreenState.h"
 #include "UI/CommonUI.h"
+#include "MusicManager.hpp"
+#include "Engine.hpp"
 #include "Menus/TitleScreen.h"
 
-TitleScreen::TitleScreen(sf::RenderWindow *renderWindow, DatabaseConnection *novelDatabase,
+TitleScreen::TitleScreen(Engine *engine, DatabaseConnection *novelDatabase,
                          ResourceManager *rManager, InputManager *iManager, ScreenState *sState, CommonUI *cui) {
-    window = renderWindow;
+    window = engine->getWindow();
+    backgroundImageRenderer = engine->getBackgroundImageRenderer();
     novelDb = novelDatabase;
     resourceManager = rManager;
     inputManager = iManager;
@@ -22,6 +25,7 @@ TitleScreen::TitleScreen(sf::RenderWindow *renderWindow, DatabaseConnection *nov
     screenState = sState;
     commonUI = cui;
     quitChoice = nullptr;
+    musicManager = resourceManager->getMusicManager();
 
     // Add the menu items that we need
     // TODO: Load these from the database
@@ -34,7 +38,7 @@ TitleScreen::~TitleScreen() {
 }
 
 void TitleScreen::start() {
-    // TODO: Play title music
+    getData();
 }
 
 void TitleScreen::update(sf::Clock *gameTime) {
@@ -68,4 +72,17 @@ void TitleScreen::update(sf::Clock *gameTime) {
 
 void TitleScreen::draw() {
     menu->draw();
+}
+
+void TitleScreen::getData() {
+    // TODO: Fetch a different title screen depending on the game's state, currently we only support one.
+    auto *dataSet = new DataSet();
+    novelDb->executeQuery("SELECT * FROM title_screens WHERE id = 1;", dataSet);
+
+    if (dataSet->getRowCount() == 0) {
+        throw ResourceException("No title screen data was found.");
+    }
+
+    backgroundImageRenderer->setBackground(dataSet->getRow(0)->getColumn("background_image_id")->getData()->asInteger());
+    musicManager->playAudioStream(dataSet->getRow(0)->getColumn("background_music_id")->getData()->asInteger(), nullptr);
 }

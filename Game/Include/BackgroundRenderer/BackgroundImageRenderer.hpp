@@ -127,6 +127,7 @@ public:
   void update();
   void draw();
   void setBackground(std::string name);
+  void setBackground(int id);
   void setUpcomingBackground(std::string name);
   int findBackground(std::string name);
   void setBackgroundColour(sf::Color *colour);

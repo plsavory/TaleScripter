@@ -155,7 +155,6 @@ void Game::draw() {
     // Clear the window
     window->clear(*backgroundImageRenderer->getBackgroundColour());
 
-    gameManager->draw();
 
     // We don't want to update anything beyond here if the engine didn't start properly
     if (!engine->getErrorMessage().empty()) {
@@ -163,6 +162,7 @@ void Game::draw() {
     }
 
     backgroundImageRenderer->draw();
+    gameManager->draw();
 
     if (!backgroundOverlay->isInForeground()) {
         backgroundOverlay->draw();

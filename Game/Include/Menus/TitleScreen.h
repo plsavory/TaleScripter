@@ -9,7 +9,7 @@
 
 class TitleScreen {
 public:
-    TitleScreen(sf::RenderWindow *renderWindow, DatabaseConnection *novelDatabase, ResourceManager *rManager,
+    TitleScreen(Engine *engine, DatabaseConnection *novelDatabase, ResourceManager *rManager,
                 InputManager *iManager, ScreenState *sState, CommonUI *cui);
 
     ~TitleScreen();
@@ -29,6 +29,9 @@ private:
     ScreenState *screenState;
     CommonUI *commonUI;
     ChoiceDialog *quitChoice;
+    BackgroundImageRenderer *backgroundImageRenderer;
+    MusicManager *musicManager;
+    void getData();
 };
 
 #endif //TALESCRIPTER_TITLESCREEN_H
