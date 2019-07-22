@@ -318,6 +318,20 @@ void GameCompiler::createNovelDatabase() {
     titleScreensTable->addColumn("background_music_id", ColumnType::tInteger, true, "");
     titleScreensTable->addColumn("menu_id", ColumnType::tInteger, true, "");
 
+    DatabaseTable *menusTable = novelDb->addTable("menus");
+    menusTable->addPrimaryKey();
+    menusTable->addColumn("heading_text", ColumnType::tText, true, "");
+    menusTable->addColumn("orientation", ColumnType::tText, true, "");
+
+    DatabaseTable *menuOptionsTable = novelDb->addTable("menu_options");
+    menuOptionsTable->addPrimaryKey();
+    menuOptionsTable->addColumn("x_position", ColumnType::tInteger, true, "");
+    menuOptionsTable->addColumn("y_position", ColumnType::tInteger, true, "");
+    menuOptionsTable->addColumn("text", ColumnType::tText, false, "");
+    menuOptionsTable->addColumn("texture_id", ColumnType::tInteger, false, "");
+    menuOptionsTable->addColumn("action", ColumnType::tText, false, "");
+    menuOptionsTable->addColumn("menu_id", ColumnType::tInteger, false, "");
+
     novelDb->createDatabase();
 
 }

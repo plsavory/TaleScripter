@@ -21,16 +21,11 @@ TitleScreen::TitleScreen(Engine *engine, DatabaseConnection *novelDatabase,
     novelDb = novelDatabase;
     resourceManager = rManager;
     inputManager = iManager;
-    menu = new Menu(window, resourceManager, inputManager);
+    menu = nullptr;
     screenState = sState;
     commonUI = cui;
     quitChoice = nullptr;
     musicManager = resourceManager->getMusicManager();
-
-    // Add the menu items that we need
-    // TODO: Load these from the database
-    menu->addButton("start", "Start", sf::Vector2f(570, 360));
-    menu->addButton("quit", "Quit", sf::Vector2f(720, 360));
 }
 
 TitleScreen::~TitleScreen() {
@@ -66,12 +61,16 @@ void TitleScreen::update(sf::Clock *gameTime) {
         quitChoice = commonUI->showChoiceDialog("Are you sure that you want to quit?", {"yes", "no"}, {"Yes", "No"});
     }
 
-    menu->update(gameTime);
+    if (menu) {
+        menu->update(gameTime);
+    }
 
 }
 
 void TitleScreen::draw() {
-    menu->draw();
+    if (menu) {
+        menu->draw();
+    }
 }
 
 void TitleScreen::getData() {
@@ -82,6 +81,9 @@ void TitleScreen::getData() {
     if (dataSet->getRowCount() == 0) {
         throw ResourceException("No title screen data was found.");
     }
+
+    // Construct the menu
+    menu = new Menu(window, resourceManager, inputManager, novelDb, dataSet->getRow(0)->getColumn("id")->getData()->asInteger());
 
     backgroundImageRenderer->setBackground(dataSet->getRow(0)->getColumn("background_image_id")->getData()->asInteger());
     musicManager->playAudioStream(dataSet->getRow(0)->getColumn("background_music_id")->getData()->asInteger(), nullptr);

@@ -17,8 +17,44 @@ Menu::Menu(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManag
     setOrientation(ORIENTATION_HORIZONTAL);
     inputManager = iManager;
     currentSelection = 0;
+}
 
+Menu::Menu(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager, DatabaseConnection *novel, int menuId) {
 
+    window = renderWindow;
+    resourceManager = rManager;
+    selectedItem = "";
+    inputManager = iManager;
+    currentSelection = 0;
+
+    // Get the required data from the database and create the menu items
+    auto *menuDataSet = new DataSet();
+    novel->executeQuery(Utils::implodeString({"SELECT * FROM menus WHERE id = ", std::to_string(menuId), ";"}), menuDataSet);
+
+    if (menuDataSet->getRowCount() == 0) {
+        throw DataSetException(Utils::implodeString({"No menu with id ", std::to_string(menuId), " was found."}));
+    }
+
+    setOrientation(menuDataSet->getRow(0)->getColumn("orientation")->getData()->asString() == "horizontal" ? ORIENTATION_HORIZONTAL : ORIENTATION_VERTICAL);
+
+    // Fetch menu items and create them
+    auto *menuItemDataSet = new DataSet();
+    novel->executeQuery(Utils::implodeString({"SELECT * FROM menu_options WHERE menu_id = ", std::to_string(menuId)}), menuItemDataSet);
+
+    if (menuItemDataSet->getRowCount() == 0) {
+        throw DataSetException("A menu was attempted to be created with no menu items linked to it.");
+    }
+
+    for (auto &item : menuItemDataSet->getRows()) {
+        // TODO: Fetch the texture if it is populated and exists
+        sf::Vector2f itemPosition = sf::Vector2f(item->getColumn("x_position")->getData()->asInteger(), item->getColumn("y_position")->getData()->asInteger());
+        std::string action = item->getColumn("action")->getData()->asString();
+        std::string text = item->getColumn("text")->getData()->asString();
+        addButton(action, text, itemPosition);
+    }
+
+    delete(menuItemDataSet);
+    delete(menuDataSet);
 }
 
 Menu::~Menu() {

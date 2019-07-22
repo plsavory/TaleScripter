@@ -13,6 +13,8 @@ class Menu {
 public:
     Menu(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager);
 
+    Menu(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager, DatabaseConnection *novel, int menuId);
+
     ~Menu();
 
     void update(sf::Clock *gameTime);

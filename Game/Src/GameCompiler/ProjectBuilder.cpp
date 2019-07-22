@@ -2,10 +2,9 @@
 #include "Database/DatabaseConnection.hpp"
 #include "Database/TypeCaster.hpp"
 #include <nlohmann/json.hpp>
-#include "ProjectBuilderHelper.h"
-
 #include "Misc/JsonHandler.hpp"
 #include "GameCompiler/ProjectBuilder.hpp"
+#include "ProjectBuilderHelper.h"
 #include "GameCompiler/ResourceBuilder.hpp"
 #include "GameCompiler/ChapterBuilder.hpp"
 #include "Exceptions/ProjectBuilderException.hpp"
