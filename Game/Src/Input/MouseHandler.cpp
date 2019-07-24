@@ -13,6 +13,10 @@
 MouseHandler::MouseHandler(sf::RenderWindow *windowPointer) {
     window = windowPointer;
     enabled = true;
+
+    for (int i = 0; i < 16; i++) {
+        wasClickedInLastFrame[i] = false;
+    }
 }
 
 MouseHandler::~MouseHandler() {
@@ -37,6 +41,13 @@ void MouseHandler::update() {
         events[i]->update();
     }
 
+    // Handle global mouse click stuff
+    for (int i = 0; i < 16; i++) {
+        if (wasClickedInLastFrame[i]) {
+            wasClickedInLastFrame[i] = sf::Mouse::isButtonPressed((sf::Mouse::Button)i);
+        }
+    }
+
 }
 
 sf::Vector2i MouseHandler::getMousePosition() {
@@ -52,6 +63,22 @@ sf::Vector2i MouseHandler::getMousePosition() {
  */
 void MouseHandler::draw() {
 
+}
+
+/**
+ * Returns true if the window is in focus and the given button has been pressed
+ * @param button
+ * @return
+ */
+bool MouseHandler::isButtonClicked(sf::Mouse::Button button) {
+    bool clicked = window->hasFocus() && sf::Mouse::isButtonPressed(button);
+
+    if (wasClickedInLastFrame[button]) {
+        return false;
+    }
+
+    wasClickedInLastFrame[button] = clicked;
+    return clicked;
 }
 
 MouseEvent *MouseHandler::addEvent(std::string name, MouseEventType eventType) {
@@ -179,4 +206,3 @@ void MouseEvent::update() {
 std::string MouseEvent::getName() {
     return name;
 }
-

@@ -10,7 +10,7 @@
 
 class MenuItem {
 public:
-    MenuItem(sf::RenderWindow *renderWindow, ResourceManager *rManager);
+    MenuItem(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mouseHandler);
 
     ~MenuItem();
 
@@ -22,7 +22,7 @@ public:
 
     void setAsButton(std::string name, std::string text, sf::Vector2f position);
 
-    bool isSelected();
+    bool isClicked();
 
     std::string getName();
 
@@ -34,9 +34,12 @@ public:
 
     sf::FloatRect getGlobalBounds();
 
+    bool handleMouseInput();
+
 private:
     sf::RenderWindow *window;
     ResourceManager *resourceManager;
+    MouseHandler *mouseHandler;
     int type;
 
     void typeSetValidation();

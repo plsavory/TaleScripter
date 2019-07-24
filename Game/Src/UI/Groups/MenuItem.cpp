@@ -6,13 +6,15 @@
 #include <SFML/Graphics.hpp>
 #include "DatabaseConnection.hpp"
 #include "BackgroundImageRenderer.hpp"
+#include "MouseHandler.hpp"
 #include "ResourceManager.hpp"
 #include "UI/Groups/MenuItem.h"
 
-MenuItem::MenuItem(sf::RenderWindow *renderWindow, ResourceManager *rManager) {
+MenuItem::MenuItem(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mHandler) {
     window = renderWindow;
     resourceManager = rManager;
     type = TYPE_NONE;
+    mouseHandler = mHandler;
 
     // Set all of the possible UI elements that we can hold to nullptr so that we can detect when there is something stored in there.
     button = nullptr;
@@ -54,7 +56,7 @@ void MenuItem::setAsButton(std::string name, std::string text, sf::Vector2f posi
 
     typeSetValidation();
 
-    button = new Button(window, resourceManager);
+    button = new Button(window, resourceManager, mouseHandler);
     button->setName(name);
     button->setText(text);
     button->setPosition(position);
@@ -67,8 +69,13 @@ void MenuItem::typeSetValidation() {
     }
 }
 
-bool MenuItem::isSelected() {
-    return false;
+bool MenuItem::isClicked() {
+    switch (type) {
+        case TYPE_BUTTON:
+            return button->isClicked();
+        default:
+            throw MisuseException("Unknown menu item type");
+    }
 }
 
 std::string MenuItem::getName() {
@@ -109,5 +116,13 @@ sf::FloatRect MenuItem::getGlobalBounds() {
         default:
             throw MisuseException("Unknown menu item type");
     }
+}
 
+bool MenuItem::handleMouseInput() {
+    switch (type) {
+        case TYPE_BUTTON:
+            return button->handleMouseInput();
+        default:
+            throw MisuseException("Unknown menu item type");
+    }
 }

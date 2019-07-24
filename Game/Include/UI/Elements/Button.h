@@ -7,7 +7,7 @@
 
 class Button {
 public:
-    Button(sf::RenderWindow *renderWindow, ResourceManager *rManager);
+    Button(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mHandler);
 
     ~Button();
 
@@ -28,6 +28,10 @@ public:
     sf::Vector2f getPosition();
 
     sf::FloatRect getSize();
+
+    bool isClicked();
+
+    bool handleMouseInput();
 private:
     sf::RenderWindow *window;
     ResourceManager *resourceManager;
@@ -35,6 +39,7 @@ private:
     std::string name;
     sf::Text *text;
     sf::RectangleShape *selectedRectangle;
+    MouseHandler *mouseHandler;
 };
 
 #endif //TALESCRIPTER_BUTTON_H

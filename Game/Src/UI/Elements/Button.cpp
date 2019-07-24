@@ -8,11 +8,13 @@
 #include "DatabaseConnection.hpp"
 #include "BackgroundImageRenderer.hpp"
 #include "ResourceManager.hpp"
+#include "MouseHandler.hpp"
 #include "UI/Elements/Button.h"
 
-Button::Button(sf::RenderWindow *renderWindow, ResourceManager *rManager) {
+Button::Button(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mHandler) {
     window = renderWindow;
     resourceManager = rManager;
+    mouseHandler = mHandler;
 
     text = new sf::Text;
     text->setFont(*resourceManager->getFontManager()->getFont("story_font")->getFont());
@@ -83,4 +85,21 @@ sf::Vector2f Button::getPosition() {
 
 sf::FloatRect Button::getSize() {
     return selectedRectangle->getGlobalBounds();
+}
+
+/**
+ * Returns true if the mouse cursor has been clicked within the bounds of the button
+ * @return
+ */
+bool Button::isClicked() {
+    return handleMouseInput() && mouseHandler->isButtonClicked(sf::Mouse::Button::Left);
+}
+
+/**
+ * Returns true if the mouse cursor is within the bounds of the button
+ * @return
+ */
+bool Button::handleMouseInput() {
+    sf::Vector2i mousePosition = mouseHandler->getMousePosition();
+    return getSize().contains(mousePosition.x, mousePosition.y);
 }

@@ -93,11 +93,14 @@ void Menu::update(sf::Clock *gameTime) {
         return;
     }
 
-    // TODO Handle mouse input
+    for (int i = 0; i < items.size(); i++) {
 
-    for (auto &item : items) {
-        if (item->isSelected()) {
-            selectedItem = item->getName();
+        if (items[i]->handleMouseInput()) {
+            currentSelection = i;
+        }
+
+        if (items[i]->isClicked()) {
+            selectedItem = items[i]->getName();
         }
     }
 
@@ -116,14 +119,14 @@ void Menu::draw() {
 }
 
 MenuItem *Menu::addButton(const std::string &name, const std::string &text) {
-    auto *newItem = new MenuItem(window, resourceManager);
+    auto *newItem = new MenuItem(window, resourceManager, inputManager->getMouseHandler());
     newItem->setAsButton(name, text, sf::Vector2f(0, 0));
     items.push_back(newItem);
     return newItem;
 }
 
 void Menu::addButton(const std::string &name, const std::string &text, const sf::Vector2f &position) {
-    auto *newItem = new MenuItem(window, resourceManager);
+    auto *newItem = new MenuItem(window, resourceManager, inputManager->getMouseHandler());
     newItem->setAsButton(name, text, position);
     items.push_back(newItem);
 }

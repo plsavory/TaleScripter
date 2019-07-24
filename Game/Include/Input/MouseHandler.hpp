@@ -45,14 +45,18 @@ public:
     MouseEvent *
     addEvent(std::string eventName, MouseEventType eventType, int areaX, int areaY, int areaWidth, int areaHeight);
 
+    sf::Vector2i getMousePosition();
+
+    bool isButtonClicked(sf::Mouse::Button button);
 private:
     bool enabled;
     sf::RenderWindow *window;
+
     sf::Vector2i mousePosition;
 
-    sf::Vector2i getMousePosition();
-
     std::vector<MouseEvent *> events;
+
+    bool wasClickedInLastFrame[16];
 };
 
 #endif
