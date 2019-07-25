@@ -5,6 +5,7 @@
 #include "Resource/ResourceManager.hpp"
 #include "TextRenderer/TextRenderer.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
+#include "InputManager.hpp"
 #include "UI/CommonUI.h"
 #include "VisualNovelEngine/Classes/UI/NovelTextDisplay.hpp"
 #include <sstream>

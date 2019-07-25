@@ -7,6 +7,7 @@
 #include "DatabaseConnection.hpp"
 #include "BackgroundImageRenderer.hpp"
 #include "ResourceManager.hpp"
+#include "InputManager.hpp"
 #include "UI/CommonUI.h"
 
 CommonUI::CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager, UIThemeManager *uiTManager) {
@@ -15,6 +16,7 @@ CommonUI::CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, In
     inputManager = iManager;
     activeDialog = nullptr;
     uiThemeManager = uiTManager;
+    dataMenu = nullptr;
 }
 
 CommonUI::~CommonUI() {
@@ -30,9 +32,21 @@ void CommonUI::update(sf::Clock *gameTime) {
         return;
     }
 
+    if (dataMenu) {
+        dataMenu->update(gameTime);
+    }
+
+    if (dataMenu && dataMenu->needsToBeClosed()) {
+        delete(dataMenu);
+        dataMenu = nullptr;
+    }
 }
 
 void CommonUI::draw() {
+
+    if (dataMenu) {
+        dataMenu->draw();
+    }
 
     if (activeDialog) {
         activeDialog->draw();
@@ -40,6 +54,10 @@ void CommonUI::draw() {
 
 }
 
+/**
+ * Returns true if no overlay menus or dialogs are currently being drawn
+ * @return
+ */
 bool CommonUI::isDoingNothing() {
 
     if (activeDialog) {
@@ -48,7 +66,15 @@ bool CommonUI::isDoingNothing() {
         }
     }
 
-    return true;
+    return dataMenu == nullptr;
+
+}
+
+/**
+ * Displays the data menu for loading and saving progress
+ */
+void CommonUI::showDataMenu() {
+    dataMenu = new DataMenu(window, resourceManager, inputManager);
 }
 
 ChoiceDialog *CommonUI::showChoiceDialog(const std::string &text, const std::vector<std::string> &optionNames,
@@ -59,6 +85,11 @@ ChoiceDialog *CommonUI::showChoiceDialog(const std::string &text, const std::vec
     }
     activeDialog = new ChoiceDialog(window, resourceManager, text, optionNames, optionText, inputManager);
     return activeDialog;
+}
+
+void CommonUI::removeChoiceDialog() {
+    delete(activeDialog);
+    activeDialog = nullptr;
 }
 
 UIThemeManager* CommonUI::getUIThemeManager() {

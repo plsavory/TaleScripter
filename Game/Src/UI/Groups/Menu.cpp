@@ -14,6 +14,7 @@ Menu::Menu(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManag
     window = renderWindow;
     resourceManager = rManager;
     selectedItem = "";
+    keyboardInputEnabled = true;
     setOrientation(ORIENTATION_HORIZONTAL);
     inputManager = iManager;
     currentSelection = 0;
@@ -24,6 +25,7 @@ Menu::Menu(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManag
     window = renderWindow;
     resourceManager = rManager;
     selectedItem = "";
+    keyboardInputEnabled = true;
     inputManager = iManager;
     currentSelection = 0;
 
@@ -72,25 +74,31 @@ void Menu::update(sf::Clock *gameTime) {
         return;
     }
 
-    if (inputManager->isEventPressed(decrementEventName)) {
-        if (currentSelection > 0) {
-            --currentSelection;
-        } else {
-            currentSelection = items.size() - 1;
-        }
-    }
-
-    if (inputManager->isEventPressed(incrementEventName)) {
-        if (currentSelection < items.size() - 1) {
-            ++currentSelection;
-        } else {
-            currentSelection = 0;
-        }
-    }
-
-    if (inputManager->isEventPressed("menu_next")) {
-        selectedItem = items[currentSelection]->getName();
+    if (items.empty()) {
         return;
+    }
+
+    if (keyboardInputEnabled) {
+        if (inputManager->isEventPressed(decrementEventName)) {
+            if (currentSelection > 0) {
+                --currentSelection;
+            } else {
+                currentSelection = items.size() - 1;
+            }
+        }
+
+        if (inputManager->isEventPressed(incrementEventName)) {
+            if (currentSelection < items.size() - 1) {
+                ++currentSelection;
+            } else {
+                currentSelection = 0;
+            }
+        }
+
+        if (inputManager->isEventPressed("menu_next")) {
+            selectedItem = items[currentSelection]->getName();
+            return;
+        }
     }
 
     for (int i = 0; i < items.size(); i++) {
@@ -119,14 +127,20 @@ void Menu::draw() {
 }
 
 MenuItem *Menu::addButton(const std::string &name, const std::string &text) {
-    auto *newItem = new MenuItem(window, resourceManager, inputManager->getMouseHandler());
+    auto *newItem = new MenuItem(window, resourceManager, inputManager->getMouseHandler(), sf::Vector2f(0,0));
     newItem->setAsButton(name, text, sf::Vector2f(0, 0));
     items.push_back(newItem);
     return newItem;
 }
 
 void Menu::addButton(const std::string &name, const std::string &text, const sf::Vector2f &position) {
-    auto *newItem = new MenuItem(window, resourceManager, inputManager->getMouseHandler());
+    auto *newItem = new MenuItem(window, resourceManager, inputManager->getMouseHandler(), sf::Vector2f(0,0));
+    newItem->setAsButton(name, text, position);
+    items.push_back(newItem);
+}
+
+void Menu::addButton(const std::string &name, const std::string &text, const sf::Vector2f &position, sf::Vector2f size) {
+    auto *newItem = new MenuItem(window, resourceManager, inputManager->getMouseHandler(), size);
     newItem->setAsButton(name, text, position);
     items.push_back(newItem);
 }
@@ -270,3 +284,6 @@ sf::Vector2f Menu::getPosition() {
     return position;
 }
 
+void Menu::resetSelection() {
+    selectedItem = std::string();
+}

@@ -25,6 +25,8 @@ public:
 
     void addButton(const std::string &name, const std::string &text, const sf::Vector2f &position);
 
+    void addButton(const std::string &name, const std::string &text, const sf::Vector2f &position, sf::Vector2f size);
+
     MenuItem *getItem(std::string name);
 
     std::string getSelectedItemName();
@@ -44,6 +46,12 @@ public:
 
     sf::Vector2f getPosition();
 
+    void resetSelection();
+
+    void setKeyboardInputEnabled(bool value) {
+        keyboardInputEnabled = value;
+    }
+
 private:
     sf::RenderWindow *window;
     ResourceManager *resourceManager;
@@ -55,6 +63,7 @@ private:
     std::string incrementEventName;
     std::string decrementEventName;
     sf::Vector2f position;
+    bool keyboardInputEnabled;
 };
 
 #endif //TALESCRIPTER_MENU_H

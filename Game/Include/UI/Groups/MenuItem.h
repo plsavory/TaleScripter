@@ -10,7 +10,7 @@
 
 class MenuItem {
 public:
-    MenuItem(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mouseHandler);
+    MenuItem(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mouseHandler, sf::Vector2f itemSize);
 
     ~MenuItem();
 
@@ -41,6 +41,8 @@ private:
     ResourceManager *resourceManager;
     MouseHandler *mouseHandler;
     int type;
+    bool compact;
+    sf::Vector2f size;
 
     void typeSetValidation();
 

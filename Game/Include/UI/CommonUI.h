@@ -7,6 +7,7 @@
 #define TALESCRIPTER_COMMON_UI_H
 
 #include "UI/Themes/UIThemeManager.h"
+#include "Menus/DataMenu.hpp"
 #include "UI/Groups/ChoiceDialog.h"
 
 class CommonUI {
@@ -25,7 +26,11 @@ public:
     showChoiceDialog(const std::string &text, const std::vector<std::string> &optionNames,
                      const std::vector<std::string> &optionText);
 
+    void removeChoiceDialog();
+
     UIThemeManager* getUIThemeManager();
+
+    void showDataMenu();
 
 private:
     sf::RenderWindow *window;
@@ -33,6 +38,7 @@ private:
     ChoiceDialog *activeDialog;
     InputManager *inputManager;
     UIThemeManager *uiThemeManager;
+    DataMenu *dataMenu;
 };
 
 #endif //TALESCRIPTER_COMMON_UI_H

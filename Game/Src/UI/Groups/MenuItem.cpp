@@ -10,11 +10,12 @@
 #include "ResourceManager.hpp"
 #include "UI/Groups/MenuItem.h"
 
-MenuItem::MenuItem(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mHandler) {
+MenuItem::MenuItem(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mHandler, sf::Vector2f itemSize) {
     window = renderWindow;
     resourceManager = rManager;
     type = TYPE_NONE;
     mouseHandler = mHandler;
+    size = itemSize;
 
     // Set all of the possible UI elements that we can hold to nullptr so that we can detect when there is something stored in there.
     button = nullptr;
@@ -56,10 +57,17 @@ void MenuItem::setAsButton(std::string name, std::string text, sf::Vector2f posi
 
     typeSetValidation();
 
-    button = new Button(window, resourceManager, mouseHandler);
+    button = new Button(window, resourceManager, mouseHandler, compact);
     button->setName(name);
     button->setText(text);
     button->setPosition(position);
+
+    if (size != sf::Vector2f(0,0)) {
+        button->setSize(size);
+    } else {
+        button->setSize();
+    }
+
     type = TYPE_BUTTON;
 }
 

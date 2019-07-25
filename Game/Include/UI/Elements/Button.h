@@ -7,7 +7,7 @@
 
 class Button {
 public:
-    Button(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mHandler);
+    Button(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mHandler, bool isCompact);
 
     ~Button();
 
@@ -32,11 +32,16 @@ public:
     bool isClicked();
 
     bool handleMouseInput();
+
+    void setSize();
+
+    void setSize(sf::Vector2f size);
 private:
     sf::RenderWindow *window;
     ResourceManager *resourceManager;
     sf::Vector2f position;
     std::string name;
+    bool compact;
     sf::Text *text;
     sf::RectangleShape *selectedRectangle;
     MouseHandler *mouseHandler;

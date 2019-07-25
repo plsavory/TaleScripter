@@ -11,7 +11,7 @@
 #include "MouseHandler.hpp"
 #include "UI/Elements/Button.h"
 
-Button::Button(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mHandler) {
+Button::Button(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseHandler *mHandler, bool isCompact) {
     window = renderWindow;
     resourceManager = rManager;
     mouseHandler = mHandler;
@@ -20,10 +20,10 @@ Button::Button(sf::RenderWindow *renderWindow, ResourceManager *rManager, MouseH
     text->setFont(*resourceManager->getFontManager()->getFont("story_font")->getFont());
     text->setCharacterSize(18);
 
+    selectedRectangle = new sf::RectangleShape();
+
     setName("unnamed");
     setText("Unnamed");
-
-    selectedRectangle = nullptr;
 }
 
 Button::~Button() {
@@ -60,23 +60,26 @@ std::string Button::getName() {
 
 void Button::setText(std::string newText) {
     text->setString(newText);
-    text->setOrigin(text->getGlobalBounds().width/2, text->getGlobalBounds().height/2);
 }
 
 void Button::setPosition(sf::Vector2f newPosition) {
 
     position = newPosition;
+    selectedRectangle->setFillColor(sf::Color(200,200,200,200));
+    text->setPosition((newPosition));
+    text->setOrigin(text->getLocalBounds().width/2, text->getLocalBounds().height/2);
+}
 
-    if (!selectedRectangle) {
-        selectedRectangle = new sf::RectangleShape();
-    }
-
+void Button::setSize() {
     selectedRectangle->setSize(sf::Vector2f(100,50));
     selectedRectangle->setOrigin(selectedRectangle->getGlobalBounds().width/2, selectedRectangle->getGlobalBounds().height/2);
-    selectedRectangle->setPosition(position.x, position.y);
-    selectedRectangle->setFillColor(sf::Color(200,200,200,200));
+    selectedRectangle->setPosition(text->getPosition().x, text->getPosition().y);
+}
 
-    text->setPosition(position.x, position.y);
+void Button::setSize(sf::Vector2f size) {
+    selectedRectangle->setSize(size);
+    selectedRectangle->setOrigin(selectedRectangle->getGlobalBounds().width/2, selectedRectangle->getGlobalBounds().height/2);
+    selectedRectangle->setPosition(text->getPosition().x, text->getPosition().y);
 }
 
 sf::Vector2f Button::getPosition() {

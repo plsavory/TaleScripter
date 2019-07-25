@@ -45,7 +45,13 @@ void TitleScreen::update(sf::Clock *gameTime) {
         }
 
         if (quitChoice->getSelectedItem() == "yes") {
+            window->close();
+        }
 
+        if (quitChoice->getSelectedItem() == "no") {
+            commonUI->removeChoiceDialog();
+            quitChoice = nullptr; // We don't want any bad memory access exceptions now, do we?
+            menu->resetSelection(); // Prevent the quit menu from immediately opening again
         }
         return;
     }
@@ -57,9 +63,15 @@ void TitleScreen::update(sf::Clock *gameTime) {
         screenState->changeState(ScreenState::STATE_NOVEL);
     }
 
+    if (selectedMenuItem == "data_loadonly") {
+        commonUI->showDataMenu();
+    }
+
     if (selectedMenuItem == "quit") {
         quitChoice = commonUI->showChoiceDialog("Are you sure that you want to quit?", {"yes", "no"}, {"Yes", "No"});
     }
+
+    menu->resetSelection();
 
     if (menu) {
         menu->update(gameTime);
