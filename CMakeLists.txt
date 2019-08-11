@@ -151,7 +151,19 @@ add_executable(${EXECUTABLE_NAME}
         Game/Src/UI/Elements/Button.cpp
         Game/Include/UI/Groups/Menu.h
         Game/Src/UI/Groups/Menu.cpp Game/Src/UI/Groups/MenuItem.cpp
-        Game/Include/UI/Groups/MenuItem.h Game/Src/UI/Groups/ChoiceDialog.cpp Game/Include/UI/Groups/ChoiceDialog.h Game/Include/UI/Themes/UIThemeManager.h Game/Src/UI/Themes/UIThemeManager.cpp Game/Include/UI/Themes/UITheme.h Game/Src/UI/Themes/UITheme.cpp Game/Include/UI/UIConstants.h Game/Include/UI/UIUtils.hpp Game/Include/Database/DataAttribute.hpp Game/Src/Menus/DataMenu.cpp)
+        Game/Include/UI/Groups/MenuItem.h
+        Game/Src/UI/Groups/ChoiceDialog.cpp
+        Game/Include/UI/Groups/ChoiceDialog.h
+        Game/Include/UI/Themes/UIThemeManager.h
+        Game/Src/UI/Themes/UIThemeManager.cpp
+        Game/Include/UI/Themes/UITheme.h
+        Game/Src/UI/Themes/UITheme.cpp
+        Game/Include/UI/UIConstants.h
+        Game/Include/UI/UIUtils.hpp
+        Game/Include/Database/DataAttribute.hpp
+        Game/Src/Menus/DataMenu.cpp
+        Game/Include/GameData/GameSaveManager.h
+        Game/Src/GameData/GameSaveManager.cpp Game/Include/GameData/GameState.h Game/Src/GameData/GameState.cpp)
 
 add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp

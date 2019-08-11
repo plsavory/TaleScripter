@@ -6,16 +6,19 @@
 #include "TextRenderer/TextRenderer.hpp"
 #include "SpriteRenderer/SpriteRenderer.hpp"
 #include "InputManager.hpp"
+#include "Data/Novel.hpp"
+#include "GameData/GameState.h"
 #include "UI/CommonUI.h"
 #include "VisualNovelEngine/Classes/UI/NovelTextDisplay.hpp"
 #include <sstream>
 #include <vector>
 #include "Misc/Utils.hpp"
 
-NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRenderer, ResourceManager *rManager, CommonUI *cUI) {
+NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRenderer, ResourceManager *rManager, CommonUI *cUI, GameState *gState) {
 
     textRenderer = tRenderer;
     fontManager = tRenderer->getFontManager();
+    gameState = gState;
     spriteRenderer = sRenderer;
     resourceManager = rManager;
     commonUI = cUI;
@@ -125,6 +128,8 @@ void NovelTextDisplay::update() {
     }
 
     myText->setString(currentDisplayText);
+
+    gameState->setNovelTextDisplayCharacter(currentDisplayText.length());
 
 }
 

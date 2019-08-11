@@ -9,6 +9,7 @@
 #include "BackgroundImageRenderer.hpp"
 #include "ResourceManager.hpp"
 #include "ScreenState.h"
+#include "Novel.hpp"
 #include "UI/CommonUI.h"
 #include "MusicManager.hpp"
 #include "Engine.hpp"
@@ -64,7 +65,7 @@ void TitleScreen::update(sf::Clock *gameTime) {
     }
 
     if (selectedMenuItem == "data_loadonly") {
-        commonUI->showDataMenu();
+        commonUI->showLoadMenu();
     }
 
     if (selectedMenuItem == "quit") {

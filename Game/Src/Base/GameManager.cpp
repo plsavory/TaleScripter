@@ -41,7 +41,7 @@ GameManager::GameManager(Engine *enginePointer, const std::string &initialErrorM
 
         // Initialise the UI
         uiThemeManager = new UIThemeManager(engine->getWindow(), resourceManager, novel->getNovelDatabase());
-        commonUI = new CommonUI(newWindow, resourceManager, inputManager, uiThemeManager);
+        commonUI = new CommonUI(newWindow, resourceManager, inputManager, uiThemeManager, engine->getGameSaveManager());
 
 
         std::string windowTitle = novel->getProjectInformation()->getGameTitle();
@@ -65,13 +65,13 @@ void GameManager::init() {
 
 void GameManager::update() {
 
-    if (screenState->getCurrentState() != ScreenState::STATE_ERROR && !commonUI->isDoingNothing()) {
-        commonUI->update(gameTime);
-        gameTime->restart();
-        return;
-    }
-
     try {
+
+        if (screenState->getCurrentState() != ScreenState::STATE_ERROR && !commonUI->isDoingNothing()) {
+            commonUI->update(gameTime);
+            gameTime->restart();
+            return;
+        }
 
         switch (screenState->getCurrentState()) {
             case ScreenState::STATE_NOVEL:
@@ -117,11 +117,22 @@ void GameManager::draw() {
             default:
                 break;
         }
-
-        commonUI->draw(); // Draw common UI elements over the top of everything else
     } catch (GeneralException &e) {
         invokeErrorScreen(e);
     }
+}
+
+/**
+ * Draws overlay UI elements (Pop-up menus and load/save game data menus)
+ */
+void GameManager::drawCommonUI() {
+
+    if (screenState->getCurrentState() == ScreenState::STATE_ERROR) {
+        // Don't want to draw these menus over the top of an error message...
+        return;
+    }
+
+    commonUI->draw();
 }
 
 void GameManager::updateWindowPointers(sf::RenderWindow *windowPointer) {

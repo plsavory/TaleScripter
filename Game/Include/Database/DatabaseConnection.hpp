@@ -515,6 +515,8 @@ public:
 
     void executeQuery(const std::string &query, DataSet *destinationDataSet);
 
+    void execute(const std::string &query, DataSet *destinationDataSet, const std::vector<std::string> &parameters, const std::vector<int> &types);
+
     int executeQuery(const std::string &query);
 
     int getLastInsertId();
@@ -527,6 +529,12 @@ public:
     bool isUsable() {
         return usable;
     }
+
+    // Data type constants for parameters
+    static const int TYPE_INT = 0;
+    static const int TYPE_TEXT = 1;
+    static const int TYPE_DOUBLE = 2;
+    static const int TYPE_BOOL = 3;
 
 private:
     std::string name;

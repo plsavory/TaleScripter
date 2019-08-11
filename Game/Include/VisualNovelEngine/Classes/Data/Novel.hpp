@@ -82,6 +82,9 @@ public:
   int getCharacterId();
   std::string getOverrideCharacterName();
   CharacterStateGroup* getCharacterStateGroup();
+  int getId() {
+      return id;
+  }
 private:
   int id;
   int characterId;

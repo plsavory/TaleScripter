@@ -22,6 +22,8 @@ public:
 
     void draw();
 
+    void drawCommonUI();
+
     void updateWindowPointers(sf::RenderWindow *windowPointer);
 
     void handleScreenChanges();

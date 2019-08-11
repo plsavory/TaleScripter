@@ -516,15 +516,11 @@ NovelSceneSegmentLine::NovelSceneSegmentLine(DatabaseConnection *db, int sslId, 
         return;
     }
 
-    std::vector<std::string> characterStateGroupQuery = {
-            "SELECT * FROM character_state_groups WHERE id = ",
-            std::to_string(sslCharacterStateGroupId),
-            ";"
-    };
+    std::string queryString = "SELECT * FROM character_state_groups WHERE id = ?;";
 
     DataSet *dataSet = new DataSet();
 
-    db->executeQuery(Utils::implodeString(characterStateGroupQuery), dataSet);
+    db->execute(queryString, dataSet, {std::to_string(sslCharacterStateGroupId)}, {DatabaseConnection::TYPE_INT});
 
     if (dataSet->getRowCount() > 0) {
         characterStateGroup = new CharacterStateGroup(dataSet->getRow(0)->getColumn("id")->getData()->asInteger(), db,

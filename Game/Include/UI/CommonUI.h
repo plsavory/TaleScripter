@@ -12,7 +12,7 @@
 
 class CommonUI {
 public:
-    CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager, UIThemeManager *uiTManager);
+    CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager, UIThemeManager *uiTManager, GameSaveManager *gsManager);
 
     ~CommonUI();
 
@@ -30,7 +30,11 @@ public:
 
     UIThemeManager* getUIThemeManager();
 
-    void showDataMenu();
+    void showLoadMenu();
+
+    void showSaveMenu();
+
+    void takeScreenshotForSave();
 
 private:
     sf::RenderWindow *window;
@@ -39,6 +43,8 @@ private:
     InputManager *inputManager;
     UIThemeManager *uiThemeManager;
     DataMenu *dataMenu;
+    sf::Texture *saveScreenshot;
+    GameSaveManager *gameSaveManager;
 };
 
 #endif //TALESCRIPTER_COMMON_UI_H

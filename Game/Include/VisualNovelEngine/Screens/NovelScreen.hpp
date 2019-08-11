@@ -24,8 +24,10 @@ private:
   CharacterSpriteRenderer *characterSpriteRenderer;
   MouseEvent* advanceMouseEvent;
   NovelData *novel;
+  GameState *gameState;
   void advance();
   int advanceEventId;
+  int novelScreenSaveKeyId;
   void nextLine();
   void nextSegment();
   void nextScene();

@@ -24,13 +24,16 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer, CommonU
     characterSpriteRenderer = engine->getCharacterSpriteRenderer();
     sceneTransitioning = false;
     commonUI = cUI;
+    gameState = engine->getGameState();
 
-    textDisplay = new NovelTextDisplay(textRenderer, spriteRenderer, resourceManager, commonUI);
+    textDisplay = new NovelTextDisplay(textRenderer, spriteRenderer, resourceManager, commonUI, gameState);
 
     // User input bindings for this screen (TODO: Also react to gamepad input)
     advanceEventId = inputManager->bindKeyboardEvent("novel_screen_text_advance", "return", true);
     advanceMouseEvent = inputManager->getMouseHandler()->addEvent("novel_screen_text_advance",
                                                                   MouseEventType::LeftClick);
+    novelScreenSaveKeyId = inputManager->bindKeyboardEvent("novel_screen_save", "S", true);
+
 }
 
 NovelScreen::~NovelScreen() {
@@ -71,6 +74,11 @@ void NovelScreen::update() {
 
         // Otherwise, load the next part of the novel
         advance();
+    }
+
+    // Listen for the save key being pressed and display the save menu when needed.
+    if (inputManager->isEventPressed(novelScreenSaveKeyId)) {
+        commonUI->showSaveMenu();
     }
 }
 
@@ -141,6 +149,8 @@ void NovelScreen::nextLine() {
     }
 
     textDisplay->setText(nextLine->getText(), characterName);
+
+    gameState->setNovelTextLine(nextLine);
 }
 
 void NovelScreen::nextSegment() {

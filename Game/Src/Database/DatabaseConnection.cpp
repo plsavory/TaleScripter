@@ -8,6 +8,7 @@
 #include "Misc/Utils.hpp"
 #include <regex>
 #include <Exceptions/DatabaseException.hpp>
+#include "MisuseException.hpp"
 
 DatabaseConnection::DatabaseConnection(const std::string& name) {
 
@@ -161,6 +162,146 @@ int DatabaseConnection::executeQuery(const std::string& query) {
     }
 
     return 0;
+
+}
+
+/**
+ * Execute a prepared statement, this function allows query parameters to be used.
+ * @param query
+ * @param destinationDataSet
+ * @param parameters
+ * @param types
+ */
+void DatabaseConnection::execute(const std::string& query, DataSet *destinationDataSet, const std::vector<std::string> &parameters, const std::vector<int> &types) {
+    sqlite3_stmt *statement;
+
+    if (parameters.size() != types.size()) {
+        throw DatabaseException("Parameters and Types vectors must contain the same number of values");
+    }
+
+#ifdef DATABASE_DEBUG
+    std::cout<<"Execute SQL statement: "<<query<<std::endl;
+#endif
+
+    char *queryString = new char[query.length() + 1];
+    std::strcpy(queryString, query.c_str());
+
+    if (sqlite3_prepare_v2(db, queryString, -1, &statement, nullptr) == SQLITE_OK) {
+
+        // Bind the parameters to the query
+        for (int i = 0; i < parameters.size(); i++) {
+
+            int errorCode = 0;
+
+            std::string param = parameters[i];
+
+            // Handle null values
+            if (Utils::strToLower(parameters[i]) == "null") {
+                errorCode = sqlite3_bind_null(statement, i);
+            } else {
+                switch (types[i]) {
+                    case TYPE_INT:
+                        errorCode = sqlite3_bind_int(statement, i+1, std::stoi(parameters[i]));
+                        break;
+                    case TYPE_TEXT:
+                        errorCode = sqlite3_bind_text(statement, i+1, parameters[i].c_str(), -1, nullptr);
+                        break;
+                    case TYPE_BOOL:
+                        if (Utils::strToLower(parameters[i]) != "true" && Utils::strToLower(parameters[i]) != "false") {
+                            throw MisuseException("Boolean must be true or false (You don't say?)");
+                        }
+                        errorCode = sqlite3_bind_int(statement, i+1, parameters[i] == "true" ? 1 : 0);
+                        break;
+                    case TYPE_DOUBLE:
+                        errorCode = sqlite3_bind_double(statement, i+1, std::stod(parameters[i]));
+                        break;
+                    default:
+                        throw DatabaseException(Utils::implodeString({"Unknown data type id: ", std::to_string(types[i])}));
+                }
+
+            }
+
+            if (errorCode != SQLITE_OK) {
+                std::string reason;
+
+                switch (errorCode) {
+                    case SQLITE_TOOBIG:
+                        reason = "too big";
+                        break;
+                    case SQLITE_NOMEM:
+                        reason = "no memory";
+                        break;
+                    default:
+                        reason = "unknown reason";
+                        break;
+                }
+
+                throw DatabaseException(Utils::implodeString({"An error occurred while binding parameter", std::to_string(i), "(", parameters[i], "), reason: ", reason}));
+            }
+
+        }
+
+
+        int columns = sqlite3_column_count(statement);
+        int result = 0;
+        int rows = 0;
+
+        // Loop until we have run out of rows
+        while (true) {
+
+            result = sqlite3_step(statement);
+
+            if (result == SQLITE_ROW) {
+
+                // Add a row to the data set
+                DataSetRow *row = destinationDataSet->addRow();
+
+                for (int col = 0; col < columns; col++) {
+
+                    bool isNull = sqlite3_column_type(statement, col) == SQLITE_NULL;
+
+                    if (sqlite3_column_text(statement, col)) {
+                        // Add a column to the row
+
+                        const char *cName = sqlite3_column_name(statement, col);
+                        const char *cData = reinterpret_cast<const char *>(sqlite3_column_text(statement, col));
+
+                        std::string columnName((cName ? cName : ""));
+                        std::string data(cData ? cData : "");
+
+                        row->addColumn(columnName, data, false);
+                    } else if (isNull) {
+                        const char *cName = sqlite3_column_name(statement, col);
+                        std::string columnName = (cName ? cName : "");
+                        std::string data;
+                        row->addColumn(columnName, data, true);
+                    }
+                }
+
+                rows++;
+
+            } else {
+                break;
+            }
+
+        }
+
+        sqlite3_finalize(statement);
+        return;
+    }
+
+    std::string error = sqlite3_errmsg(db);
+
+    if (error != "not an error") {
+        std::vector<std::string> errorVector = {
+                "An SQL error has occurred:\n",
+                error,
+                "\n\n",
+                query
+        };
+
+        throw DatabaseException(Utils::implodeString(errorVector));
+    }
 
 }
 

@@ -3,7 +3,7 @@
 
 class NovelTextDisplay {
 public:
-  NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRenderer, ResourceManager *rManager, CommonUI *cUI);
+  NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRenderer, ResourceManager *rManager, CommonUI *cUI, GameState *gState);
   ~NovelTextDisplay();
   bool hasTextFinished();
   void update();
@@ -31,6 +31,7 @@ private:
   Sprite *backgroundSprite;
   bool updateNameDisplayText;
   CommonUI *commonUI;
+  GameState *gameState;
 };
 
 #endif

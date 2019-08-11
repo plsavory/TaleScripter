@@ -13,8 +13,10 @@
 #include "TextRenderer/TextRenderer.hpp"
 #include "Input/InputManager.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
+#include "GameData/GameState.h"
 #include "VisualNovelEngine/Classes/UI/CharacterSpriteRenderer.hpp"
 #include "UI/Themes/UIThemeManager.h"
+#include "GameData/GameSaveManager.h"
 
 class Engine {
 public:
@@ -48,8 +50,14 @@ public:
   BackgroundOverlay* getBackgroundOverlay() {
       return backgroundOverlay;
   }
+  GameState* getGameState() {
+      return gameState;
+  }
   std::string getErrorMessage() {
       return errorMessage;
+  }
+  GameSaveManager* getGameSaveManager() {
+      return gameSaveManager;
   }
 private:
   ResourceManager *resourceManager;
@@ -60,6 +68,8 @@ private:
   BackgroundImageRenderer *backgroundImageRenderer;
   BackgroundTransitionHandler *backgroundTransitionRenderer;
   CharacterSpriteRenderer *characterSpriteRenderer;
+  GameSaveManager *gameSaveManager;
+  GameState *gameState;
   sf::RenderWindow *window;
   std::string errorMessage;
 };

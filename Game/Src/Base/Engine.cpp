@@ -18,6 +18,8 @@ Engine::Engine(sf::RenderWindow *windowPointer) {
 
     try {
 
+        gameState = new GameState();
+        gameSaveManager = new GameSaveManager(gameState);
         inputManager = new InputManager(window);
         backgroundOverlay = new BackgroundOverlay(window);
         backgroundImageRenderer = new BackgroundImageRenderer(window);

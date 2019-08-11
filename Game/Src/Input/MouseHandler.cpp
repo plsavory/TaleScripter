@@ -27,6 +27,7 @@ MouseHandler::~MouseHandler() {
 }
 
 void MouseHandler::update() {
+
     if (!enabled) {
         return;
     }

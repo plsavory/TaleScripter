@@ -105,6 +105,12 @@ sf::FloatRect MenuItem::getSize() {
 
 void MenuItem::setPosition(sf::Vector2f position) {
     button->setPosition(position);
+
+    if (size != sf::Vector2f(0,0)) {
+        button->setSize(size);
+    } else {
+        button->setSize();
+    }
 }
 
 sf::Vector2f MenuItem::getPosition() {

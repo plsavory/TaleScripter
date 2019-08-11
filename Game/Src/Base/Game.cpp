@@ -90,6 +90,7 @@ void Game::run() {
     renderingThread->detach(); // Launch the thread
 #endif
 
+
     // Enter the main loop
     while (window->isOpen()) {
 
@@ -174,6 +175,8 @@ void Game::draw() {
     if (backgroundOverlay->isInForeground()) {
         backgroundOverlay->draw();
     }
+
+    gameManager->drawCommonUI();
 }
 
 #ifdef MULTITHREADED_RENDERING
