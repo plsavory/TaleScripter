@@ -14,6 +14,8 @@ public:
 
     void setText(std::string newText);
 
+    void setThumbnail(sf::Texture *texture);
+
 private:
     int id;
     sf::RenderWindow *window;
@@ -21,9 +23,13 @@ private:
     sf::RectangleShape *bg;
     sf::Vector2f position;
     sf::Text *text;
+    sf::Text *dateTimeText;
     InputManager *inputManager;
     GameSaveManager *gameSaveManager;
     int saveMode;
+    bool exists;
+    DataSetRow *saveData;
+    sf::Sprite *sprite;
 };
 
 class DataMenu {
@@ -76,6 +82,8 @@ private:
     int selectedSave;
     InputManager *inputManager;
     GameSaveManager *gameSaveManager;
+    sf::Texture *screenshot;
+    void getThumbnails();
 
     int populateSaves();
 };

@@ -36,9 +36,7 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer, CommonU
 
 }
 
-NovelScreen::~NovelScreen() {
-
-}
+NovelScreen::~NovelScreen() = default;
 
 void NovelScreen::start() {
     nextScene();
@@ -135,15 +133,15 @@ void NovelScreen::nextLine() {
 
         std::vector<CharacterSpriteDrawRequest *> requests;
 
-        for (unsigned int i = 0; i < states.size(); i++) {
-            requests.push_back(new CharacterSpriteDrawRequest(states[i]->getCharacterSprite()));
+        for (auto & state : states) {
+            requests.push_back(new CharacterSpriteDrawRequest(state->getCharacterSprite()));
         }
 
         characterSpriteRenderer->push(requests);
 
-        // Delete the now-unneeded data
-        for (unsigned int i = 0; i < requests.size(); i++) {
-            delete (requests[i]);
+        // Delete the now-unneeded data from RAM
+        for (auto & request : requests) {
+            delete request;
         }
 
     }

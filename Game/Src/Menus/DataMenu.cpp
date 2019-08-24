@@ -19,11 +19,10 @@ DataMenu::DataMenu(sf::RenderWindow *renderWindow, ResourceManager *rManager, In
     mode = menuMode;
     offset = 0;
     navigationButtonCount = 0;
-    selectedSave = 0;
+    selectedSave = -1;
     this->inputManager = inputManager;
     gameSaveManager = gsManager;
     navigationMenu = nullptr;
-
     needsClosing = false;
 
     // Create the save menu's background (Just a translucent box for now)
@@ -59,6 +58,10 @@ DataMenu::DataMenu(sf::RenderWindow *renderWindow, ResourceManager *rManager, In
 
     heading->setPosition(50, 50);
 
+    screenshot = new sf::Texture();
+    screenshot->create(1280,720);
+    screenshot->update(*window);
+    gameSaveManager->setScreenshot(screenshot); // To ensure that the save manager has a pointer to the screenshot texture at all times.
     getSaves();
 }
 
@@ -66,11 +69,12 @@ DataMenu::~DataMenu() {
     delete (bg);
     delete (heading);
     delete (navigationMenu);
+    delete (screenshot);
 }
 
 void DataMenu::update(sf::Clock *gameTime) {
 
-    if (selectedSave) {
+    if (hasSelectedASave()) {
         return;
     }
 
@@ -113,7 +117,7 @@ void DataMenu::update(sf::Clock *gameTime) {
     for (int i = 0; i < saves.size(); i++) {
         if (saves[i]->update()) {
             // Set the id of the selected slot so that we know which one is selected (1-indexed as it'll be a database ID) if a save item is clicked.
-            selectedSave = i+1;
+            selectedSave = i;
             return;
         }
     }
@@ -142,7 +146,7 @@ void DataMenu::draw() {
 }
 
 bool DataMenu::hasSelectedASave() {
-    return selectedSave > 0;
+    return selectedSave != -1;
 }
 
 int DataMenu::getSelectedSave() {
@@ -175,7 +179,6 @@ void DataMenu::getSaves() {
     // Get a list of game saves that we need to handle
     int numberOfPages = populateSaves();
 
-
     // Create the navigation menu and its buttons
     if (navigationMenu) {
         delete(navigationMenu);
@@ -201,32 +204,40 @@ void DataMenu::getSaves() {
     }
 }
 
+/**
+ * Loads saves from the database and positions them appropriately on the main menu
+ * @return
+ */
 int DataMenu::populateSaves() {
+
+    // TODO: Support both modes of displaying saves, selectable by the game's author in the novel database
+    auto *gameSaves = gameSaveManager->getSaves();
 
     float x = 0;
     float y = 0;
 
     int numberOfSaves = 0;
 
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i <= gameSaves->getRowCount(); i++) {
 
-        if (i % 3 == 0) {
+        if (i == 0 && mode == MODE_LOAD_ONLY) {
+            continue;
+        }
+        
+        int index = mode == MODE_LOAD_ONLY ? i-1 : i;
+
+        if (index % 3 == 0) {
             y += 130;
             x = 0;
         }
 
-        if (i % 9 == 0) {
+        if (index % 9 == 0) {
             y = 0;
         }
 
         auto *newSaveEntry = new DataMenuGameSave(window, resourceManager, inputManager, sf::Vector2f(320 + x, 120 + y),
                                                   i, mode, gameSaveManager);
 
-        if (i == 0) {
-            newSaveEntry->setText("Empty Slot");
-        } else {
-            newSaveEntry->setText(Utils::implodeString({"Save ", std::to_string(i)}));
-        }
         saves.push_back(newSaveEntry);
 
         x += 266;
@@ -234,8 +245,21 @@ int DataMenu::populateSaves() {
         numberOfSaves = i;
     }
 
+    getThumbnails();
+
     return (numberOfSaves / 9);
 
+}
+
+void DataMenu::getThumbnails() {
+    for (int i = 0; i < saves.size(); i++) {
+
+        if (i == 0 && mode == MODE_SAVE_ONLY) {
+            continue;
+        }
+
+        saves[i]->setThumbnail(gameSaveManager->getThumbnail(mode == MODE_SAVE_ONLY ? i : i+1));
+    }
 }
 
 DataMenuGameSave::DataMenuGameSave(sf::RenderWindow *renderWindow, ResourceManager *rManager,
@@ -248,6 +272,9 @@ DataMenuGameSave::DataMenuGameSave(sf::RenderWindow *renderWindow, ResourceManag
     this->inputManager = inputManager;
     this->saveMode = saveMode;
     gameSaveManager = gsManager;
+    sprite = nullptr;
+
+    dateTimeText = nullptr;
 
     // Create the background rectangle
     bg = new sf::RectangleShape();
@@ -260,9 +287,33 @@ DataMenuGameSave::DataMenuGameSave(sf::RenderWindow *renderWindow, ResourceManag
     // Text
     text = new sf::Text();
     text->setFont(*resourceManager->getFontManager()->getFont("story_font")->getFont());
-    text->setPosition(position.x + 20, position.y + 20);
+    text->setPosition(position.x + 5, position.y + 5);
     text->setOutlineColor(sf::Color::White);
     text->setCharacterSize(16);
+
+    if (saveId > 0) {
+        auto *save = gameSaveManager->getSave(saveId);
+        exists = true;
+        dateTimeText = new sf::Text();
+        dateTimeText->setFont(*resourceManager->getFontManager()->getFont("story_font")->getFont());
+        dateTimeText->setCharacterSize(12);
+        dateTimeText->setString(save->getColumn("formatted_saved_at")->getData()->asString());
+        dateTimeText->setPosition(position.x + 72, position.y + 105);
+
+        std::string textString = save->getColumn("text_line")->getData()->asString();
+
+        if (textString.size() > 30) {
+            textString = Utils::implodeString({textString.substr(1, 30), "..."});
+        }
+
+        if (false) { // lol
+            text->setString(textString);
+        }
+
+    } else {
+        exists = false;
+        setText("Empty");
+    }
 }
 
 DataMenuGameSave::~DataMenuGameSave() {
@@ -285,8 +336,27 @@ bool DataMenuGameSave::update() {
 void DataMenuGameSave::draw() {
     window->draw(*bg);
     window->draw(*text);
+
+    if (dateTimeText) {
+        window->draw(*dateTimeText);
+    }
+
+    if (sprite) {
+        window->draw(*sprite);
+    }
 }
 
 void DataMenuGameSave::setText(std::string newText) {
     text->setString(newText);
+}
+
+void DataMenuGameSave::setThumbnail(sf::Texture *texture) {
+
+    if (!sprite) {
+        sprite = new sf::Sprite();
+    }
+
+    sprite->setTexture(*texture);
+    sprite->setPosition(position.x+10, position.y+5);
+    sprite->setScale(235/(float)texture->getSize().x, 100/(float)texture->getSize().y);
 }

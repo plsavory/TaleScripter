@@ -232,7 +232,7 @@ std::string Utils::formatDate(const std::string& date, DateFormat dateFormat) {
             break;
     }
 
-    std::tm *tm = {};
+    auto *tm = new struct tm();
     std::istringstream ss(date);
     ss >> std::get_time(tm, formatToUse.c_str());
 

@@ -58,6 +58,7 @@ void CommonUI::update(sf::Clock *gameTime) {
                 if (activeDialog && !activeDialog->getSelectedItem().empty()) {
                     if (activeDialog->getSelectedItem() == "yes") {
                         gameSaveManager->save(dataMenu->getSelectedSave());
+                        gameSaveManager->storeSaves();
                         dataMenu->getSaves();
                         removeChoiceDialog();
                         dataMenu->resetSelectedSave();
