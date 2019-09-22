@@ -157,10 +157,11 @@ private:
 
 class NovelData {
 public:
-  NovelData();
+  NovelData(DatabaseConnection *saveDb);
   ~NovelData();
   void start();
   void start(int cChapter, int cScene, int cSceneSegment, int cSceneSegmentLine);
+  void start(int gameSaveId);
   AdvanceState getNextAction();
   NovelSceneSegment* getCurrentSceneSegment();
   NovelSceneSegmentLine* getNextLine();
@@ -176,6 +177,7 @@ public:
   DatabaseConnection* getNovelDatabase() {
       return novelDb;
   }
+  DatabaseConnection *gameSaveDb;
 
   /**
    * Gets the current scene index within the chapter

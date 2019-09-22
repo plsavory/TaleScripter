@@ -31,6 +31,7 @@ public:
     void invokeErrorScreen(GeneralException &e);
 
     void invokeErrorScreen(const std::string& message);
+
 private:
 
     Engine *engine;

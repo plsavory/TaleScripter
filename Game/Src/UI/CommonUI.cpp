@@ -9,10 +9,11 @@
 #include "ResourceManager.hpp"
 #include "InputManager.hpp"
 #include "Novel.hpp"
+#include "ScreenState.h"
 #include "UI/CommonUI.h"
 
 CommonUI::CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager,
-                   UIThemeManager *uiTManager, GameSaveManager *gsManager) {
+                   UIThemeManager *uiTManager, GameSaveManager *gsManager, ScreenState *screenState) {
     window = renderWindow;
     resourceManager = rManager;
     inputManager = iManager;
@@ -21,6 +22,7 @@ CommonUI::CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, In
     dataMenu = nullptr;
     saveScreenshot = nullptr;
     gameSaveManager = gsManager;
+    this->screenState = screenState;
 }
 
 CommonUI::~CommonUI() {
@@ -49,7 +51,7 @@ void CommonUI::update(sf::Clock *gameTime) {
         // We're going to have to do some extra handling here for dialogs, the data menu should always be called through this class anyway though so it isn't a problem.
         if (dataMenu->hasSelectedASave()) {
 
-            // Show a dialog if we need to
+            // Handle the input from the dialog
             if (dataMenu->getMode() == DataMenu::MODE_SAVE_ONLY) {
 
                 bool hasDestroyedDialog = false;
@@ -60,8 +62,8 @@ void CommonUI::update(sf::Clock *gameTime) {
                         gameSaveManager->save(dataMenu->getSelectedSave());
                         gameSaveManager->storeSaves();
                         dataMenu->getSaves();
-                        removeChoiceDialog();
                         dataMenu->resetSelectedSave();
+                        removeChoiceDialog();
                     } else {
                         // Reset the data menu
                         dataMenu->resetSelectedSave();
@@ -77,9 +79,32 @@ void CommonUI::update(sf::Clock *gameTime) {
                 }
 
             } else {
-                // Game loading isn't supported yet - throw a not-useful error just so I can see that this code actually runs when it should
-                // TODO: Do something useful here...
-                throw MisuseException("This isn't implemented yet.");
+
+                bool hasDestroyedDialog = false;
+
+                if (activeDialog && !activeDialog->getSelectedItem().empty()) {
+
+                    // Dialog is currently open...
+                    if (activeDialog->getSelectedItem() == "yes") {
+                        screenState->loadGame();
+                        gameSaveManager->load(dataMenu->getSelectedSave());
+                        dataMenu->resetSelectedSave();
+                        removeChoiceDialog();
+                        dataMenu->close();
+                    } else {
+                        dataMenu->resetSelectedSave();
+                        removeChoiceDialog();
+                    }
+
+                    hasDestroyedDialog = true;
+
+                }
+
+                if (!activeDialog && !hasDestroyedDialog) {
+                    // We need to show a dialog in this instance
+                    showChoiceDialog("Load this save?", {"yes", "no"}, {"Yes", "No"});
+                }
+
             }
 
         }

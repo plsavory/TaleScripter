@@ -16,6 +16,7 @@ GameSaveManager::GameSaveManager(GameState *gState) {
     saveDatabase = new DatabaseConnection("saves");
     gameState = gState;
     gameSaves = nullptr;
+    selectedSave = 0;
     storeSaves();
 
 }
@@ -123,6 +124,15 @@ void GameSaveManager::load(int id) {
     if (id == 0) {
         throw MisuseException("Attempting to load a game save that does not exist.");
     }
+
+    selectedSave = id;
+}
+
+/**
+ * Returns the id of the loaded game save
+ */
+int GameSaveManager::getLoadedSaveId() {
+    return selectedSave;
 }
 
 /**
@@ -156,10 +166,11 @@ DataSetRow* GameSaveManager::getSave(int id) {
 void GameSaveManager::storeSaves() {
 
     // Clear the existing textures
-    for (int i = 0; i < thumbnails.size(); i++) {
+    int size = thumbnails.size();
+    for (int i = 0; i < size; i++) {
         delete(thumbnails[i]);
-        thumbnails.erase(thumbnails.begin() + i);
     }
+    thumbnails.clear();
 
     if (gameSaves) {
         delete(gameSaves);
@@ -167,7 +178,7 @@ void GameSaveManager::storeSaves() {
 
     gameSaves = new DataSet();
 
-    saveDatabase->execute("SELECT *, strftime('%d/%m/%Y %H:%M', saved_at) AS formatted_saved_at, gs.id as save_id FROM game_saves gs INNER JOIN game_save_progress gsp ON gsp.game_save_id = gs.id;", gameSaves, {}, {});
+    saveDatabase->execute("SELECT *, strftime('%d/%m/%Y %H:%M', saved_at) AS formatted_saved_at, gs.id as save_id FROM game_saves gs INNER JOIN game_save_progress gsp ON gsp.game_save_id = gs.id ORDER BY gs.saved_at DESC;", gameSaves, {}, {});
 
     for (auto &save : gameSaves->getRows()) {
         auto *texture = new sf::Texture();

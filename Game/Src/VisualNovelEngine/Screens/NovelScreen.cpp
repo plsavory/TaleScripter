@@ -1,6 +1,7 @@
 #include "Base/Engine.hpp"
 #include "Database/DatabaseConnection.hpp"
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
+#include "ScreenState.h"
 #include "UI/CommonUI.h"
 #include "VisualNovelEngine/Screens/NovelScreen.hpp"
 #include "Misc/ColourBuilder.hpp"
@@ -39,6 +40,12 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer, CommonU
 NovelScreen::~NovelScreen() = default;
 
 void NovelScreen::start() {
+    novel->start();
+    nextScene();
+}
+
+void NovelScreen::start(int gameSaveId) {
+    novel->start(gameSaveId);
     nextScene();
 }
 

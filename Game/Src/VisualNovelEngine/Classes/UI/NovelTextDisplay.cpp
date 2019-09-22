@@ -8,6 +8,7 @@
 #include "InputManager.hpp"
 #include "Data/Novel.hpp"
 #include "GameData/GameState.h"
+#include "ScreenState.h"
 #include "UI/CommonUI.h"
 #include "VisualNovelEngine/Classes/UI/NovelTextDisplay.hpp"
 #include <sstream>

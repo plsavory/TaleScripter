@@ -18,6 +18,20 @@ public:
         upcomingState = newState;
     };
 
+    /**
+     * Immediately sets the game state, will not cause any code that runs on state changes to run.
+     * This is meant to be used as an override.
+     * @param state
+     */
+    void setState(int state) {
+        currentState = state;
+        upcomingState = state;
+    }
+
+    void loadGame() {
+        upcomingState = STATE_NOVEL_LOAD;
+    };
+
     int getCurrentState() {
         return currentState;
     }
@@ -55,6 +69,7 @@ public:
     static const int STATE_ART_GALLERY = 7;
     static const int STATE_ERROR = 8;
     static const int STATE_NONE = 9;
+    static const int STATE_NOVEL_LOAD = 10;
 
 private:
     int currentState;

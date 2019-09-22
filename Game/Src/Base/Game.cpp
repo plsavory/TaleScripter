@@ -11,6 +11,7 @@
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/Engine.hpp"
 #include "UI/Themes/UIThemeManager.h"
+#include "ScreenState.h"
 #include "UI/CommonUI.h"
 #include "Base/GameManager.hpp"
 #include <thread>

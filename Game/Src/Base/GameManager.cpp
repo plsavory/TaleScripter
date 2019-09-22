@@ -4,6 +4,7 @@
 #include "VisualNovelEngine/Classes/Data/Novel.hpp"
 #include "Base/Engine.hpp"
 #include "UI/Themes/UIThemeManager.h"
+#include "ScreenState.h"
 #include "UI/CommonUI.h"
 #include "Base/GameManager.hpp"
 #include <sstream>
@@ -36,12 +37,12 @@ GameManager::GameManager(Engine *enginePointer, const std::string &initialErrorM
     titleScreen = nullptr;
 
     try {
-        novel = new NovelData();
+        novel = new NovelData(engine->getGameSaveManager()->getSaveDb());
         engine->getCharacterSpriteRenderer()->initData(novel);
 
         // Initialise the UI
         uiThemeManager = new UIThemeManager(engine->getWindow(), resourceManager, novel->getNovelDatabase());
-        commonUI = new CommonUI(newWindow, resourceManager, inputManager, uiThemeManager, engine->getGameSaveManager());
+        commonUI = new CommonUI(newWindow, resourceManager, inputManager, uiThemeManager, engine->getGameSaveManager(), screenState);
 
 
         std::string windowTitle = novel->getProjectInformation()->getGameTitle();
@@ -158,6 +159,10 @@ void GameManager::handleScreenChanges() {
                 break;
             case ScreenState::STATE_NOVEL:
                 novelScreen->start();
+                break;
+            case ScreenState::STATE_NOVEL_LOAD:
+                novelScreen->start(engine->getGameSaveManager()->getLoadedSaveId());
+                screenState->setState(ScreenState::STATE_NOVEL);
                 break;
             default:
                 break;

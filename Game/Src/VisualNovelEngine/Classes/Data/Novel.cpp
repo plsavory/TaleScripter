@@ -5,15 +5,15 @@
 #include <sstream>
 #include <Exceptions/ResourceException.hpp>
 
-NovelData::NovelData() {
+NovelData::NovelData(DatabaseConnection *saveDb) {
 
     for (int i = 0; i < MAX_CHARACTERS; i++) {
         character[i] = nullptr;
     }
 
+    this->gameSaveDb = saveDb;
     chapterCount = 0;
     loadFromDatabase();
-    start();
 }
 
 /**
@@ -21,6 +21,62 @@ NovelData::NovelData() {
  */
 void NovelData::start() {
     start(0, -1, -1, -1);
+}
+
+void NovelData::start(int gameSaveId) {
+    // Load a game and set the novel's progress to it
+    auto *gameSave = new DataSet();
+
+
+    std::string queryString = Utils::implodeString({
+        "SELECT *",
+        "FROM game_saves gs",
+        "INNER JOIN game_save_progress gsp ON gsp.game_save_id = gs.id",
+        "WHERE gs.id = ?"
+    }, " ");
+
+    gameSaveDb->execute(queryString, gameSave, {std::to_string(gameSaveId)}, {DatabaseConnection::TYPE_INT});
+
+    if (!gameSave->getRowCount()) {
+        throw GeneralException(Utils::implodeString({"No game save with id ", std::to_string(gameSaveId), " was found."}));
+    }
+
+    // TODO: Set any variables stored within the game save relating to decisions and scripts when we are supporting these.
+
+    // Get the information required to set our position in the novel
+    auto *novelProgressInformation = new DataSet();
+
+    queryString = Utils::implodeString({
+        "SELECT",
+        "sl.id AS segment_line_id,",
+        "ss.id AS scene_segment_id,",
+        "s.id AS scene_id,",
+        "c.id AS chapter_id",
+        "FROM segment_lines sl",
+        "INNER JOIN scene_segments ss ON ss.id = sl.scene_segment_id",
+        "INNER JOIN scenes s ON s.id = ss.scene_id",
+        "INNER JOIN chapters c ON c.id = s.chapter_id",
+        "WHERE sl.id = ?"
+    }, " ");
+
+    novelDb->execute(queryString, novelProgressInformation, {gameSave->getRow(0)->getColumn("segment_line_id")->getData()->asString()}, {DatabaseConnection::TYPE_TEXT});
+
+    if (!novelProgressInformation->getRowCount()) {
+        throw GeneralException(Utils::implodeString({"No segment line with id ", gameSave->getRow(0)->getColumn("segment_line_id")->getData()->asString(), " could be found."}));
+    }
+
+    // TODO: Get the most recent (in the past) character sprite draw request to restore them as this line likely won't have one linked to it.
+
+    // TODO: Get the position in the track that the music was currently at when the game was saved
+
+    // TODO: Update how 'start' works so that the -1's aren't needed.
+    start(novelProgressInformation->getRow(0)->getColumn("chapter_id")->getData()->asInteger()-1,
+            novelProgressInformation->getRow(0)->getColumn("scene_id")->getData()->asInteger()-1,
+            novelProgressInformation->getRow(0)->getColumn("scene_segment_id")->getData()->asInteger()-1,
+            novelProgressInformation->getRow(0)->getColumn("segment_line_id")->getData()->asInteger()-1);
+
+    delete(gameSave);
+    delete(novelProgressInformation);
 }
 
 /**

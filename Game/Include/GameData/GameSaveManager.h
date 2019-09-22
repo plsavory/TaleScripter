@@ -18,6 +18,13 @@ public:
     void storeSaves();
     void setScreenshot(sf::Texture *texture);
     sf::Texture* getThumbnail(int id);
+    int getLoadedSaveId();
+    void setSelectedSave(int saveId) {
+        selectedSave = saveId;
+    }
+    DatabaseConnection *getSaveDb() {
+        return saveDatabase;
+    }
 private:
     static void createDatabase();
     DatabaseConnection *saveDatabase;
@@ -26,6 +33,7 @@ private:
     sf::RenderWindow *window;
     sf::Texture *screenshot;
     std::vector<sf::Texture*> thumbnails;
+    int selectedSave;
 };
 
 #endif //TALESCRIPTER_GAMESAVEMANAGER_H

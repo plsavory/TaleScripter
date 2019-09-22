@@ -8,6 +8,7 @@ public:
   NovelScreen(Engine *enginePointer, NovelData *novelPointer, CommonUI *cUI);
   ~NovelScreen();
   void start();
+  void start(int gameSaveId);
   void update();
   void draw();
 private:

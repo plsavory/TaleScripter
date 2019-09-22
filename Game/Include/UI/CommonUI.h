@@ -12,7 +12,8 @@
 
 class CommonUI {
 public:
-    CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager, UIThemeManager *uiTManager, GameSaveManager *gsManager);
+    CommonUI(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *iManager,
+             UIThemeManager *uiTManager, GameSaveManager *gsManager, ScreenState *screenState);
 
     ~CommonUI();
 
@@ -28,7 +29,7 @@ public:
 
     void removeChoiceDialog();
 
-    UIThemeManager* getUIThemeManager();
+    UIThemeManager *getUIThemeManager();
 
     void showLoadMenu();
 
@@ -45,6 +46,7 @@ private:
     DataMenu *dataMenu;
     sf::Texture *saveScreenshot;
     GameSaveManager *gameSaveManager;
+    ScreenState *screenState;
 };
 
 #endif //TALESCRIPTER_COMMON_UI_H

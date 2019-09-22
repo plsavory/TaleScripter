@@ -11,6 +11,8 @@
 #include "UI/Groups/Menu.h"
 #include "Novel.hpp"
 #include "Menus/DataMenu.hpp"
+#include <cmath>
+#include <math.h>
 
 DataMenu::DataMenu(sf::RenderWindow *renderWindow, ResourceManager *rManager, InputManager *inputManager, int menuMode,
                    GameSaveManager *gsManager) {
@@ -116,8 +118,8 @@ void DataMenu::update(sf::Clock *gameTime) {
     // Update the save items
     for (int i = 0; i < saves.size(); i++) {
         if (saves[i]->update()) {
-            // Set the id of the selected slot so that we know which one is selected (1-indexed as it'll be a database ID) if a save item is clicked.
-            selectedSave = i;
+            // Set the id of the selected slot so that we know which one is selected (1-indexed as it'll be a database ID if loading) if a save item is clicked.
+            selectedSave = mode == MODE_LOAD_ONLY ? i+1 : i;
             return;
         }
     }
@@ -167,7 +169,7 @@ int DataMenu::getMode() {
 }
 
 void DataMenu::resetSelectedSave() {
-    selectedSave = 0;
+    selectedSave = -1;
 }
 
 void DataMenu::close() {
@@ -211,6 +213,13 @@ void DataMenu::getSaves() {
 int DataMenu::populateSaves() {
 
     // TODO: Support both modes of displaying saves, selectable by the game's author in the novel database
+
+    // Delete any already existing save items
+    for (auto &save : saves) {
+        delete(save);
+    }
+    saves.clear();
+
     auto *gameSaves = gameSaveManager->getSaves();
 
     float x = 0;
@@ -223,7 +232,7 @@ int DataMenu::populateSaves() {
         if (i == 0 && mode == MODE_LOAD_ONLY) {
             continue;
         }
-        
+
         int index = mode == MODE_LOAD_ONLY ? i-1 : i;
 
         if (index % 3 == 0) {
@@ -247,7 +256,7 @@ int DataMenu::populateSaves() {
 
     getThumbnails();
 
-    return (numberOfSaves / 9);
+    return ceil((double)numberOfSaves / (double)9);
 
 }
 
@@ -304,10 +313,6 @@ DataMenuGameSave::DataMenuGameSave(sf::RenderWindow *renderWindow, ResourceManag
 
         if (textString.size() > 30) {
             textString = Utils::implodeString({textString.substr(1, 30), "..."});
-        }
-
-        if (false) { // lol
-            text->setString(textString);
         }
 
     } else {
