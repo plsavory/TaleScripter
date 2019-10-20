@@ -65,8 +65,6 @@ void NovelData::start(int gameSaveId) {
         throw GeneralException(Utils::implodeString({"No segment line with id ", gameSave->getRow(0)->getColumn("segment_line_id")->getData()->asString(), " could be found."}));
     }
 
-    // TODO: Get the most recent (in the past) character sprite draw request to restore them as this line likely won't have one linked to it.
-
     // TODO: Get the position in the track that the music was currently at when the game was saved
 
     // TODO: Update how 'start' works so that the -1's aren't needed.
@@ -238,6 +236,24 @@ NovelSceneSegmentLine *NovelData::getNextLine() {
     return getCurrentSceneSegment()->getLine(++currentSceneSegmentLine);
 }
 
+NovelSceneSegmentLine* NovelData::getSceneSegmentLine(int id) {
+
+    // FORCEPTION?!
+    for (auto &iChapter : chapter) {
+        for (auto &iScene : iChapter->getScenes()) {
+            for (auto &iSceneSegment : iScene->getSceneSegments()) {
+                for (auto &iSceneSegmentLine : iSceneSegment->getSceneSegmentLines()) {
+                    if (iSceneSegmentLine->getId() == id) {
+                        return iSceneSegmentLine;
+                    }
+                }
+            }
+        }
+    }
+
+    throw GeneralException(Utils::implodeString({"No scene segment line with id '", std::to_string(id), "' was found"}));
+}
+
 NovelSceneSegment *NovelData::advanceToNextSegment() {
     currentSceneSegmentLine = -1; // Reset which line we're on
 
@@ -279,10 +295,6 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
     std::cout<<"Adding chapter "<<id<<" '"<<title<<"'"<<std::endl;
 #endif
 
-    for (int i = 0; i < MAX_SCENES; i++) {
-        scene[i] = nullptr;
-    }
-
     // Get all of the scenes within the chapter
     auto *sceneData = new DataSet();
 
@@ -320,7 +332,7 @@ NovelChapter::NovelChapter(DatabaseConnection *db, std::string chapterTitle, int
             endTransitionColourId = sceneData->getRow(i)->getColumn("end_transition_colour_id")->getData()->asInteger();
         }
 
-        scene[i] = new NovelScene(db, sceneData->getRow(i), character);
+        scene.push_back(new NovelScene(db, sceneData->getRow(i), character));
         sceneCount++;
     }
 
@@ -363,10 +375,6 @@ NovelScene::NovelScene(DatabaseConnection *db, DataSetRow *data, Character *char
 
     segmentCount = 0;
 
-    for (int i = 0; i < MAX_SEGMENTS; i++) {
-        segment[i] = nullptr;
-    }
-
 #ifdef DEBUG_NOVEL_DATA
     std::cout<<"Adding scene "<<id<<std::endl;
 #endif
@@ -388,12 +396,12 @@ NovelScene::NovelScene(DatabaseConnection *db, DataSetRow *data, Character *char
         std::string visualEffectName = sceneSegmentData->getRow(i)->doesColumnExist("visual_effect_name")
                                        ? sceneSegmentData->getRow(i)->getColumn("visual_effect_name")->getRawData() : "";
 
-        segment[i] = new NovelSceneSegment(db,
+        segment.push_back(new NovelSceneSegment(db,
                                            sceneSegmentData->getRow(i)->getColumn("id")->getData()->asInteger(),
                                            visualEffectName,
                                            character,
                                            sceneSegmentData->getRow(i)->getColumn(
-                                                   "music_playback_request_id")->getData()->asInteger());
+                                                   "music_playback_request_id")->getData()->asInteger()));
 
         segmentCount++;
     }
@@ -517,14 +525,14 @@ NovelSceneSegment::NovelSceneSegment(DatabaseConnection *db, int ssId,
             overrideCharacterName = lineData->getRow(i)->getColumn("override_character_name")->getRawData();
         }
 
-        line[i] = new NovelSceneSegmentLine(db,
+        line.push_back(new NovelSceneSegmentLine(db,
                                             lineData->getRow(i)->getColumn("id")->getData()->asInteger(),
                                             characterId,
                                             lineData->getRow(i)->getColumn("text")->getRawData(),
                                             characterStateGroupId,
                                             overrideCharacterName,
                                             character
-        );
+        ));
 
         lineCount++;
     }

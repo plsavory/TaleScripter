@@ -99,6 +99,11 @@ public:
   ~NovelSceneSegment();
   int getLineCount();
   NovelSceneSegmentLine* getLine(int id);
+
+  std::vector<NovelSceneSegmentLine*> getSceneSegmentLines() {
+      return line;
+  }
+
   std::string getBackgroundMusicName();
   MusicPlaybackRequest* getMusicPlaybackRequest() {
       return musicPlaybackRequest;
@@ -107,7 +112,7 @@ private:
   int id;
   std::string backgroundMusicName;
   std::string visualEffectName;
-  NovelSceneSegmentLine *line[MAX_LINES];
+  std::vector<NovelSceneSegmentLine*> line;
   int lineCount;
   MusicPlaybackRequest *musicPlaybackRequest;
 };
@@ -126,10 +131,13 @@ public:
   int getEndTransitionTypeId() {
       return endTransitionTypeId;
   }
+  std::vector<NovelSceneSegment*> getSceneSegments() {
+      return segment;
+  }
 private:
   int id;
   std::string backgroundImage;
-  NovelSceneSegment *segment[MAX_SEGMENTS];
+  std::vector<NovelSceneSegment*> segment;
   int segmentCount;
   int backgroundColourId;
   int startTransitionColourId;
@@ -146,12 +154,15 @@ public:
   int getId();
   void start();
   NovelScene* getScene(int id);
+  std::vector<NovelScene*> getScenes() {
+      return scene;
+  }
   int getSceneCount();
 private:
   DatabaseConnection *novelDb;
   int id;
   std::string title;
-  NovelScene *scene[MAX_SCENES];
+  std::vector<NovelScene*> scene;
   int sceneCount;
 };
 
@@ -177,6 +188,12 @@ public:
   DatabaseConnection* getNovelDatabase() {
       return novelDb;
   }
+  /**
+   * Returns the scene segment line with the given id in the database
+   * @param id
+   * @return
+   */
+  NovelSceneSegmentLine* getSceneSegmentLine(int id);
   DatabaseConnection *gameSaveDb;
 
   /**

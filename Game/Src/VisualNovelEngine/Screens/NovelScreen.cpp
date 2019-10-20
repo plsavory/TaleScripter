@@ -35,16 +35,20 @@ NovelScreen::NovelScreen(Engine *enginePointer, NovelData *novelPointer, CommonU
                                                                   MouseEventType::LeftClick);
     novelScreenSaveKeyId = inputManager->bindKeyboardEvent("novel_screen_save", "S", true);
 
+    isFirstChange = true;
+
 }
 
 NovelScreen::~NovelScreen() = default;
 
 void NovelScreen::start() {
+    isFirstChange = true;
     novel->start();
     nextScene();
 }
 
 void NovelScreen::start(int gameSaveId) {
+    isFirstChange = true;
     novel->start(gameSaveId);
     nextScene();
 }
@@ -135,6 +139,34 @@ void NovelScreen::nextLine() {
 
     // Handle character sprite drawing
     CharacterStateGroup *characterStateGroup = nextLine->getCharacterStateGroup();
+
+    if (!characterStateGroup && isFirstChange) {
+        // If this is the first line change since the game has started, this means a game has just been loaded (or started)
+        // In this instance, we need to find the previous character state group which was displaying to restore the state of the on-screen characters.
+        auto *dataSet = new DataSet();
+
+        novel->getNovelDatabase()->execute(Utils::implodeString({
+            "SELECT sl.id AS segment_line_id",
+            "FROM segment_lines sl",
+            "INNER JOIN scene_segments ss ON ss.id = sl.scene_segment_id",
+            "INNER JOIN scenes s ON s.id = ss.scene_id",
+            "INNER JOIN chapters c ON c.id = s.chapter_id",
+            "INNER JOIN character_state_groups csg ON csg.id = sl.character_state_group_id",
+            "WHERE sl.id < ?",
+            "AND c.id = ?",
+            "ORDER BY sl.id DESC",
+            "LIMIT 1;"
+        }, " "),dataSet, {std::to_string(nextLine->getId()), std::to_string(novel->getCurrentChapter()->getId())},
+                                           {DatabaseConnection::TYPE_INT, DatabaseConnection::TYPE_INT});
+
+        if (dataSet->getRowCount()) {
+            // If we've found something, use this to populate the character sprite renderer
+            characterStateGroup = novel->getSceneSegmentLine(dataSet->getRow(0)->getColumn("segment_line_id")->getData()->asInteger())->getCharacterStateGroup();
+        }
+
+        delete(dataSet);
+    }
+
     if (characterStateGroup) {
         std::vector<CharacterState *> states = characterStateGroup->getCharacterStates();
 
@@ -215,6 +247,7 @@ void NovelScreen::nextScene() {
 
     sceneTransitioning = false;
     textDisplay->setVisible();
+    isFirstChange = false;
 }
 
 /**

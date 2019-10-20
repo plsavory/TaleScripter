@@ -35,6 +35,7 @@ private:
   void transitionToNextScene();
   bool sceneTransitioning; // Indicates that we need to advance the scene after an end transition
   CommonUI *commonUI;
+  bool isFirstChange; // Is this the first change of scene or not upon game start?
 };
 
 #endif
