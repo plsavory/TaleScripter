@@ -114,7 +114,6 @@ add_executable(${EXECUTABLE_NAME}
         Game/Src/Base/GameScreen.cpp
         Game/Src/Base/ErrorScreen.cpp
         Game/Src/Config/ConfigHandler.cpp
-        Game/Src/Database/DatabaseConnection.cpp
         Game/Src/Database/DatabaseSchema.cpp
         Game/Src/Input/GamepadHandler.cpp
         Game/Src/Input/InputManager.cpp
@@ -181,7 +180,6 @@ add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Exceptions/ProjectBuilderException.hpp
         Game/Include/Exceptions/JsonParserException.hpp
         Game/Include/Exceptions/ProjectDataException.hpp
-        Game/Src/Database/DatabaseConnection.cpp
         Game/Src/Database/DatabaseSchema.cpp
         Game/Src/GameCompiler/ChapterBuilder.cpp
         Game/Src/GameCompiler/GameCompiler.cpp
