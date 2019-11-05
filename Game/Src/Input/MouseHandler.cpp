@@ -82,6 +82,17 @@ bool MouseHandler::isButtonClicked(sf::Mouse::Button button) {
     return clicked;
 }
 
+/**
+ * Returns true if the window is in focus and the given button has been pressed, regardless of whether it has been pressed recently
+ * @param button
+ * @return
+ */
+bool MouseHandler::isButtonDown(sf::Mouse::Button button) {
+    bool clicked = window->hasFocus() && sf::Mouse::isButtonPressed(button);
+    wasClickedInLastFrame[button] = clicked;
+    return clicked;
+}
+
 MouseEvent *MouseHandler::addEvent(std::string name, MouseEventType eventType) {
     events.push_back(new MouseEvent(name, eventType));
     return events.back();

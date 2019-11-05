@@ -8,7 +8,7 @@ public:
   NovelScreen(Engine *enginePointer, NovelData *novelPointer, CommonUI *cUI);
   ~NovelScreen();
   void start();
-  void start(int gameSaveId);
+  void start(DataSet *gameSave);
   void update();
   void draw();
 private:
@@ -36,6 +36,11 @@ private:
   bool sceneTransitioning; // Indicates that we need to advance the scene after an end transition
   CommonUI *commonUI;
   bool isFirstChange; // Is this the first change of scene or not upon game start?
+
+  // Methods to set which part of the novel we are at - will perform the appropriate background image changes and whatever else.
+  void setScene(NovelScene *scene, bool setSegment);
+  void setSceneSegment(NovelSceneSegment *sceneSegment, bool setLine);
+  void setSceneSegmentLine(NovelSceneSegmentLine *sceneSegmentLine);
 };
 
 #endif

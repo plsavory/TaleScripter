@@ -17,8 +17,8 @@ public:
     DataSetRow* getSave(int id);
     void storeSaves();
     void setScreenshot(sf::Texture *texture);
-    sf::Texture* getThumbnail(int id);
     int getLoadedSaveId();
+    DataSet* getLoadedSave();
     void setSelectedSave(int saveId) {
         selectedSave = saveId;
     }

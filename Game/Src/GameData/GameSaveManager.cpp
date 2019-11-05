@@ -107,7 +107,16 @@ void GameSaveManager::save(int id) {
     }
 
     // Save the screenshot
-    bool success = screenshot->copyToImage().saveToFile(Utils::implodeString({"save_thumbnail_", std::to_string(newRowId), ".png"}));
+    std::string filename = Utils::implodeString({"save_thumbnail_", std::to_string(newRowId), ".png"});
+    if (Utils::fileExists(filename)) {
+        bool success = std::remove(filename.c_str());
+
+        if (!success) {
+            throw GeneralException("Unable to save screenshot for game save.");
+        }
+    }
+
+    bool success = screenshot->copyToImage().saveToFile(filename);
 
     if (!success) {
         throw GeneralException("Unable to save screenshot for game save.");
@@ -132,7 +141,34 @@ void GameSaveManager::load(int id) {
  * Returns the id of the loaded game save
  */
 int GameSaveManager::getLoadedSaveId() {
+
+    if (!selectedSave) {
+        throw MisuseException("No game save has yet been selected");
+    }
+
     return selectedSave;
+}
+
+DataSet* GameSaveManager::getLoadedSave() {
+    int gameSaveId = getLoadedSaveId(); // Ensure that required errors are thrown if a save is not yet loaded.
+
+    auto gameSave = new DataSet();
+
+    std::string queryString = Utils::implodeString({
+                                   "SELECT *",
+                                   "FROM game_saves gs",
+                                   "INNER JOIN game_save_progress gsp ON gsp.game_save_id = gs.id",
+                                   "WHERE gs.id = ?"
+                           }, " ");
+
+    saveDatabase->execute(queryString, gameSave, {std::to_string(gameSaveId)}, {DatabaseConnection::TYPE_INT});
+
+    if (!gameSave->getRowCount()) {
+        throw GeneralException(Utils::implodeString({"No game save with id ", std::to_string(gameSaveId), " was found."}));
+    }
+
+    return gameSave;
+
 }
 
 /**
@@ -154,23 +190,10 @@ DataSetRow* GameSaveManager::getSave(int id) {
         return nullptr;
     }
 
-    --id;
-
-    if (gameSaves->getRowCount() < id) {
-        throw DataSetException(Utils::implodeString({"No save file with id ", std::to_string(id), " was found."}));
-    }
-
-    return gameSaves->getRow(id);
+    return gameSaves->getRowWithColumnValue("save_id", std::to_string(id));
 }
 
 void GameSaveManager::storeSaves() {
-
-    // Clear the existing textures
-    int size = thumbnails.size();
-    for (int i = 0; i < size; i++) {
-        delete(thumbnails[i]);
-    }
-    thumbnails.clear();
 
     if (gameSaves) {
         delete(gameSaves);
@@ -179,21 +202,8 @@ void GameSaveManager::storeSaves() {
     gameSaves = new DataSet();
 
     saveDatabase->execute("SELECT *, strftime('%d/%m/%Y %H:%M', saved_at) AS formatted_saved_at, gs.id as save_id FROM game_saves gs INNER JOIN game_save_progress gsp ON gsp.game_save_id = gs.id ORDER BY gs.saved_at DESC;", gameSaves, {}, {});
-
-    for (auto &save : gameSaves->getRows()) {
-        auto *texture = new sf::Texture();
-        if (!texture->loadFromFile(Utils::implodeString({"save_thumbnail_", save->getColumn("save_id")->getData()->asString(), ".png"}))) {
-            throw ResourceException(Utils::implodeString({"Unable to load save thumbnail image for save id ", save->getColumn("save_id")->getData()->asString()}));
-        }
-        thumbnails.push_back(texture);
-    }
 }
 
 void GameSaveManager::setScreenshot(sf::Texture *texture) {
     screenshot = texture;
-}
-
-sf::Texture* GameSaveManager::getThumbnail(int id) {
-    --id;
-    return thumbnails[id];
 }

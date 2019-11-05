@@ -161,7 +161,7 @@ void GameManager::handleScreenChanges() {
                 novelScreen->start();
                 break;
             case ScreenState::STATE_NOVEL_LOAD:
-                novelScreen->start(engine->getGameSaveManager()->getLoadedSaveId());
+                novelScreen->start(engine->getGameSaveManager()->getLoadedSave());
                 screenState->setState(ScreenState::STATE_NOVEL);
                 break;
             default:

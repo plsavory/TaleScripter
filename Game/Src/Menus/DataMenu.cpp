@@ -254,21 +254,8 @@ int DataMenu::populateSaves() {
         numberOfSaves = i;
     }
 
-    getThumbnails();
-
     return ceil((double)numberOfSaves / (double)9);
 
-}
-
-void DataMenu::getThumbnails() {
-    for (int i = 0; i < saves.size(); i++) {
-
-        if (i == 0 && mode == MODE_SAVE_ONLY) {
-            continue;
-        }
-
-        saves[i]->setThumbnail(gameSaveManager->getThumbnail(mode == MODE_SAVE_ONLY ? i : i+1));
-    }
 }
 
 DataMenuGameSave::DataMenuGameSave(sf::RenderWindow *renderWindow, ResourceManager *rManager,
@@ -282,6 +269,7 @@ DataMenuGameSave::DataMenuGameSave(sf::RenderWindow *renderWindow, ResourceManag
     this->saveMode = saveMode;
     gameSaveManager = gsManager;
     sprite = nullptr;
+    thumbnailTexture = nullptr;
 
     dateTimeText = nullptr;
 
@@ -315,6 +303,21 @@ DataMenuGameSave::DataMenuGameSave(sf::RenderWindow *renderWindow, ResourceManag
             textString = Utils::implodeString({textString.substr(1, 30), "..."});
         }
 
+        // Load the image thumbnail
+        thumbnailTexture = new sf::Texture();
+
+        if (!thumbnailTexture->loadFromFile(Utils::implodeString({"save_thumbnail_", std::to_string(id), ".png"}))) {
+            throw GeneralException(Utils::implodeString({"Unable to load thumbnail image file for game save id ", std::to_string(id)}));
+        }
+
+        if (!sprite) {
+            sprite = new sf::Sprite();
+        }
+
+        sprite->setTexture(*thumbnailTexture);
+        sprite->setPosition(position.x+10, position.y+5);
+        sprite->setScale(235/(float)thumbnailTexture->getSize().x, 100/(float)thumbnailTexture->getSize().y);
+
     } else {
         exists = false;
         setText("Empty");
@@ -324,6 +327,10 @@ DataMenuGameSave::DataMenuGameSave(sf::RenderWindow *renderWindow, ResourceManag
 DataMenuGameSave::~DataMenuGameSave() {
     delete (bg);
     delete (text);
+
+    if (thumbnailTexture) {
+        delete(thumbnailTexture);
+    }
 }
 
 /**
@@ -333,7 +340,7 @@ bool DataMenuGameSave::update() {
 
     auto *mouseHandler = inputManager->getMouseHandler();
 
-    return mouseHandler->isButtonClicked(sf::Mouse::Left) &&
+    return mouseHandler->isButtonDown(sf::Mouse::Left) &&
            bg->getGlobalBounds().contains(mouseHandler->getMousePosition().x, mouseHandler->getMousePosition().y);
 
 }
@@ -353,15 +360,4 @@ void DataMenuGameSave::draw() {
 
 void DataMenuGameSave::setText(std::string newText) {
     text->setString(newText);
-}
-
-void DataMenuGameSave::setThumbnail(sf::Texture *texture) {
-
-    if (!sprite) {
-        sprite = new sf::Sprite();
-    }
-
-    sprite->setTexture(*texture);
-    sprite->setPosition(position.x+10, position.y+5);
-    sprite->setScale(235/(float)texture->getSize().x, 100/(float)texture->getSize().y);
 }

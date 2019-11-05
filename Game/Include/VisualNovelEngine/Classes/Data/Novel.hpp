@@ -98,7 +98,12 @@ public:
   NovelSceneSegment(DatabaseConnection *db, int ssId, std::string ssVisualEffectName, Character *character[], int musicPlaybackRequestId);
   ~NovelSceneSegment();
   int getLineCount();
+  int getId() {
+      return id;
+  }
   NovelSceneSegmentLine* getLine(int id);
+  NovelSceneSegmentLine* getLineUsingDatabaseId(int id);
+  int getNovelSceneSegmentLineOffsetUsingDatabaseId(int id);
 
   std::vector<NovelSceneSegmentLine*> getSceneSegmentLines() {
       return line;
@@ -122,6 +127,8 @@ public:
   NovelScene(DatabaseConnection *db, DataSetRow *data, Character *character[]);
   ~NovelScene();
   NovelSceneSegment* getSceneSegment(int id);
+  NovelSceneSegment* getSceneSegmentUsingDatabaseId(int id);
+  int getSceneSegmentOffsetUsingDatabaseId(int id);
   int getSegmentCount();
   int getId();
   std::string getBackgroundImageName();
@@ -154,6 +161,8 @@ public:
   int getId();
   void start();
   NovelScene* getScene(int id);
+  NovelScene* getSceneUsingDatabaseId(int id);
+  int getSceneOffsetUsingDatabaseId(int id);
   std::vector<NovelScene*> getScenes() {
       return scene;
   }
@@ -172,7 +181,7 @@ public:
   ~NovelData();
   void start();
   void start(int cChapter, int cScene, int cSceneSegment, int cSceneSegmentLine);
-  void start(int gameSaveId);
+  void start(DataSet *novelProgressInformation);
   AdvanceState getNextAction();
   NovelSceneSegment* getCurrentSceneSegment();
   NovelSceneSegmentLine* getNextLine();
@@ -180,6 +189,16 @@ public:
   NovelScene* advanceToNextScene();
   NovelScene* getCurrentScene();
   NovelChapter* getCurrentChapter();
+  NovelChapter* getChapter(int offset) {
+
+      if (!chapter[offset]) {
+          throw GeneralException(Utils::implodeString({"No chapter with id ", std::to_string(offset)}, " exists"));
+      }
+
+      // TODO: Load the chapter's data into memory if it exists but is not loaded
+
+      return chapter[offset];
+  }
   ProjectInformation* getProjectInformation();
   Character* getCharacter(int id);
   NovelScene* getPreviousScene() {
@@ -201,7 +220,7 @@ public:
    * @return the scene index
    */
   int getCurrentSceneIndex() {
-      return currentScene;
+      return sceneOffset;
   };
 private:
   void loadFromDatabase();
@@ -209,10 +228,10 @@ private:
   NovelChapter *chapter[MAX_CHAPTERS];
   Character *character[MAX_CHARACTERS];
   int chapterCount;
-  int currentChapter;
-  int currentScene;
-  int currentSceneSegment;
-  int currentSceneSegmentLine;
+  int chapterOffset;
+  int sceneOffset;
+  int sceneSegmentOffset;
+  int sceneSegmentLineOffset;
   ProjectInformation *projectInformation;
   NovelScene *previousScene;
 };

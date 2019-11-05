@@ -425,6 +425,31 @@ public:
     }
 
     /**
+     * Returns a row where the value stored within the column with columnName matches the given value
+     * @param columnName The column name to look for
+     * @param value The value to match on
+     * @return A row
+     */
+    DataSetRow *getRowWithColumnValue(std::string columnName, std::string value) {
+
+        for (auto &currentRow : row) {
+            if (currentRow->getColumn(columnName)->getData()->asString() == value) {
+                return currentRow;
+            }
+        }
+
+        std::vector<std::string> errorVector = {
+                "A row with value ",
+                value,
+                " in column ",
+                columnName,
+                " could not be found"
+        };
+
+        throw DataSetException(Utils::implodeString(errorVector));
+    }
+
+    /**
      * Returns a data set row where the given column has the given value
      * Does not throw exceptions if a row was not found.
      * Does throw an exception if the column does not exist on a row or if the data type is incorrect and unable to be cast

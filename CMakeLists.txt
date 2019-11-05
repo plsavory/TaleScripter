@@ -162,7 +162,10 @@ add_executable(${EXECUTABLE_NAME}
         Game/Include/Database/DataAttribute.hpp
         Game/Src/Menus/DataMenu.cpp
         Game/Include/GameData/GameSaveManager.h
-        Game/Src/GameData/GameSaveManager.cpp Game/Include/GameData/GameState.h Game/Src/GameData/GameState.cpp Game/Include/Misc/DateTime.h)
+        Game/Src/GameData/GameSaveManager.cpp
+        Game/Include/GameData/GameState.h
+        Game/Src/GameData/GameState.cpp
+        Game/Include/Misc/DateTime.h)
 
 add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Include/Misc/ProjectInfo.hpp
@@ -187,7 +190,16 @@ add_executable(${COMPILER_EXECUTABLE_NAME}
         Game/Src/GameCompiler/ResourceBuilder.cpp
         Game/Src/Misc/Utils.cpp
         Game/Src/GameCompilerEntryPoint.cpp
-        Game/Include/VisualNovelEngine/Classes/Data/VisualNovelEngineConstants.hpp Game/Include/GameCompiler/ThemeBuilder.hpp Game/Src/GameCompiler/ThemeBuilder.cpp Game/Include/UI/UIConstants.h Game/Include/UI/UIUtils.hpp Game/Include/Database/DataAttribute.hpp Game/Include/GameCompiler/ScreenBuilder.hpp Game/Src/GameCompiler/ScreenBuilder.cpp Game/Include/GameCompiler/ProjectBuilderHelper.h Game/Include/Misc/DateTime.h)
+        Game/Include/VisualNovelEngine/Classes/Data/VisualNovelEngineConstants.hpp
+        Game/Include/GameCompiler/ThemeBuilder.hpp
+        Game/Src/GameCompiler/ThemeBuilder.cpp
+        Game/Include/UI/UIConstants.h
+        Game/Include/UI/UIUtils.hpp
+        Game/Include/Database/DataAttribute.hpp
+        Game/Include/GameCompiler/ScreenBuilder.hpp
+        Game/Src/GameCompiler/ScreenBuilder.cpp
+        Game/Include/GameCompiler/ProjectBuilderHelper.h
+        Game/Include/Misc/DateTime.h)
 
 find_package(SFML 2.5.1 REQUIRED audio graphics window system )
 

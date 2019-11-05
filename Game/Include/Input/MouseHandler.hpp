@@ -48,6 +48,8 @@ public:
     sf::Vector2i getMousePosition();
 
     bool isButtonClicked(sf::Mouse::Button button);
+
+    bool isButtonDown(sf::Mouse::Button button);
 private:
     bool enabled;
     sf::RenderWindow *window;

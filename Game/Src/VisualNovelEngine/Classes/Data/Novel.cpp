@@ -23,58 +23,27 @@ void NovelData::start() {
     start(0, -1, -1, -1);
 }
 
-void NovelData::start(int gameSaveId) {
-    // Load a game and set the novel's progress to it
-    auto *gameSave = new DataSet();
+void NovelData::start(DataSet *novelProgressInformation) {
 
+    // Get the offsets of the objects that we need within the other objects from novelProgressInformation
+    int chapterOffset = novelProgressInformation->getRow(0)->getColumn("chapter_id")->getData()->asInteger()-1;
 
-    std::string queryString = Utils::implodeString({
-        "SELECT *",
-        "FROM game_saves gs",
-        "INNER JOIN game_save_progress gsp ON gsp.game_save_id = gs.id",
-        "WHERE gs.id = ?"
-    }, " ");
+    int sceneOffset = this->getChapter(chapterOffset)
+            ->getSceneOffsetUsingDatabaseId(novelProgressInformation->getRow(0)->getColumn("scene_id")->getData()->asInteger());
 
-    gameSaveDb->execute(queryString, gameSave, {std::to_string(gameSaveId)}, {DatabaseConnection::TYPE_INT});
+    int sceneSegmentOffset = this->getChapter(chapterOffset)
+            ->getScene(sceneOffset)
+            ->getSceneSegmentOffsetUsingDatabaseId(
+                    novelProgressInformation->getRow(0)->getColumn("scene_segment_id")->getData()->asInteger());
 
-    if (!gameSave->getRowCount()) {
-        throw GeneralException(Utils::implodeString({"No game save with id ", std::to_string(gameSaveId), " was found."}));
-    }
+    int sceneSegmentLineOffset = this->getChapter(chapterOffset)
+            ->getScene(sceneOffset)
+            ->getSceneSegment(sceneSegmentOffset)
+            ->getNovelSceneSegmentLineOffsetUsingDatabaseId(novelProgressInformation->getRow(0)->getColumn("segment_line_id")->getData()->asInteger());
 
-    // TODO: Set any variables stored within the game save relating to decisions and scripts when we are supporting these.
+    // This method relies on offsets of objects with how they are stored in other objects, so we have to do things a bit differently...
+    start(chapterOffset, sceneOffset, sceneSegmentOffset, sceneSegmentLineOffset);
 
-    // Get the information required to set our position in the novel
-    auto *novelProgressInformation = new DataSet();
-
-    queryString = Utils::implodeString({
-        "SELECT",
-        "sl.id AS segment_line_id,",
-        "ss.id AS scene_segment_id,",
-        "s.id AS scene_id,",
-        "c.id AS chapter_id",
-        "FROM segment_lines sl",
-        "INNER JOIN scene_segments ss ON ss.id = sl.scene_segment_id",
-        "INNER JOIN scenes s ON s.id = ss.scene_id",
-        "INNER JOIN chapters c ON c.id = s.chapter_id",
-        "WHERE sl.id = ?"
-    }, " ");
-
-    novelDb->execute(queryString, novelProgressInformation, {gameSave->getRow(0)->getColumn("segment_line_id")->getData()->asString()}, {DatabaseConnection::TYPE_TEXT});
-
-    if (!novelProgressInformation->getRowCount()) {
-        throw GeneralException(Utils::implodeString({"No segment line with id ", gameSave->getRow(0)->getColumn("segment_line_id")->getData()->asString(), " could be found."}));
-    }
-
-    // TODO: Get the position in the track that the music was currently at when the game was saved
-
-    // TODO: Update how 'start' works so that the -1's aren't needed.
-    start(novelProgressInformation->getRow(0)->getColumn("chapter_id")->getData()->asInteger()-1,
-            novelProgressInformation->getRow(0)->getColumn("scene_id")->getData()->asInteger()-1,
-            novelProgressInformation->getRow(0)->getColumn("scene_segment_id")->getData()->asInteger()-1,
-            novelProgressInformation->getRow(0)->getColumn("segment_line_id")->getData()->asInteger()-1);
-
-    delete(gameSave);
-    delete(novelProgressInformation);
 }
 
 /**
@@ -82,10 +51,10 @@ void NovelData::start(int gameSaveId) {
  */
 void NovelData::start(int cChapter, int cScene, int cSceneSegment, int cSceneSegmentLine) {
 
-    currentChapter = cChapter;
-    currentScene = cScene;
-    currentSceneSegment = cSceneSegment;
-    currentSceneSegmentLine = cSceneSegmentLine; // Game hasn't started yet, first line has id of 0
+    chapterOffset = cChapter;
+    sceneOffset = cScene;
+    sceneSegmentOffset = cSceneSegment;
+    sceneSegmentLineOffset = cSceneSegmentLine; // Game hasn't started yet, first line has id of 0
 
 }
 
@@ -95,11 +64,11 @@ void NovelData::start(int cChapter, int cScene, int cSceneSegment, int cSceneSeg
  */
 AdvanceState NovelData::getNextAction() {
 
-    if (currentSceneSegmentLine == getCurrentSceneSegment()->getLineCount() - 1) {
+    if (sceneSegmentLineOffset == getCurrentSceneSegment()->getLineCount() - 1) {
 
-        if (currentSceneSegment == getCurrentScene()->getSegmentCount() - 1) {
+        if (sceneSegmentOffset == getCurrentScene()->getSegmentCount() - 1) {
 
-            if (currentScene == getCurrentChapter()->getSceneCount() - 1) {
+            if (sceneOffset == getCurrentChapter()->getSceneCount() - 1) {
                 return AdvanceState::ChapterEnd;
             }
 
@@ -113,15 +82,15 @@ AdvanceState NovelData::getNextAction() {
 }
 
 NovelSceneSegment *NovelData::getCurrentSceneSegment() {
-    return chapter[currentChapter]->getScene(currentScene)->getSceneSegment(currentSceneSegment);
+    return chapter[chapterOffset]->getScene(sceneOffset)->getSceneSegment(sceneSegmentOffset);
 }
 
 NovelScene *NovelData::getCurrentScene() {
-    return chapter[currentChapter]->getScene(currentScene);
+    return chapter[chapterOffset]->getScene(sceneOffset);
 }
 
 NovelChapter *NovelData::getCurrentChapter() {
-    return chapter[currentChapter];
+    return chapter[chapterOffset];
 }
 
 void NovelData::loadFromDatabase() {
@@ -233,7 +202,7 @@ NovelData::~NovelData() {
 }
 
 NovelSceneSegmentLine *NovelData::getNextLine() {
-    return getCurrentSceneSegment()->getLine(++currentSceneSegmentLine);
+    return getCurrentSceneSegment()->getLine(++sceneSegmentLineOffset);
 }
 
 NovelSceneSegmentLine* NovelData::getSceneSegmentLine(int id) {
@@ -255,25 +224,25 @@ NovelSceneSegmentLine* NovelData::getSceneSegmentLine(int id) {
 }
 
 NovelSceneSegment *NovelData::advanceToNextSegment() {
-    currentSceneSegmentLine = -1; // Reset which line we're on
+    sceneSegmentLineOffset = -1; // Reset which line we're on
 
     if (getCurrentScene()->getSegmentCount() == 0) {
         // TODO: Allow scenes with no segments as a background image transition between multiple places
         std::cout << "Error: scene " << getCurrentScene()->getId() << " has no scene segments" << std::endl;
     }
-    return getCurrentScene()->getSceneSegment(++currentSceneSegment);
+    return getCurrentScene()->getSceneSegment(++sceneSegmentOffset);
 }
 
 NovelScene *NovelData::advanceToNextScene() {
-    currentSceneSegment = -1;
+    sceneSegmentOffset = -1;
 
-    if (currentScene >= 0) {
+    if (sceneOffset >= 0) {
         // We won't be always be jumping between them in a linear fashion
         previousScene = getCurrentScene(); // Keep a reference to it as sometimes we need to use it during transitions
     } else {
         previousScene = nullptr;
     }
-    currentScene++;
+    sceneOffset++;
     return getCurrentScene();
 }
 
@@ -359,6 +328,26 @@ NovelScene *NovelChapter::getScene(int id) {
     return scene[id];
 }
 
+NovelScene* NovelChapter::getSceneUsingDatabaseId(int id) {
+    for (auto &currentScene : scene) {
+        if (currentScene->getId() == id) {
+            return currentScene;
+        }
+    }
+
+    throw DataSetException(Utils::implodeString({"No scene with ID ", std::to_string(id), "found in chapter id", std::to_string(this->id)}));
+}
+
+int NovelChapter::getSceneOffsetUsingDatabaseId(int id) {
+    for (int i = 0; i < scene.size(); i++) {
+        if (scene[i]->getId() == id) {
+            return i;
+        }
+    }
+
+    throw DataSetException(Utils::implodeString({"No scene with ID ", std::to_string(id), "found in chapter id", std::to_string(this->id)}));
+}
+
 int NovelChapter::getSceneCount() {
     return sceneCount;
 }
@@ -420,6 +409,26 @@ NovelScene::~NovelScene() {
 
 NovelSceneSegment *NovelScene::getSceneSegment(int id) {
     return segment[id];
+}
+
+NovelSceneSegment *NovelScene::getSceneSegmentUsingDatabaseId(int id) {
+    for (auto &currentSceneSegment : segment) {
+        if (currentSceneSegment->getId() == id) {
+            return currentSceneSegment;
+        }
+    }
+
+    throw DataSetException(Utils::implodeString({"No scene segment with ID ", std::to_string(id), "found in scene id", std::to_string(this->id)}));
+}
+
+int NovelScene::getSceneSegmentOffsetUsingDatabaseId(int id) {
+    for (int i = 0; i < segment.size(); i++) {
+        if (segment[i]->getId() == id) {
+            return i;
+        }
+    }
+
+    throw DataSetException(Utils::implodeString({"No scene segment with ID ", std::to_string(id), "found in scene id", std::to_string(this->id)}));
 }
 
 int NovelScene::getSegmentCount() {
@@ -554,6 +563,26 @@ int NovelSceneSegment::getLineCount() {
 
 NovelSceneSegmentLine *NovelSceneSegment::getLine(int id) {
     return line[id];
+}
+
+NovelSceneSegmentLine *NovelSceneSegment::getLineUsingDatabaseId(int id) {
+    for (auto &currentLine : line) {
+        if (currentLine->getId() == id) {
+            return currentLine;
+        }
+    }
+
+    throw DataSetException(Utils::implodeString({"No scene segment line with ID ", std::to_string(id), "found in scene segment id", std::to_string(this->id)}));
+}
+
+int NovelSceneSegment::getNovelSceneSegmentLineOffsetUsingDatabaseId(int id) {
+    for (int i = 0; i < line.size(); i++) {
+        if (line[i]->getId() == id) {
+            return i;
+        }
+    }
+
+    throw DataSetException(Utils::implodeString({"No scene segment line with ID ", std::to_string(id), "found in scene segment id", std::to_string(this->id)}));
 }
 
 std::string NovelSceneSegment::getBackgroundMusicName() {
