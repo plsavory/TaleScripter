@@ -32,6 +32,7 @@ NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRen
 
     auto *activeTheme = commonUI->getUIThemeManager()->getActiveTheme();
     auto *textDisplayAttributes = activeTheme->getNovelScreenThemeData()->getTextDisplayData();
+    auto *nameDisplayAttributes = activeTheme->getNovelScreenThemeData()->getNovelScreenCharacterNameDisplayData();
 
     storyFont = "story_font"; // TODO: Load from config
 
@@ -41,7 +42,8 @@ NovelTextDisplay::NovelTextDisplay(TextRenderer *tRenderer, SpriteRenderer *sRen
     myText->setOutline(sf::Color::Black, 2); // TODO: Load from game theme in database
 
     nameDisplayText = textRenderer->addText("novel_text_display_name", storyFont);
-    nameDisplayText->setPosition(150, 550);
+    nameDisplayText->setPosition(nameDisplayAttributes->getFramePositionX()+nameDisplayAttributes->getTextOffsetX(),
+                                 nameDisplayAttributes->getFramePositionY()+nameDisplayAttributes->getTextOffsetY());;
     nameDisplayText->setOutline(sf::Color::Black, 2); // TODO: Load from game theme in database
     nameDisplayText->setString("");
     updateNameDisplayText = false;

@@ -242,7 +242,7 @@ NovelScreenThemeData::NovelScreenThemeData(int themeId, DatabaseConnection *nove
         throw DataSetException(Utils::implodeString({"No 'characterNameDisplay' attribute group was found for theme ", std::to_string(themeId)}));
     }
 
-    novelScreenCharacterNameDisplay = new NovelScreenCharacterNameDisplay(novelTextDisplayRow, novel);
+    novelScreenCharacterNameDisplay = new NovelScreenCharacterNameDisplay(characterNameDisplayRow, novel);
 
     delete(dataSet);
 

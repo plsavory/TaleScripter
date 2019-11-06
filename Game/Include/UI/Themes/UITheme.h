@@ -55,7 +55,7 @@ public:
     NovelScreenTextDisplay* getTextDisplayData() {
         return novelScreenTextDisplay;
     }
-    NovelScreenCharacterNameDisplay* getNovelScreenCharacterNameDisplay() {
+    NovelScreenCharacterNameDisplay* getNovelScreenCharacterNameDisplayData() {
         return novelScreenCharacterNameDisplay;
     }
 private:
