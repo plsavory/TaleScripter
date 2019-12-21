@@ -12,13 +12,123 @@ enum BackgroundStatus {
 #include <cmath>
 #include <ResourceException.hpp>
 
+class BackgroundTexture {
+public:
+    explicit BackgroundTexture(DataSetRow *backgroundTextureRow) {
+        id = backgroundTextureRow->getColumn("id")->getData()->asInteger();
+        name = backgroundTextureRow->getColumn("name")->getData()->asString();
+        fileName = backgroundTextureRow->getColumn("filename")->getData()->asString();
+        texture = nullptr;
+    }
+
+    ~BackgroundTexture() {
+        unload();
+    }
+
+    bool isLoaded() {
+        return texture != nullptr;
+    }
+
+    void load() {
+
+        if (texture) {
+            unload();
+        }
+
+        texture = new sf::Texture();
+
+        std::string fullFileName = "resource/backgrounds/";
+        fullFileName.append(fileName);
+
+        if (!texture->loadFromFile(fullFileName)) {
+            throw ResourceException(
+                    Utils::implodeString({"Unable to load background texture (", fileName, ")"}));
+        }
+
+    }
+
+    void unload() {
+        if (texture) {
+            delete (texture);
+        }
+    }
+
+    int getId() {
+        return id;
+    }
+
+    sf::Texture* getTexture() {
+        return texture;
+    }
+
+private:
+    int id;
+
+    std::string name;
+
+    std::string fileName;
+
+    sf::Texture *texture;
+};
+
+class BackgroundTextureManager {
+public:
+    BackgroundTextureManager() = default;
+
+    ~BackgroundTextureManager() {
+
+        for (auto &texture: textures) {
+            delete (texture);
+        }
+
+    }
+
+    /**
+     * Load all of the background texture information from the database
+     * This does not actually load the textures into memory - only the information about them.
+     * @param db - Resource database connection
+     */
+    void loadAllFromDatabase(DatabaseConnection *db) {
+        // TODO: Also ensure that we're not doing this twice, I think we have two BackgroundImageRenderers... (One for foregrounds)
+
+        this->resourceDb = db;
+
+        auto *dataSet = new DataSet();
+        resourceDb->executeQuery("SELECT * FROM background_textures", dataSet);
+
+        for (auto &row : dataSet->getRows()) {
+            // Add a new background texture for every row.
+            auto *newTexture = new BackgroundTexture(row);
+            textures.push_back(newTexture);
+        }
+
+        delete (dataSet);
+    }
+
+    BackgroundTexture *getBackgroundTexture(int id) {
+        for (auto &texture : textures) {
+            if (texture->getId() == id) {
+                return texture;
+            }
+        }
+
+        throw ResourceException(Utils::implodeString({"No background texture with id ", std::to_string(id), " exists."}));
+    }
+
+private:
+
+    std::vector<BackgroundTexture *> textures;
+
+    DatabaseConnection *resourceDb;
+};
+
 class BackgroundLayer {
 public:
 
     BackgroundLayer(sf::RenderWindow *window) {
         this->window = window;
         texture = nullptr;
-        sprite = nullptr;
+        this->sprite = nullptr;
         tilingEnabled = false;
 
         // Set the default position to be in the middle of the screen.
@@ -29,7 +139,36 @@ public:
         verticalScrollSpeed = 0;
         xOffset = 0;
         yOffset = 0;
+        tilingEnabled = false;
 
+    }
+
+    /**
+     * Constructor
+     * @param window - A pointer to a SFML window
+     * @param row - A row from the background_layers table
+     * @param bgTextureManager - A pointer to a BackgroundTextureManager object
+     */
+    BackgroundLayer(sf::RenderWindow *window, DataSetRow *row, BackgroundTextureManager *bgTextureManager) {
+        backgroundTexture = nullptr;
+        this->window = window;
+        this->sprite = nullptr;
+
+        id = row->getColumn("id")->getData()->asInteger();
+
+        // Ensure that the image exists and set it...
+        backgroundTexture = bgTextureManager->getBackgroundTexture(row->getColumn("background_texture_id")->getData()->asInteger());
+
+        // Load the appropriate background attributes from the database and store them
+        xOffset = (float)row->getColumn("offset_left")->getData()->asInteger();
+        yOffset = (float)row->getColumn("offset_top")->getData()->asInteger();
+        tilingEnabled = row->getColumn("is_tiled")->getData()->asBoolean();
+
+        maxWidth = row->getColumn("max_width")->getData()->asInteger();
+        maxHeight = row->getColumn("max_height")->getData()->asInteger();
+
+        horizontalScrollSpeed = row->getColumn("horizontal_scroll_speed")->getData()->asFloat();
+        verticalScrollSpeed = row->getColumn("vertical_scroll_speed")->getData()->asFloat();
     }
 
     ~BackgroundLayer() {
@@ -42,7 +181,11 @@ public:
 
     void update(sf::Clock *gameTime) {
         // TODO: Handle background animation frame switching here
+        if (!this->isLoaded()) {
+            return;
+        }
 
+        // Handle background scrolling and wrapping
         sf::FloatRect textureRect = this->sprite->getGlobalBounds();
 
         xOffset += horizontalScrollSpeed;
@@ -66,6 +209,10 @@ public:
     }
 
     void draw() {
+
+        if (!this->sprite) {
+            return; // Can't draw if we've not loaded an image yet...
+        }
 
         // If tiling is not enabled, simply draw the sprite in its standard position - the quickest mode...
         if (!tilingEnabled) {
@@ -101,8 +248,8 @@ public:
 
     }
 
-    void setTexture(std::string textureFileName) {
-        this->textureFileName = textureFileName;
+    void setTexture(BackgroundTexture *texture) {
+        this->backgroundTexture = texture;
     }
 
     void enableTiling() {
@@ -124,21 +271,20 @@ public:
     // Actually load the texture into memory
     void load() {
 
-        if (texture) {
-            unload();
+        // Load the texture if we need to
+        if (!backgroundTexture) {
+            throw ResourceException("No background texture has been assigned to a background layer");
         }
 
-        texture = new sf::Texture();
-
-        if (!texture->loadFromFile(textureFileName)) {
-            throw ResourceException(
-                    Utils::implodeString({"Unable to load background texture (", textureFileName, ")"}));
+        if (!backgroundTexture->isLoaded()) {
+            backgroundTexture->load();
         }
 
         if (!this->sprite) {
             this->sprite = new sf::Sprite();
-            this->sprite->setTexture(*texture);
+            this->sprite->setTexture(*backgroundTexture->getTexture());
             sprite->setPosition(position.x, position.y);
+            fitToSize((float)maxWidth, (float)maxHeight);
         }
 
     }
@@ -157,11 +303,16 @@ public:
     }
 
     bool isLoaded() {
-        return texture != nullptr;
+        return backgroundTexture != nullptr && backgroundTexture->isLoaded() &&
+        sprite != nullptr;
     }
 
     void fitToSize(float width, float height) {
-        this->sprite->setScale(width/texture->getSize().x,height/texture->getSize().y);
+        if (width == 0 || height == 0) {
+            return;
+        }
+
+        this->sprite->setScale(width / backgroundTexture->getTexture()->getSize().x, height / backgroundTexture->getTexture()->getSize().y);
     }
 
 private:
@@ -171,6 +322,8 @@ private:
     sf::Texture *texture;
 
     sf::Sprite *sprite;
+
+    int id;
 
     bool tilingEnabled;
 
@@ -184,7 +337,11 @@ private:
 
     float yOffset;
 
-    std::string textureFileName;
+    BackgroundTexture *backgroundTexture;
+
+    int maxWidth;
+
+    int maxHeight;
 };
 
 class BackgroundImageAttributes {
@@ -221,17 +378,33 @@ private:
 
 class Background {
 public:
-    Background(std::string bName, std::string bFilename, sf::RenderWindow *windowPointer) {
-        id = 0; // TODO: fix;
-        name = bName;
+    Background(DataSetRow *row, sf::RenderWindow *windowPointer, DatabaseConnection *resourceDb,
+               BackgroundTextureManager *bgTextureManager) {
+        id = row->getColumn("id")->getData()->asInteger();
+        name = row->getColumn("name")->getData()->asString();
         myStatus = BackgroundStatus::bgUnloaded;
         window = windowPointer;
-        addLayer(bFilename);
+
+        // Fetch all of the background layer information and store it
+        auto *dataSet = new DataSet();
+
+        resourceDb->execute(Utils::implodeString({
+                                                         "SELECT *",
+                                                         "FROM background_layers",
+                                                         "WHERE background_id = ?",
+                                                         "ORDER BY depth DESC"
+                                                 }, " "), dataSet, {std::to_string(id)}, {DatabaseConnection::TYPE_INT});
+
+        for (auto &layerRow : dataSet->getRows()) {
+            addLayer(layerRow, bgTextureManager);
+        }
+
+        delete (dataSet);
     }
 
     ~Background() {
         for (auto &layer : layers) {
-            delete(layer);
+            delete (layer);
         }
     }
 
@@ -250,6 +423,12 @@ public:
 
     BackgroundStatus getStatus() {
         return myStatus;
+    }
+
+    void update(sf::Clock *gameTime) {
+        for (auto &layer : layers) {
+            layer->update(gameTime);
+        }
     }
 
     void draw() {
@@ -274,11 +453,45 @@ public:
         }
     }
 
-    BackgroundLayer* addLayer(const std::string& fileName) {
+    /**
+     * Adds a layer using a filename
+     * @param fileName
+     * @return
+     */
+    BackgroundLayer *addLayer(const std::string &fileName) {
         auto *newLayer = new BackgroundLayer(window);
-        newLayer->setTexture(fileName);
         layers.push_back(newLayer);
         return newLayer;
+    }
+
+    /**
+     * Adds a background layer
+     * @param row - A row from the background_layers table
+     * @param bgTextureManager - A pointer to a BackgroundTextureManager
+     * @return - The newly-created layer
+     */
+    BackgroundLayer *addLayer(DataSetRow *row, BackgroundTextureManager *bgTextureManager) {
+        auto *newLayer = new BackgroundLayer(window, row, bgTextureManager);
+        layers.push_back(newLayer);
+        return newLayer;
+    };
+
+    int getId() {
+        return id;
+    }
+
+    /**
+     * Will return false if any of the layers are not yet loaded
+     * @return
+     */
+    bool isLoaded() {
+        for (auto &layer : layers) {
+            if (!layer->isLoaded()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 private:
@@ -321,17 +534,17 @@ public:
 
     bool isQueueEmpty();
 
-    void update();
+    void update(sf::Clock *gameTime);
 
     void draw();
 
-    void setBackground(std::string name);
+    void setBackground(const std::string &name);
 
     void setBackground(int id);
 
-    void setUpcomingBackground(std::string name);
+    void setUpcomingBackground(const std::string &name);
 
-    int findBackground(std::string name);
+    Background* findBackground(const std::string &name);
 
     void setBackgroundColour(sf::Color *colour);
 
@@ -345,12 +558,12 @@ public:
 
     void setBackgroundAlpha(int alpha);
 
+    Background* getBackground(int id);
+
 private:
     sf::RenderWindow *window;
 
-    Background *addBackground(std::string name, std::string filename);
-
-    Background *background[MAX_BACKGROUNDS];
+    std::vector<Background *> backgrounds;
     std::queue<BackgroundLoadRequest> backgroundLoadQueue;
     Background *currentBackground;
     Background *upcomingBackground; // Used for transitions
@@ -359,6 +572,9 @@ private:
     sf::Color *backgroundColour;
     bool drawingEnabled;
     int backgroundAlpha;
+
+    BackgroundTextureManager *backgroundTextureManager;
+
 };
 
 #endif

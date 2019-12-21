@@ -98,6 +98,6 @@ void TitleScreen::getData() {
     // Construct the menu
     menu = new Menu(window, resourceManager, inputManager, novelDb, dataSet->getRow(0)->getColumn("id")->getData()->asInteger());
 
-    backgroundImageRenderer->setBackground(dataSet->getRow(0)->getColumn("background_image_id")->getData()->asInteger());
+    backgroundImageRenderer->setBackground(dataSet->getRow(0)->getColumn("background_id")->getData()->asInteger());
     musicManager->playAudioStream(dataSet->getRow(0)->getColumn("background_music_id")->getData()->asInteger(), nullptr);
 }

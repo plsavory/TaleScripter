@@ -16,6 +16,8 @@ GameManager::GameManager(Engine *enginePointer, const std::string &initialErrorM
     engine = enginePointer;
     sf::RenderWindow *newWindow = engine->getWindow();
 
+    gameTime = new sf::Clock();
+
     if (!initialErrorMessage.empty()) {
         invokeErrorScreen(initialErrorMessage);
         return;
@@ -54,7 +56,6 @@ GameManager::GameManager(Engine *enginePointer, const std::string &initialErrorM
         invokeErrorScreen(e);
     }
 
-    gameTime = new sf::Clock();
 
 }
 

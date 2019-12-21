@@ -81,21 +81,33 @@ void GameCompiler::createResourceDatabase() {
     textStyleTable->addColumn("bold", ColumnType::tBoolean, false, "");
     textStyleTable->addColumn("italic", ColumnType::tBoolean, false, "");
 
-    // Create background image table
-    DatabaseTable *backgroundImageTable = resourceDb->addTable("background_images");
-    backgroundImageTable->addPrimaryKey();
-    backgroundImageTable->addColumn("name", ColumnType::tText, false, "");
-    backgroundImageTable->addColumn("filename", ColumnType::tText, false, "");
-    backgroundImageTable->addColumn("enabled", ColumnType::tBoolean, false, "");
+    // Create background texture table
+    DatabaseTable *backgroundTextureTable = resourceDb->addTable("background_textures");
+    backgroundTextureTable->addPrimaryKey();
+    backgroundTextureTable->addColumn("name", ColumnType::tText, false, "");
+    backgroundTextureTable->addColumn("filename", ColumnType::tText, false, "");
 
-    DatabaseTable *backgroundImageAttributesTable = resourceDb->addTable("background_image_attributes");
-    backgroundImageAttributesTable->addPrimaryKey();
-    backgroundImageAttributesTable->addColumn("background_image_id", ColumnType::tInteger, false, "");
-    backgroundImageAttributesTable->addColumn("enabled", ColumnType::tBoolean, false, "");
-    backgroundImageAttributesTable->addColumn("max_height", ColumnType::tInteger, false, "");
-    backgroundImageAttributesTable->addColumn("max_width", ColumnType::tInteger, false, "");
-    backgroundImageAttributesTable->addColumn("offset_left", ColumnType::tInteger, false, "");
-    backgroundImageAttributesTable->addColumn("offset_top", ColumnType::tInteger, false, "");
+    // Create backgrounds table
+    DatabaseTable *backgroundsTable = resourceDb->addTable("backgrounds");
+    backgroundsTable->addPrimaryKey();
+    backgroundsTable->addColumn("name", ColumnType::tText, false, "");
+    backgroundsTable->addColumn("enabled", ColumnType::tBoolean, false, "");
+
+    // Create background image table
+    DatabaseTable *backgroundLayersTable = resourceDb->addTable("background_layers");
+    backgroundLayersTable->addPrimaryKey();
+    backgroundLayersTable->addColumn("background_id", ColumnType::tInteger, true, "");
+    backgroundLayersTable->addColumn("background_texture_id", ColumnType::tInteger, true, "");
+    backgroundLayersTable->addColumn("enabled", ColumnType::tBoolean, false, "");
+    backgroundLayersTable->addColumn("max_width", ColumnType::tInteger, false, "");
+    backgroundLayersTable->addColumn("max_height", ColumnType::tInteger, false, "");
+    backgroundLayersTable->addColumn("offset_left", ColumnType::tInteger, false, "");
+    backgroundLayersTable->addColumn("offset_top", ColumnType::tInteger, false, "");
+    backgroundLayersTable->addColumn("horizontal_scroll_speed", ColumnType::tInteger, false, "");
+    backgroundLayersTable->addColumn("vertical_scroll_speed", ColumnType::tInteger, false, "");
+    backgroundLayersTable->addColumn("depth", ColumnType::tInteger, false, "");
+    backgroundLayersTable->addColumn("is_tiled", ColumnType::tInteger, false, "");
+
 
     // Create textures table
     DatabaseTable *texturesTable = resourceDb->addTable("textures");
@@ -314,7 +326,7 @@ void GameCompiler::createNovelDatabase() {
 
     DatabaseTable *titleScreensTable = novelDb->addTable("title_screens");
     titleScreensTable->addPrimaryKey();
-    titleScreensTable->addColumn("background_image_id", ColumnType::tInteger, true, "");
+    titleScreensTable->addColumn("background_id", ColumnType::tInteger, true, "");
     titleScreensTable->addColumn("background_music_id", ColumnType::tInteger, true, "");
     titleScreensTable->addColumn("menu_id", ColumnType::tInteger, true, "");
 

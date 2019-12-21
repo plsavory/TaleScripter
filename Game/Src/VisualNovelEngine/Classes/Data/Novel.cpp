@@ -55,6 +55,7 @@ void NovelData::start(int cChapter, int cScene, int cSceneSegment, int cSceneSeg
     sceneOffset = cScene;
     sceneSegmentOffset = cSceneSegment;
     sceneSegmentLineOffset = cSceneSegmentLine; // Game hasn't started yet, first line has id of 0
+    previousScene = nullptr;
 
 }
 

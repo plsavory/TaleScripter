@@ -82,7 +82,7 @@ void Game::run() {
 
     gameManager = new GameManager(engine, errorMessage);
 
-    sf::Clock updateClock;
+    sf::Clock *updateClock = new sf::Clock();
 
 #ifdef MULTITHREADED_RENDERING
     // Launch the rendering thread if that compile option is enabled
@@ -110,8 +110,8 @@ void Game::run() {
 
         }
 
-        // Update the game state 60 times a second
-        update(updateClock.getElapsedTime().asMilliseconds());
+        update(updateClock);
+        updateClock->restart();
 
 #ifndef MULTITHREADED_RENDERING
         // Draw the game
@@ -128,7 +128,7 @@ void Game::run() {
 /**
  * [Game::update Update loop]
  */
-void Game::update(int gameTime) {
+void Game::update(sf::Clock *gameTime) {
 
     // If the engine didn't start properly, don't try to update anything
     if (!engine->getErrorMessage().empty()) {
@@ -138,7 +138,7 @@ void Game::update(int gameTime) {
     inputManager->update();
     resourceManager->update();
     gameManager->update();
-    backgroundImageRenderer->update();
+    backgroundImageRenderer->update(gameTime);
     spriteRenderer->update();
     textRenderer->update();
     backgroundTransitionRenderer->update();

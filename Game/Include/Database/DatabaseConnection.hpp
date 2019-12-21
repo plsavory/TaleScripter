@@ -278,11 +278,10 @@ public:
      * @return
      */
     DataSetColumn *getColumn(const std::string &name) {
-        for (int i = 0; i < DATA_SET_MAX_COLUMNS; i++) {
-            if (column[i]) {
-                if (column[i]->getName() == name) {
-                    return getColumn(i);
-                }
+
+        for (auto &currentColumn : column) {
+            if (currentColumn->getName() == name) {
+                return currentColumn;
             }
         }
 

@@ -11,7 +11,7 @@ public:
 
 private:
 
-    void update(int gameTime);
+    void update(sf::Clock *gameTime);
 
     void draw();
 

@@ -11,11 +11,13 @@ private:
   std::string resourceDirectory;
   std::string assetDirectory;
   JsonHandler *fHandler;
-  void processBackgroundImages();
+  void processBackgroundTextures();
+  void processBackgrounds();
   void processTextures();
   void processSprites();
   void processFonts();
   void processMusic();
+  void processBackgroundLayer(int backgroundId, json layerJson);
 };
 
 #endif

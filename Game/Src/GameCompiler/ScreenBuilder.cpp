@@ -61,7 +61,7 @@ void ScreenBuilder::processTitleScreen(json titleScreenJson) {
         throw ProjectBuilderException("Title screen data must be a json object, instead it is a primitive type.");
     }
 
-    int backgroundImageId;
+    int backgroundId;
     int backgroundMusicId;
 
     // Validate that we have the required fields with the correct types, and store them.
@@ -95,13 +95,13 @@ void ScreenBuilder::processTitleScreen(json titleScreenJson) {
     // Validate that the background image and music exist and get their id.
     auto *imageDataSet = new DataSet(); auto *musicDataSet = new DataSet();
 
-    resource->executeQuery(Utils::implodeString({"SELECT * FROM background_images WHERE name = '", JsonHandler::getString(titleScreenJson,"backgroundImageName"), "'"}), imageDataSet);
+    resource->executeQuery(Utils::implodeString({"SELECT * FROM backgrounds WHERE name = '", JsonHandler::getString(titleScreenJson,"backgroundImageName"), "'"}), imageDataSet);
 
     if (imageDataSet->getRowCount() == 0) {
         throw ProjectBuilderException(Utils::implodeString({"No background image named '", JsonHandler::getString(titleScreenJson, "backgroundImageName"), "' exists."}));
     }
 
-    backgroundImageId = imageDataSet->getRow(0)->getColumn("id")->getData()->asInteger();
+    backgroundId = imageDataSet->getRow(0)->getColumn("id")->getData()->asInteger();
     delete(imageDataSet);
 
     resource->executeQuery(Utils::implodeString({"SELECT * FROM music WHERE name = '", JsonHandler::getString(titleScreenJson,"backgroundMusicName"), "'"}), musicDataSet);
@@ -114,8 +114,8 @@ void ScreenBuilder::processTitleScreen(json titleScreenJson) {
     delete(musicDataSet);
 
     // Store the title screen in the database
-    std::vector<std::string> columns = {"background_image_id", "background_music_id", "menu_id"};
-    std::vector<std::string> values = {std::to_string(backgroundImageId), std::to_string(backgroundMusicId), std::to_string(menuId)};
+    std::vector<std::string> columns = {"background_id", "background_music_id", "menu_id"};
+    std::vector<std::string> values = {std::to_string(backgroundId), std::to_string(backgroundMusicId), std::to_string(menuId)};
     std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER};
     novel->insert("title_screens", columns, values, types);
 }
