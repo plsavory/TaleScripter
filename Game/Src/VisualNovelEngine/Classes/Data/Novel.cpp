@@ -730,7 +730,7 @@ CharacterState::CharacterState(int myId, DatabaseConnection *db, Character *char
             ";"
     };
 
-    DataSet *dataSet = new DataSet();
+    auto *dataSet = new DataSet();
 
     db->executeQuery(Utils::implodeString(query), dataSet);
 
@@ -757,6 +757,7 @@ CharacterState::CharacterState(int myId, DatabaseConnection *db, Character *char
             throw ResourceException(Utils::implodeString(error));
         }
 
+        // Store the values received from the database into this class.
         int characterId = dataSet->getRow(0)->getColumn("character_id")->getData()->asInteger();
         std::string characterSpriteName = dataSet->getRow(0)->getColumn("name")->getRawData();
 
@@ -785,7 +786,69 @@ CharacterState::CharacterState(int myId, DatabaseConnection *db, Character *char
         throw DataSetException(Utils::implodeString(error));
     }
 
+
+    // If a scale value is null, we will assume no override and use 1, otherwise we will use whatever value is set in the dabase
+    xScale = dataSet->getRow(0)->getColumn("x_scale")->getData()->isNull() ? 1
+                                                                           : dataSet->getRow(0)->getColumn("x_scale")->getData()->asFloat();
+
+    yScale = dataSet->getRow(0)->getColumn("y_scale")->getData()->isNull() ? 1
+                                                                           : dataSet->getRow(0)->getColumn("y_scale")->getData()->asFloat();
+
+    if (xScale == 0.f && yScale == 0.f) {
+        // Throw an error if we get 0-values here, there will be better ways than this to make a character invisible.
+        throw MisuseException("Invalid character state scale, values can't be 0.");
+    }
+
+    /* Calculate the position of the character sprite, and whether it has been overridden or not.
+    We will later detect whether any of the states in a state group have overridden positions and will enforce
+     that they all do if this is the case. */
+    xPositionIsOverridden = !dataSet->getRow(0)->getColumn("x_position")->getData()->isNull();
+    yPositionIsOverridden = !dataSet->getRow(0)->getColumn("y_position")->getData()->isNull();
+
+    xPosition = xPositionIsOverridden ? dataSet->getRow(0)->getColumn("x_position")->getData()->asFloat() : 0.f;
+    yPosition = yPositionIsOverridden ? dataSet->getRow(0)->getColumn("y_position")->getData()->asFloat() : 0.f;
+
+    // Calculate the origin override
+    xOriginIsOverridden = !dataSet->getRow(0)->getColumn("x_origin")->getData()->isNull();
+    yOriginIsOverridden = !dataSet->getRow(0)->getColumn("y_origin")->getData()->isNull();
+
+    xOrigin = xOriginIsOverridden ? dataSet->getRow(0)->getColumn("x_origin")->getData()->asInteger() : 0;
+    yOrigin = yOriginIsOverridden ? dataSet->getRow(0)->getColumn("y_origin")->getData()->asInteger() : 0;
+
     delete (dataSet);
+}
+
+float CharacterState::getXPositionOverride() {
+
+    if (isXPositionOverridden()) {
+        return xPosition;
+    }
+
+    // TODO: Return the position override stored within the character sprite itself if it is set
+
+    throw MisuseException(Utils::implodeString({"Trying to get overridden X position from character state while it does not have one."}));
+
+}
+
+float CharacterState::getYPositionOverride() {
+    if (isYPositionOverridden()) {
+        return yPosition;
+    }
+
+    // TODO: Return the position override stored within the character sprite itself if it is set
+
+    throw MisuseException(Utils::implodeString({"Trying to get overridden X position from character state while it does not have one."}));
+}
+
+sf::Vector2f CharacterState::getScale() {
+
+    if (xScale != 1 || yScale != 1) {
+        return sf::Vector2f(xScale, yScale);
+    }
+
+    // TODO: Return the scale for the character sprite itself is overridden
+
+    return sf::Vector2f(1.f, 1.f);
 }
 
 CharacterState::~CharacterState() {

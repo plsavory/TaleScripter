@@ -306,7 +306,7 @@ void NovelScreen::setSceneSegmentLine(NovelSceneSegmentLine *sceneSegmentLine) {
         std::vector<CharacterSpriteDrawRequest *> requests;
 
         for (auto & state : states) {
-            requests.push_back(new CharacterSpriteDrawRequest(state->getCharacterSprite()));
+            requests.push_back(new CharacterSpriteDrawRequest(state->getCharacterSprite(), state));
         }
 
         characterSpriteRenderer->push(requests);

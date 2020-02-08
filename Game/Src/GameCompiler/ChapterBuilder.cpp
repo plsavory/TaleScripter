@@ -448,6 +448,7 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
 
 
             if (characterState.find("characterId") == characterState.end()) {
+                // If there is no character ID, search for a character based on name
 
                 if (characterState.find("characterFirstName") != characterState.end()) {
 
@@ -528,10 +529,78 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
             }
 
             characterSpriteId = dataSet->getRow(0)->getColumn("id")->getRawData();
+            std::string xPosition = "NULL";
+            std::string yPosition = "NULL";
+            std::string xScale = "NULL";
+            std::string yScale = "NULL";
+            std::string xOrigin = "NULL";
+            std::string yOrigin = "NULL";
 
-            std::vector<std::string> columns = {"character_sprite_id", "character_state_group_id"};
-            std::vector<std::string> values = {characterSpriteId, characterStateGroupId};
-            std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER};
+            // Process additional information relating to scale, colour and position
+            // Code duplication ahoy, TODO: Fix if these actually don't end up needing any different logic.
+            if (characterState.find("xPosition") != characterState.end()) {
+                int xPositionFromJson = JsonHandler::getInteger(characterState, "xPosition");
+
+                if (xPositionFromJson < 0) {
+                    throw ProjectBuilderException(Utils::implodeString({"xPosition attribute on character state must be greater than 0, got: ", std::to_string(xPositionFromJson)}));
+                }
+
+                xPosition = std::to_string(xPositionFromJson);
+            }
+
+            if (characterState.find("yPosition") != characterState.end()) {
+                int yPositionFromJson = JsonHandler::getInteger(characterState, "yPosition");
+
+                if (yPositionFromJson < 0) {
+                    throw ProjectBuilderException(Utils::implodeString({"yPosition attribute on character state must be greater than 0, got: ", std::to_string(yPositionFromJson)}));
+                }
+
+                yPosition = std::to_string(yPositionFromJson);
+            }
+
+            if (characterState.find("xScale") != characterState.end()) {
+                int xScaleFromJson = JsonHandler::getDouble(characterState, "xScale");
+
+                if (xScaleFromJson < 0) {
+                    throw ProjectBuilderException(Utils::implodeString({"xScale attribute on character state must be greater than 0, got: ", std::to_string(xScaleFromJson)}));
+                }
+
+                xScale = std::to_string(xScaleFromJson);
+            }
+
+            if (characterState.find("yScale") != characterState.end()) {
+                int yScaleFromJson = JsonHandler::getDouble(characterState, "yScale");
+
+                if (yScaleFromJson < 0) {
+                    throw ProjectBuilderException(Utils::implodeString({"yScale attribute on character state must be greater than 0, got: ", std::to_string(yScaleFromJson)}));
+                }
+
+                yScale = std::to_string(yScaleFromJson);
+            }
+
+            if (characterState.find("xOrigin") != characterState.end()) {
+                int xOriginFromJson = JsonHandler::getInteger(characterState, "xOrigin");
+
+                if (xOriginFromJson < 0) {
+                    throw ProjectBuilderException(Utils::implodeString({"xOrigin attribute on character state must be greater than 0, got: ", std::to_string(xOriginFromJson)}));
+                }
+
+                xOrigin = std::to_string(xOriginFromJson);
+            }
+
+            if (characterState.find("yOrigin") != characterState.end()) {
+                int yOriginFromJson = JsonHandler::getInteger(characterState, "yOrigin");
+
+                if (yOriginFromJson < 0) {
+                    throw ProjectBuilderException(Utils::implodeString({"yOrigin attribute on character state must be greater than 0, got: ", std::to_string(yOriginFromJson)}));
+                }
+
+                yOrigin = std::to_string(yOriginFromJson);
+            }
+
+            std::vector<std::string> columns = {"character_sprite_id", "character_state_group_id", "x_position", "y_position", "x_scale", "y_scale", "x_origin", "y_origin"};
+            std::vector<std::string> values = {characterSpriteId, characterStateGroupId, xPosition, yPosition, xScale, yScale, xOrigin, yOrigin};
+            std::vector<int> types = {DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER, DATA_TYPE_NUMBER};
             novel->insert("character_states", columns, values, types);
         }
     }

@@ -3,14 +3,12 @@
 
 struct CharacterSpriteDrawRequest {
 public:
-  CharacterSpriteDrawRequest(CharacterSprite *cSprite) {
+  CharacterSpriteDrawRequest(CharacterSprite *cSprite, CharacterState *characterState) {
     characterSprite = cSprite;
+    this->characterState = characterState;
   }
-  int overridePositionX;
-  int overridePositionY;
-  float scaleX;
-  float scaleY;
   CharacterSprite *characterSprite;
+  CharacterState *characterState;
 };
 
 #include "VisualNovelEngine/Classes/UI/CharacterSpriteSlot.hpp"

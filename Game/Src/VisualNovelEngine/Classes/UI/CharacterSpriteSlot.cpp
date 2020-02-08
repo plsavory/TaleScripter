@@ -112,27 +112,31 @@ void CharacterSpriteSlot::push(CharacterSpriteDrawRequest *drawRequest) {
         return;
     }
 
+    Sprite *upcomingCharacterSprite = nullptr;
+
     if (previousCharacterId) {
         fadingOut = true;
         if (previousCharacterId == drawRequest->characterSprite->getCharacterId()) {
-            startTransition(UPDATE_STATE_MORPHING, drawRequest);
+            upcomingCharacterSprite = startTransition(UPDATE_STATE_MORPHING, drawRequest);
         } else {
-            startTransition(UPDATE_STATE_FADING, drawRequest);
+            upcomingCharacterSprite = startTransition(UPDATE_STATE_FADING, drawRequest);
         }
-    } else {
+    } else { // TODO: Maybe put an extra condition here to see if we are dealing with a scale/transformation change for the same character pose
         fadingOut = false;
-        startTransition(UPDATE_STATE_FADING, drawRequest);
+        upcomingCharacterSprite = startTransition(UPDATE_STATE_FADING, drawRequest);
     }
 
     previousCharacterId = drawRequest->characterSprite->getCharacterId();
     // Todo: Handle priority and positioning
+
+    upcomingCharacterSprite->setScale(drawRequest->characterState->getScale());
 }
 
 Sprite *CharacterSpriteSlot::getSprite(int id) {
     return sprite[id];
 }
 
-void CharacterSpriteSlot::startTransition(int transitionType, CharacterSpriteDrawRequest *drawRequest) {
+Sprite* CharacterSpriteSlot::startTransition(int transitionType, CharacterSpriteDrawRequest *drawRequest) {
     updateState = transitionType;
 
     int spriteToUse = fadingOut ? 1 : 0;
@@ -146,11 +150,11 @@ void CharacterSpriteSlot::startTransition(int transitionType, CharacterSpriteDra
             spritesHaveFlipped = false;
             sprite[0]->setVisible(true);
             sprite[1]->setVisible(true);
-            break;
+            return sprite[spriteToUse];
         case UPDATE_STATE_NOTHING:
             sprite[0]->setTextureName(drawRequest->characterSprite->getTextureName(), true);
             sprite[0]->setVisible(true);
-            return;
+            return sprite[0];
         default:
             throw MisuseException("Unsupported transition type");
     }

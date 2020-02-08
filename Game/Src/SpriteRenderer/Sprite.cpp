@@ -42,6 +42,7 @@ bool Sprite::setImage(sf::Texture *image) {
   mySprite->setTextureRect(rect);
   mySprite->setPosition(myPosition);
   mySprite->setColor(myColour);
+  mySprite->setScale(myScale);
   textureSet = true;
   return true;
 }

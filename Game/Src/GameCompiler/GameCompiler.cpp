@@ -267,10 +267,17 @@ void GameCompiler::createNovelDatabase() {
     characterSpritesTable->addColumn("texture_id", ColumnType::tInteger, true, "");
 
     // Create Character States table - This refers to the appearance of one character at any point within a group
+    // Any transformations (scaling or colour tinting) will override those which are defined as part of the character sprite.
     DatabaseTable *characterStatesTable = novelDb->addTable("character_states");
     characterStatesTable->addPrimaryKey();
     characterStatesTable->addColumn("character_sprite_id", ColumnType::tInteger, true, "");
     characterStatesTable->addColumn("character_state_group_id", ColumnType::tInteger, true, "");
+    characterStatesTable->addColumn("x_scale", ColumnType::tDouble, false, "");
+    characterStatesTable->addColumn("y_scale", ColumnType::tDouble, false, "");
+    characterStatesTable->addColumn("x_position", ColumnType::tInteger, false, "");
+    characterStatesTable->addColumn("y_position", ColumnType::tInteger, false, "");
+    characterStatesTable->addColumn("x_origin", ColumnType::tInteger, false, "");
+    characterStatesTable->addColumn("y_origin", ColumnType::tInteger, false, "");
 
     /*
       Create Character State Groups table. This table links a segment_line to many character_states.

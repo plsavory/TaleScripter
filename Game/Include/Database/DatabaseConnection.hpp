@@ -26,6 +26,7 @@ struct DataContainer {
     DataContainer(const std::string &value, const std::string &parentColumnName, bool isNull) {
         data = isNull ? "" : value;
         columnName = parentColumnName;
+        this->isNullValue = isNull;
     }
 
     /**
@@ -176,9 +177,14 @@ struct DataContainer {
         }
     }
 
+    bool isNull() {
+        return this->isNullValue;
+    }
+
 private:
     std::string data;
     std::string columnName; // Used for printing errors
+    bool isNullValue;
 };
 
 // Data set related stuff

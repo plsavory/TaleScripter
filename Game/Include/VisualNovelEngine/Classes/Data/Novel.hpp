@@ -8,6 +8,7 @@
 #define MAX_CHARACTERS 50
 
 // Include headers for other classes which we need
+#include <SFML/Audio.hpp>
 #include "VisualNovelEngine/Classes/Data/Character.hpp"
 
 enum AdvanceState {
@@ -56,9 +57,33 @@ public:
   CharacterSprite* getCharacterSprite() {
     return characterSprite;
   }
+
+  float getXPositionOverride();
+
+  float getYPositionOverride();
+
+  bool isXPositionOverridden() {
+      return xPositionIsOverridden;
+  }
+
+  bool isYPositionOverridden() {
+      return yPositionIsOverridden;
+  }
+
+  sf::Vector2f getScale();
 private:
   int id;
   CharacterSprite *characterSprite;
+  float xScale;
+  float yScale;
+  float xPosition;
+  float yPosition;
+  bool xPositionIsOverridden;
+  bool yPositionIsOverridden;
+  int xOrigin;
+  int yOrigin;
+  bool xOriginIsOverridden;
+  bool yOriginIsOverridden;
 };
 
 class CharacterStateGroup {

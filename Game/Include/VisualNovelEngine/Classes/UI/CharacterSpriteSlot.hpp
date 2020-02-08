@@ -34,7 +34,13 @@ private:
 
     void morphUpdate();
 
-    void startTransition(int transitionType, CharacterSpriteDrawRequest *drawRequest);
+    /**
+     *
+     * @param transitionType
+     * @param drawRequest
+     * @return - The sprite object belonging to the new character which has been pushed
+     */
+    Sprite* startTransition(int transitionType, CharacterSpriteDrawRequest *drawRequest);
 
     sf::Clock *timer;
     int fadingOut;

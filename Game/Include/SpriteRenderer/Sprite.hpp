@@ -15,6 +15,10 @@ public:
       myColour = colour;
       mySprite->setColor(colour);
   };
+  void setScale(sf::Vector2f scale) {
+      myScale = scale;
+      mySprite->setScale(scale);
+  }
   std::string name;
   int priority;
   bool isVisible() {
@@ -44,5 +48,6 @@ private:
   int id;
   bool textureSet;
   sf::Vector2f myPosition = sf::Vector2f(0,0);
+  sf::Vector2f myScale = sf::Vector2f(1,1);
   sf::Color myColour = sf::Color(255,255,255,255);
 };
