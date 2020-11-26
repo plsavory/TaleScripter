@@ -38,10 +38,6 @@ CharacterSpriteSlot::~CharacterSpriteSlot() = default;
  */
 void CharacterSpriteSlot::update() {
 
-//    if (!sprite[0]->isLoaded() || !sprite[1]->isLoaded()) {
-//        return;
-//    }
-
     if (updateState == UPDATE_STATE_NOTHING) {
         return;
     }
@@ -127,9 +123,16 @@ void CharacterSpriteSlot::push(CharacterSpriteDrawRequest *drawRequest) {
     }
 
     previousCharacterId = drawRequest->characterSprite->getCharacterId();
-    // Todo: Handle priority and positioning
 
-    upcomingCharacterSprite->setScale(drawRequest->characterState->getScale());
+    // Set the origins of the sprites
+    for (int i = 0; i <= 1; i++) {
+        sprite[i]->setOrigin(
+                sprite[i]->getSize().width / 2.f,
+                sprite[i]->getSize().height
+        );
+    }
+
+    // Todo: Handle priority and positioning
 }
 
 Sprite *CharacterSpriteSlot::getSprite(int id) {
@@ -145,6 +148,7 @@ Sprite* CharacterSpriteSlot::startTransition(int transitionType, CharacterSprite
         case UPDATE_STATE_FADING:
         case UPDATE_STATE_MORPHING:
             sprite[spriteToUse]->setTextureName(drawRequest->characterSprite->getTextureName(), true);
+            sprite[spriteToUse]->setScaleFactor(drawRequest->characterState->getScale());
             setAlpha(0, (previousCharacterId == 0) ? 0 : 255);
             setAlpha(1, 0);
             spritesHaveFlipped = false;
@@ -153,6 +157,7 @@ Sprite* CharacterSpriteSlot::startTransition(int transitionType, CharacterSprite
             return sprite[spriteToUse];
         case UPDATE_STATE_NOTHING:
             sprite[0]->setTextureName(drawRequest->characterSprite->getTextureName(), true);
+            sprite[0]->setScaleFactor(drawRequest->characterState->getScale());
             sprite[0]->setVisible(true);
             return sprite[0];
         default:

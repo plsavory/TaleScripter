@@ -16,6 +16,7 @@ Sprite::Sprite(TextureManager *sTextureManager,sf::RenderWindow *window, const s
   textureSet = false;
   visible = true;
   id = myId;
+  origin = sf::Vector2f(0,0);
 }
 
 Sprite::Sprite(TextureManager *sTextureManager, sf::RenderWindow *window, const std::string& sName, int myId) {
@@ -29,6 +30,7 @@ Sprite::Sprite(TextureManager *sTextureManager, sf::RenderWindow *window, const 
   visible = false;
   id = myId;
   priority = 5;
+  origin = sf::Vector2f(0,0);
 }
 
 Sprite::~Sprite() {
@@ -102,6 +104,7 @@ void Sprite::update() {
 
   if (texture->isLoaded()) {
     setImage(texture->getTexture());
+    updateAttributes();
   }
 
   // If no image exists with the given name, keep trying to find one as it may be loaded in later
@@ -124,12 +127,21 @@ void Sprite::draw() {
 
 sf::FloatRect Sprite::getSize() {
   if (textureSet) {
-    return mySprite->getGlobalBounds();
+    return mySprite->getLocalBounds();
   }
 
   return sf::FloatRect(0,0,0,0);
 }
 
-void Sprite::setOrigin(int x, int y) {
-  mySprite->setOrigin((float)x, (float) y);
+void Sprite::setOrigin(float x, float y) {
+    origin = sf::Vector2f(x, y);
+    mySprite->setOrigin(x, y);
+}
+
+/**
+ * Updates the SFML sprite's attributes to match up with what the instance of this class has stored with it
+ * (Scale and colour information)
+ */
+void Sprite::updateAttributes() {
+    mySprite->setOrigin(origin);
 }

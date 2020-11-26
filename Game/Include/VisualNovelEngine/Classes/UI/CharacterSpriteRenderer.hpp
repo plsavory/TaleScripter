@@ -24,9 +24,6 @@ public:
   void initData(NovelData *novelData);
   void push(std::vector<CharacterSpriteDrawRequest*> sprites);
   void clear();
-  bool hasProcessedPositioning() {
-    return processedPositioning;
-  };
   bool isDoingNothing() {
       for(int i = 0; i<activeSpriteCount; i++) {
           if (!spriteSlot[i]->isDoingNothing()) {
@@ -42,8 +39,8 @@ private:
   NovelData *novel;
   DatabaseConnection *resource;
   CharacterSpriteSlot *spriteSlot[MAX_CHARACTER_SPRITE_SLOTS];
-  bool processedPositioning;
   int activeSpriteCount;
+  void handleAutomaticSpritePositioning();
 };
 
 #endif
