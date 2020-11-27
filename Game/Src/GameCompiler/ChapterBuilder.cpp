@@ -559,7 +559,7 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
             }
 
             if (characterState.find("xScale") != characterState.end()) {
-                int xScaleFromJson = JsonHandler::getDouble(characterState, "xScale");
+                double xScaleFromJson = JsonHandler::getDouble(characterState, "xScale");
 
                 if (xScaleFromJson < 0) {
                     throw ProjectBuilderException(Utils::implodeString({"xScale attribute on character state must be greater than 0, got: ", std::to_string(xScaleFromJson)}));
@@ -569,7 +569,7 @@ void ChapterBuilder::processLine(json lineJson, int sceneSegmentId) {
             }
 
             if (characterState.find("yScale") != characterState.end()) {
-                int yScaleFromJson = JsonHandler::getDouble(characterState, "yScale");
+                double yScaleFromJson = JsonHandler::getDouble(characterState, "yScale");
 
                 if (yScaleFromJson < 0) {
                     throw ProjectBuilderException(Utils::implodeString({"yScale attribute on character state must be greater than 0, got: ", std::to_string(yScaleFromJson)}));

@@ -48,12 +48,11 @@ void SpriteRenderer::update() {
     }
 
     if (renderMode == SpriteRenderMode::Prioritised) {
-        prioritiseSprites();
+        prioritiseSprites(false);
     }
 }
 
 void SpriteRenderer::draw() {
-// TODO: add support for prioritised sprites rendering
     switch (renderMode) {
         case SpriteRenderMode::Prioritised:
             renderPrioritisedSprites();
@@ -67,16 +66,19 @@ void SpriteRenderer::draw() {
 
 }
 
-void SpriteRenderer::prioritiseSprites() {
+/**
+ * Sort the sprites into the order in which they should be drawn to the screen
+ */
+void SpriteRenderer::prioritiseSprites(bool immediate) {
 
     // Prioritising the sprites is an expensive operation, so do this infrequently.
     // TODO: Find the most adequate frequency to balance response and performance
 
-    if (!spritePriorityClock) {
+    if (!immediate && !spritePriorityClock) {
         return;
     }
 
-    if (spritePriorityClock->getElapsedTime().asMilliseconds() <= SPRITE_RENDERER_PRIORITISE_DELAY) {
+    if (!immediate && spritePriorityClock->getElapsedTime().asMilliseconds() <= SPRITE_RENDERER_PRIORITISE_DELAY) {
         return;
     }
 
@@ -108,6 +110,9 @@ void SpriteRenderer::prioritiseSprites() {
 
 }
 
+/**
+ * Draw all of the sprites to the window
+ */
 void SpriteRenderer::renderSprites() {
 
     for (auto & currentSprite : sprites) {
@@ -132,6 +137,20 @@ void SpriteRenderer::renderPrioritisedSprites() {
     }
 }
 
+/**
+ * Will return true if a sprite exists with the given name
+ * @param name
+ * @return
+ */
+bool SpriteRenderer::spriteWithNameExists(const std::string &name) {
+    return std::any_of(sprites.begin(), sprites.end(), [&name](Sprite *spr) {return spr->name == name;});
+}
+
+/**
+ * Returns the sprite object with the given name
+ * @param name - The name of the sprite
+ * @return - The requested sprite object
+ */
 Sprite *SpriteRenderer::getSprite(const std::string &name) {
 
     for (auto & currentSprite : sprites) {
@@ -143,7 +162,7 @@ Sprite *SpriteRenderer::getSprite(const std::string &name) {
     }
 
     std::vector<std::string> errorMessage = {
-            "Could not find sprites with name: ",
+            "Could not find sprite with name: ",
             name
     };
     throw ResourceException(Utils::implodeString(errorMessage));
@@ -151,19 +170,52 @@ Sprite *SpriteRenderer::getSprite(const std::string &name) {
 }
 
 /**
- * [SpriteRenderer::addSprite Add a sprite to the renderer]
- * @param  imageName [The name of the image (stored in TextureManager)]
- * @param  name      [Accessible name of the sprite]
- * @return           [Sprite object, null on failure]
+ * Returns the index of the sprite with the given name
+ * @param name - The name of the sprite
+ * @return - The index of the requested sprite
  */
-Sprite *SpriteRenderer::addSprite(const std::string &imageName, const std::string &name, int priority) {
+int SpriteRenderer::getSpriteId(const std::string &name) {
+    for (int i = 0; i < sprites.size(); i++) {
+        if (sprites[i]->name == name) {
+            return i;
+        }
+    }
 
-    auto newSprite = new Sprite(textureManager, displayWindow, name, imageName, priority, sprites.size());
+    std::vector<std::string> errorMessage = {
+            "Could not find sprite index with name: ",
+            name
+    };
+    throw ResourceException(Utils::implodeString(errorMessage));
+}
+
+/**
+ * Add a sprite to the sprite renderer with a pre-loaded texture
+ * @param textureName
+ * @param name
+ * @param priority - Render priority of the sprite, those with a lower number will be drawn last and will appear on top
+ * @return
+ */
+Sprite *SpriteRenderer::addSprite(const std::string &textureName, const std::string &name, int priority) {
+
+    if (spriteWithNameExists(name)) {
+        throw ResourceException(Utils::implodeString({"A sprite with name '", name, " ' already exists."}));
+    }
+
+    auto newSprite = new Sprite(textureManager, displayWindow, name, textureName, priority, sprites.size());
     sprites.push_back(newSprite);
     return newSprite;
 }
 
+/**
+ * Add a sprite to the sprite renderer without an image or priority
+ * @param name
+ * @return
+ */
 Sprite *SpriteRenderer::addSprite(const std::string &name) {
+
+    if (spriteWithNameExists(name)) {
+        throw ResourceException(Utils::implodeString({"A sprite with name '", name, " ' already exists."}));
+    }
 
     auto newSprite = new Sprite(textureManager, displayWindow, name, sprites.size());
     sprites.push_back(newSprite);
@@ -171,8 +223,50 @@ Sprite *SpriteRenderer::addSprite(const std::string &name) {
 
 }
 
+/**
+ * Remove a sprite with the given index from memory
+ * @param id
+ */
 void SpriteRenderer::removeSprite(int id) {
 
+    if (id >= sprites.size()) {
+        throw ResourceException(Utils::implodeString({"Unable to remove sprite: sprite id '",
+                                 std::to_string(id), "' is out of range (",
+                                 std::to_string(sprites.size()),
+                                                ")"}));
+    }
+
+    delete(sprites[id]);
+    sprites.erase(sprites.begin() + id);
+
+    // Re-prioritise sprites to prevent us from trying to render a deleted sprite
+    if (renderMode == SpriteRenderMode::Prioritised) {
+        prioritiseSprites(true);
+    }
+}
+
+/**
+ * Removes a sprite (Not its associated texture) from memory
+ * @param name
+ */
+void SpriteRenderer::removeSprite(const std::string &name) {
+    for (int i = 0; i < sprites.size(); i++) {
+        if (sprites[i]->name == name) {
+            delete(sprites[i]);
+            sprites.erase(sprites.begin() + i);
+
+            // Re-prioritise sprites to prevent us from trying to render a deleted sprite
+            if (renderMode == SpriteRenderMode::Prioritised) {
+                prioritiseSprites(true);
+            }
+
+            return; // There can be only one! (Should)
+        }
+    }
+
+    throw ResourceException(Utils::implodeString({
+         "Unable to remove sprite: could not find sprite with name: ",
+         name}));
 }
 
 void SpriteRenderer::setCameraPosition(int x, int y) {

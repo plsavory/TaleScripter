@@ -787,7 +787,7 @@ CharacterState::CharacterState(int myId, DatabaseConnection *db, Character *char
     }
 
 
-    // If a scale value is null, we will assume no override and use 1, otherwise we will use whatever value is set in the dabase
+    // If a scale value is null, we will assume no override and use 1, otherwise we will use whatever value is set in the database
     xScale = dataSet->getRow(0)->getColumn("x_scale")->getData()->isNull() ? 1
                                                                            : dataSet->getRow(0)->getColumn("x_scale")->getData()->asFloat();
 

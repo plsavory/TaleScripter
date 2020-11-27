@@ -7,12 +7,6 @@ CharacterSpriteRenderer::CharacterSpriteRenderer(ResourceManager *rManager, Spri
     resourceManager = rManager;
     spriteRenderer = sRenderer;
     resource = resourceManager->getResourceDatabase();
-    activeSpriteCount = 0;
-
-    // Create our sprite slots
-    for (int i = 0; i < MAX_CHARACTER_SPRITE_SLOTS; i++) {
-        spriteSlot[i] = new CharacterSpriteSlot(spriteRenderer, resourceManager, i);
-    }
 }
 
 CharacterSpriteRenderer::~CharacterSpriteRenderer() {
@@ -21,13 +15,8 @@ CharacterSpriteRenderer::~CharacterSpriteRenderer() {
 
 void CharacterSpriteRenderer::update() {
 
-    for (int i = 0; i < MAX_CHARACTER_SPRITE_SLOTS; i++) {
-
-        if (i > activeSpriteCount) {
-            break;
-        }
-        
-        spriteSlot[i]->update();
+    for (auto &slot : spriteSlot) {
+        slot->update();
     }
 }
 
@@ -86,21 +75,34 @@ void CharacterSpriteRenderer::initData(NovelData *novelData) {
  */
 void CharacterSpriteRenderer::push(std::vector<CharacterSpriteDrawRequest *> sprites) {
 
-    int spriteCount = sprites.size();
+    int spriteCount = sprites.size(); // The number of characters we want to draw
 
     std::vector<sf::FloatRect> spriteSizes;
 
-    for (int i = 0; i < MAX_CHARACTER_SPRITE_SLOTS; i++) {
+    for (unsigned int i = 0; i < MAX_CHARACTER_SPRITE_SLOTS; i++) {
         // TODO: Handle optional parameters
-        if (i < spriteCount) {
+
+        if (i < spriteCount) { // We want to add a character here
+
+            if (i+1 > spriteSlot.size()) {
+                // Create a new sprite slot if we don't have enough to draw this character
+                addCharacterSpriteSlot();
+            }
+
+            // We are going to use this sprite slot - so configure it.
             spriteSlot[i]->push(sprites[i]);
             continue;
         }
 
-        spriteSlot[i]->push(nullptr);
-    }
+        if (i >= spriteSlot.size()) {
+            break; // No remaining sprite slots exist - stop looping.
+        }
 
-    activeSpriteCount = spriteCount;
+        // Remove this sprite slot as it will not be used
+        delete(spriteSlot[i]);
+        spriteSlot.erase(spriteSlot.begin() + i);
+        i--; // Erasing the sprite slot above will have pushed all the ones after it down by 1.
+    }
 
     if (true) {
         handleAutomaticSpritePositioning();
@@ -116,18 +118,22 @@ void CharacterSpriteRenderer::clear() {
 
 void CharacterSpriteRenderer::handleAutomaticSpritePositioning() {
 
+    if (spriteSlot.empty()) {
+        return;
+    }
+
     // Make sure that all of the sprites are positioned and scaled correctly
     std::vector<int> potentialSpriteOffsets;
 
     int fullDisplayArea = 1280 * 0.75; // TODO: Don't hardcode this, detect from current display mode
     int startPositionX = 1280 / 2;
     int startPositionY = 720;
-    int spacingBetweenSprites = fullDisplayArea / activeSpriteCount;
+    int spacingBetweenSprites = fullDisplayArea / spriteSlot.size();
 
     // Figure out some potential initial sprite offsets
 
     // Reduce the spacing between all of the sprite until they will all fit on screen.
-    while (activeSpriteCount * spacingBetweenSprites > fullDisplayArea) {
+    while (spriteSlot.size() * spacingBetweenSprites > fullDisplayArea) {
 
         spacingBetweenSprites--;
 
@@ -137,15 +143,15 @@ void CharacterSpriteRenderer::handleAutomaticSpritePositioning() {
         }
     }
 
-    for (int i = 0; i < activeSpriteCount; i++) {
+    for (int i = 0; i < spriteSlot.size(); i++) {
         int thisSpriteOffset = i * (spacingBetweenSprites);
         potentialSpriteOffsets.push_back(thisSpriteOffset);
     }
 
-    int renderingStartPosition = startPositionX - ((potentialSpriteOffsets[activeSpriteCount - 1]) / 2);
+    int renderingStartPosition = startPositionX - ((potentialSpriteOffsets[spriteSlot.size() - 1]) / 2);
 
     // Set the sprite positions and origins
-    for (int i = 0; i < activeSpriteCount; i++) {
+    for (int i = 0; i < spriteSlot.size(); i++) {
         for (int j = 0; j <= 1; j++) {
             spriteSlot[i]->getSprite(j)->setPosition(renderingStartPosition + potentialSpriteOffsets[i],
                                                      startPositionY);

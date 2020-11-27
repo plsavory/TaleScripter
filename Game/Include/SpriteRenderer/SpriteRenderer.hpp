@@ -18,13 +18,16 @@ public:
   void update();
   void draw();
   Sprite* getSprite(const std::string& name);
-  Sprite* addSprite(const std::string& imageName, const std::string& name, int priority);
+  int getSpriteId(const std::string& name);
+  bool spriteWithNameExists(const std::string& name);
+  Sprite* addSprite(const std::string& textureName, const std::string& name, int priority);
   Sprite* addSprite(const std::string& name);
   void removeSprite(int id);
+  void removeSprite(const std::string &name);
   void setCameraPosition(int x, int y);
   sf::Vector2u getRenderArea();
 private:
-  void prioritiseSprites();
+  void prioritiseSprites(bool immediate);
   void renderSprites();
   void renderPrioritisedSprites();
   sf::RenderWindow *displayWindow;

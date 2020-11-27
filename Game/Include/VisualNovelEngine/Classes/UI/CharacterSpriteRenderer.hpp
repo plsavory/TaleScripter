@@ -1,6 +1,8 @@
 #ifndef CHARACTER_SPRITE_RENDERER_INCLUDED
 #define CHARACTER_SPRITE_RENDERER_INCLUDED
 
+#include <vector>
+
 struct CharacterSpriteDrawRequest {
 public:
   CharacterSpriteDrawRequest(CharacterSprite *cSprite, CharacterState *characterState) {
@@ -24,23 +26,28 @@ public:
   void initData(NovelData *novelData);
   void push(std::vector<CharacterSpriteDrawRequest*> sprites);
   void clear();
-  bool isDoingNothing() {
-      for(int i = 0; i<activeSpriteCount; i++) {
-          if (!spriteSlot[i]->isDoingNothing()) {
-              return false;
-          }
-      }
 
-      return true;
+  /**
+   * Returns true if none of the character sprite slots are transitioning or moving
+   * @return
+   */
+  bool isDoingNothing() {
+      return !std::any_of(spriteSlot.begin(), spriteSlot.end(), [](CharacterSpriteSlot *slot) {return !slot->isDoingNothing();});
   }
 private:
   ResourceManager *resourceManager;
   SpriteRenderer *spriteRenderer;
   NovelData *novel;
   DatabaseConnection *resource;
-  CharacterSpriteSlot *spriteSlot[MAX_CHARACTER_SPRITE_SLOTS];
-  int activeSpriteCount;
+  std::vector<CharacterSpriteSlot*> spriteSlot;
+
   void handleAutomaticSpritePositioning();
+
+  CharacterSpriteSlot* addCharacterSpriteSlot() {
+      auto* newSlot = new CharacterSpriteSlot(spriteRenderer, resourceManager, spriteSlot.size());
+      spriteSlot.push_back(newSlot);
+      return newSlot;
+  }
 };
 
 #endif

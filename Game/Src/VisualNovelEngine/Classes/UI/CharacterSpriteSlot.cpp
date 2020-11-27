@@ -27,11 +27,22 @@ CharacterSpriteSlot::CharacterSpriteSlot(SpriteRenderer *sRenderer, ResourceMana
         };
 
         sprite[i] = spriteRenderer->addSprite(Utils::implodeString(spriteIdentifier, ""));
-        sprite[i] = spriteRenderer->addSprite(Utils::implodeString(spriteIdentifier, ""));
     }
 }
 
-CharacterSpriteSlot::~CharacterSpriteSlot() = default;
+CharacterSpriteSlot::~CharacterSpriteSlot() {
+    for (int i = 0; i < 2; i++) {
+        std::vector<std::string> spriteIdentifier = {
+                "character_sprite_slot_",
+                std::to_string(id),
+                "_",
+                std::to_string(i)
+        };
+
+        spriteRenderer->removeSprite(Utils::implodeString(spriteIdentifier));
+        sprite[i] = nullptr;
+    }
+}
 
 /**
  * Once implemented, this function will handle sprite transitions and smooth positioning changes
