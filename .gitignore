@@ -1,9 +1,0 @@
-*.DS_Store
-.idea
-cmake-build-debug
-cmake-build-release
-Libs\SFML
-Libs\SQLite
-Libs\Lua
-Libs
-todo-list
